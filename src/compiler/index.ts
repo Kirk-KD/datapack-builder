@@ -7,9 +7,11 @@ import { mcfunctionGenerator } from './generator'
 import { scoreboardManager } from './scoreboardManager'
 import { addFile, resetFiles, getFiles } from './fileRegistry'
 import { getProjectConfig } from './projectConfig'
+import { resetIds } from './idGenerator'
 
 export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   resetFiles()
+  resetIds()
   scoreboardManager.reset()
 
   const { namespace, packFormat, description } = getProjectConfig()

@@ -15,7 +15,22 @@ const builtinBlocks: string[] = [
   'math_number'
 ]
 
-export default function getToolboxContents() {
+function bindFirstVar(blocks: { type: string }[], workspace?: Blockly.WorkspaceSvg) {
+  const firstVar = workspace?.getVariableMap().getAllVariables()[0]
+  if (!firstVar) return blocks.map(block => ({ kind: 'block', type: block.type }))
+  const name = firstVar.getName()
+  return blocks.map(block => ({
+    kind: 'block',
+    type: block.type,
+    fields: {
+      VAR: { name, type: '' },
+      VAR_A: { name, type: '' },
+      VAR_B: { name, type: '' }
+    }
+  }))
+}
+
+export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
   return [
     {
       kind: 'category',
@@ -33,7 +48,7 @@ export default function getToolboxContents() {
       kind: 'category',
       name: 'Control',
       colour: '210',
-      contents: control.map(block => ({ kind: 'block', type: block.type }))
+      contents: bindFirstVar(control, workspace)
     },
     {
       kind: 'category',

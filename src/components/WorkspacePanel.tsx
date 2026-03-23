@@ -17,6 +17,8 @@ function WorkspacePanel() {
       }
     })
 
+    workspaceRef.current.getVariableMap().createVariable('myVar')
+
     workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', (workspace) => {
       const vars = workspace.getVariableMap().getAllVariables()
       const createButton = {
@@ -36,6 +38,24 @@ function WorkspacePanel() {
 
     workspaceRef.current.registerButtonCallback('CREATE_VARIABLE', () => {
       Blockly.Variables.createVariableButtonHandler(workspaceRef.current!)
+    })
+
+    workspaceRef.current.addChangeListener((event) => {
+      if (
+        event.type === Blockly.Events.VAR_CREATE ||
+        event.type === Blockly.Events.VAR_DELETE ||
+        event.type === Blockly.Events.VAR_RENAME
+      ) {
+        workspaceRef.current!.updateToolbox({
+          kind: 'categoryToolbox',
+          contents: getToolboxContents(workspaceRef.current!)
+        })
+      }
+    })
+
+    workspaceRef.current.updateToolbox({
+      kind: 'categoryToolbox',
+      contents: getToolboxContents(workspaceRef.current)
     })
 
     return () => {
