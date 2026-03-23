@@ -3,11 +3,18 @@ import './generator'
 import './generators/commands'
 import './generators/control'
 import './generators/variables'
+import './generators/events'
 import { mcfunctionGenerator } from './generator'
 import { scoreboardManager } from './scoreboardManager'
-import { addFile, resetFiles, getFiles } from './fileRegistry'
-import { getProjectConfig } from './projectConfig'
+import { addFile, appendToFile, resetFiles, getFiles } from './fileRegistry'
+import { getProjectConfig, getInternalNamespace } from './projectConfig'
 import { resetIds } from './idGenerator'
+
+function compileChain(block: Blockly.Block): string {
+  const next = block.nextConnection?.targetBlock()
+  if (!next) return ''
+  return mcfunctionGenerator.blockToCode(next) as string
+}
 
 export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   resetFiles()
@@ -15,12 +22,52 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   scoreboardManager.reset()
 
   const { namespace, packFormat, description } = getProjectConfig()
+  const internalNs = getInternalNamespace()
+  const obj = scoreboardManager.getObjectiveName()
+  const initializedVar = `$__dpb_${namespace}_initialized`
 
-  const mainCode = mcfunctionGenerator.workspaceToCode(workspace)
-  addFile(`data/${namespace}/function/main.mcfunction`, mainCode)
+  const topBlocks = workspace.getTopBlocks(true)
+  let hasLoad = false
+  let hasTick = false
+
+  for (const block of topBlocks) {
+    if (block.type === 'mc_on_load') {
+      hasLoad = true
+      addFile(`data/${internalNs}/function/load.mcfunction`, compileChain(block))
+    } else if (block.type === 'mc_on_tick') {
+      hasTick = true
+      addFile(
+        `data/${internalNs}/function/tick.mcfunction`,
+        `execute unless score ${initializedVar} ${obj} matches 1 run return\n`
+        + compileChain(block)
+      )
+    }
+  }
+
+  if (hasLoad || hasTick || scoreboardManager.isObjectiveRegistered()) {
+    appendToFile(
+      `data/${internalNs}/function/load.mcfunction`,
+      `scoreboard objectives add ${obj} dummy\n`
+      + `scoreboard players set ${initializedVar} ${obj} 1\n`
+    )
+    addFile(
+      'data/minecraft/tags/function/load.json',
+      JSON.stringify({ values: [`${internalNs}:load`] }, null, 2)
+    )
+  }
+
+  if (hasTick) {
+    addFile(
+      'data/minecraft/tags/function/tick.json',
+      JSON.stringify({ values: [`${internalNs}:tick`] }, null, 2)
+    )
+  }
+
   addFile('pack.mcmeta', JSON.stringify({
     pack: { pack_format: packFormat, description }
   }, null, 2))
 
   return getFiles()
 }
+
+export { mcfunctionGenerator }

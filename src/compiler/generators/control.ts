@@ -2,7 +2,7 @@ import * as Blockly from 'blockly'
 import { addFile } from '../fileRegistry'
 import { mcfunctionGenerator } from '../generator'
 import { nextId } from '../idGenerator'
-import { getProjectConfig } from '../projectConfig'
+import { getInternalNamespace } from '../projectConfig'
 import { scoreboardManager } from '../scoreboardManager'
 
 const opMap: Record<string, string> = {
@@ -60,12 +60,12 @@ mcfunctionGenerator.forBlock['mc_if'] = function(block) {
   const setup = getConditionSetup(conditionBlock)
   const condition = mcfunctionGenerator.valueToCode(block, 'CONDITION', 0)
   const doCode = mcfunctionGenerator.statementToCode(block, 'DO')
-  const { namespace } = getProjectConfig()
+  const internalNs = getInternalNamespace()
 
-  addFile(`data/${namespace}/function/internal/${id}_true.mcfunction`, doCode)
+  addFile(`data/${internalNs}/function/${id}_true.mcfunction`, doCode)
 
   return setup
-       + `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
+       + `execute if ${condition} run function ${internalNs}:${id}_true\n`
 }
 
 mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
@@ -75,14 +75,14 @@ mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
   const condition = mcfunctionGenerator.valueToCode(block, 'CONDITION', 0)
   const doCode = mcfunctionGenerator.statementToCode(block, 'DO')
   const elseCode = mcfunctionGenerator.statementToCode(block, 'ELSE')
-  const { namespace } = getProjectConfig()
+  const internalNs = getInternalNamespace()
 
-  addFile(`data/${namespace}/function/internal/${id}_true.mcfunction`, doCode)
-  addFile(`data/${namespace}/function/internal/${id}_false.mcfunction`, elseCode)
+  addFile(`data/${internalNs}/function/${id}_true.mcfunction`, doCode)
+  addFile(`data/${internalNs}/function/${id}_false.mcfunction`, elseCode)
 
   return setup
-       + `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
-       + `execute unless ${condition} run function ${namespace}:internal/${id}_false\n`
+       + `execute if ${condition} run function ${internalNs}:${id}_true\n`
+       + `execute unless ${condition} run function ${internalNs}:${id}_false\n`
 }
 
 mcfunctionGenerator.forBlock['mc_while'] = function(block) {
@@ -91,20 +91,20 @@ mcfunctionGenerator.forBlock['mc_while'] = function(block) {
   const setup = getConditionSetup(conditionBlock)
   const condition = mcfunctionGenerator.valueToCode(block, 'CONDITION', 0)
   const bodyCode = mcfunctionGenerator.statementToCode(block, 'DO')
-  const { namespace } = getProjectConfig()
+  const internalNs = getInternalNamespace()
 
   addFile(
-    `data/${namespace}/function/internal/${id}.mcfunction`,
-    `execute if ${condition} run function ${namespace}:internal/${id}_body\n`
+    `data/${internalNs}/function/${id}.mcfunction`,
+    `execute if ${condition} run function ${internalNs}:${id}_body\n`
   )
 
   addFile(
-    `data/${namespace}/function/internal/${id}_body.mcfunction`,
+    `data/${internalNs}/function/${id}_body.mcfunction`,
     bodyCode
     + setup
-    + `function ${namespace}:internal/${id}\n`
+    + `function ${internalNs}:${id}\n`
   )
 
   return setup
-       + `function ${namespace}:internal/${id}\n`
+       + `function ${internalNs}:${id}\n`
 }

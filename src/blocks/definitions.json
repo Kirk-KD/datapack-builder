@@ -204,5 +204,21 @@
       "colour": 290,
       "output": "Number"
     }
+  ],
+  "events": [
+    {
+      "type": "mc_on_load",
+      "message0": "on load",
+      "args0": [],
+      "colour": 30,
+      "nextStatement": null
+    },
+    {
+      "type": "mc_on_tick",
+      "message0": "every tick",
+      "args0": [],
+      "colour": 30,
+      "nextStatement": null
+    }
   ]
 }

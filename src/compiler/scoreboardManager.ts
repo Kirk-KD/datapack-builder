@@ -1,35 +1,38 @@
-import { appendToFile } from './fileRegistry'
 import { getProjectConfig } from './projectConfig'
 
 class ScoreboardManager {
-  private objectiveName = '__dpb_vars'
   private objectiveRegistered = false
-  private variablePrefix = '$__dpb_'
-  private tempVariableName = this.variablePrefix + '$temp'
+
+  getObjectiveName(): string {
+    const { namespace } = getProjectConfig()
+    return `__dpb_${namespace}_vars`
+  }
 
   getVarName(name: string): string {
-    return `${this.variablePrefix}${name}`
+    const { namespace } = getProjectConfig()
+    return `$__dpb_${namespace}_${name}`
   }
 
   getTempVar(): string {
-    return this.tempVariableName
+    const { namespace } = getProjectConfig()
+    return `$__dpb_${namespace}_$temp`
   }
 
-  getObjectiveName(): string {
-    return this.objectiveName
+  getObjectiveNamePublic(): string {
+    return this.getObjectiveName()
   }
 
   withObjective(command: string): string {
-    if (!this.objectiveRegistered) {
-      this.objectiveRegistered = true
-      const { namespace } = getProjectConfig()
-      appendToFile(`data/${namespace}/function/load.mcfunction`, `scoreboard objectives add ${this.objectiveName} dummy\n`)
-    }
+    this.objectiveRegistered = true
     return command
   }
 
   reset() {
     this.objectiveRegistered = false
+  }
+
+  isObjectiveRegistered() {
+    return this.objectiveRegistered
   }
 }
 

@@ -17,3 +17,7 @@ export function setProjectConfig(partial: Partial<ProjectConfig>): void {
 export function getProjectConfig(): ProjectConfig {
   return config
 }
+
+export function getInternalNamespace(): string {
+  return `__dpb_${config.namespace}_internal`
+}

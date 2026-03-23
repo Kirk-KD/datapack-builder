@@ -1,15 +1,17 @@
 import * as Blockly from 'blockly'
 import definitionsJson from './definitions.json'
 
-const { commands, control, variable } = definitionsJson as {
+const { commands, control, variable, events } = definitionsJson as {
   commands: { type: string }[]
   control: { type: string }[]
   variable: { type: string }[]
+  events: { type: string }[]
 }
 
 Blockly.defineBlocksWithJsonArray(commands)
 Blockly.defineBlocksWithJsonArray(control)
 Blockly.defineBlocksWithJsonArray(variable)
+Blockly.defineBlocksWithJsonArray(events)
 
 const builtinBlocks: string[] = [
   'math_number'
@@ -32,6 +34,12 @@ function bindFirstVar(blocks: { type: string }[], workspace?: Blockly.WorkspaceS
 
 export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
   return [
+    {
+      kind: 'category',
+      name: 'Events',
+      colour: '30',
+      contents: events.map(block => ({ kind: 'block', type: block.type }))
+    },
     {
       kind: 'category',
       name: 'Variables',
