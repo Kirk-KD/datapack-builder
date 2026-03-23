@@ -84,3 +84,27 @@ mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
        + `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
        + `execute unless ${condition} run function ${namespace}:internal/${id}_false\n`
 }
+
+mcfunctionGenerator.forBlock['mc_while'] = function(block) {
+  const id = nextId('while')
+  const conditionBlock = block.getInputTargetBlock('CONDITION')!
+  const setup = getConditionSetup(conditionBlock)
+  const condition = mcfunctionGenerator.valueToCode(block, 'CONDITION', 0)
+  const bodyCode = mcfunctionGenerator.statementToCode(block, 'DO')
+  const { namespace } = getProjectConfig()
+
+  addFile(
+    `data/${namespace}/function/internal/${id}.mcfunction`,
+    `execute if ${condition} run function ${namespace}:internal/${id}_body\n`
+  )
+
+  addFile(
+    `data/${namespace}/function/internal/${id}_body.mcfunction`,
+    bodyCode
+    + setup
+    + `function ${namespace}:internal/${id}\n`
+  )
+
+  return setup
+       + `function ${namespace}:internal/${id}\n`
+}
