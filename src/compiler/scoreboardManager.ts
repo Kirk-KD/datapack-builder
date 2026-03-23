@@ -1,3 +1,6 @@
+import { appendToFile } from './fileRegistry'
+import { getProjectConfig } from './projectConfig'
+
 class ScoreboardManager {
   private objectiveName = '__dpb_vars'
   private objectiveRegistered = false
@@ -17,9 +20,12 @@ class ScoreboardManager {
   }
 
   withObjective(command: string): string {
-    if (this.objectiveRegistered) return command
-    this.objectiveRegistered = true
-    return `scoreboard objectives add ${this.objectiveName} dummy\n${command}`
+    if (!this.objectiveRegistered) {
+      this.objectiveRegistered = true
+      const { namespace } = getProjectConfig()
+      appendToFile(`data/${namespace}/function/load.mcfunction`, `scoreboard objectives add ${this.objectiveName} dummy\n`)
+    }
+    return command
   }
 
   reset() {

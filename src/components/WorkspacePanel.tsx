@@ -1,8 +1,7 @@
 import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
 import getToolboxContents from '../blocks'
-import { mcfunctionGenerator } from '../compiler'
-import { scoreboardManager } from '../compiler/scoreboardManager'
+import { compile } from '../compiler'
 
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
@@ -46,9 +45,11 @@ function WorkspacePanel() {
 
   function handleInspect() {
     if (!workspaceRef.current) return
-    scoreboardManager.reset()
-    const code = mcfunctionGenerator.workspaceToCode(workspaceRef.current)
-    console.log(code)
+    const files = compile(workspaceRef.current)
+    const output = Array.from(files.entries())
+      .map(([path, content]) => `=== ${path} ===\n${content}`)
+      .join('\n\n')
+    console.log(output)
   }
 
   return (
