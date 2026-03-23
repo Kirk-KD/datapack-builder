@@ -1,5 +1,6 @@
 import { mcfunctionGenerator } from "../generator"
 import { scoreboardManager } from '../scoreboardManager'
+import { getConditionSetup } from "./control"
 
 function isConditionBlock(type: string): boolean {
   return type.startsWith('mc_comp_')
@@ -13,9 +14,11 @@ mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
   let cmd: string
 
   if (isConditionBlock(valueBlock.type)) {
+    const setup = getConditionSetup(valueBlock)
     const condition = mcfunctionGenerator.valueToCode(block, 'VALUE', 0)
-    cmd = `execute if ${condition} run scoreboard players set ${varName} ${obj} 1\n`
-         + `execute unless ${condition} run scoreboard players set ${varName} ${obj} 0\n`
+    cmd = setup
+        + `execute if ${condition} run scoreboard players set ${varName} ${obj} 1\n`
+        + `execute unless ${condition} run scoreboard players set ${varName} ${obj} 0\n`
   } else if (valueBlock.type === 'mc_var_get') {
     const srcName = scoreboardManager.getVarName(valueBlock.getField('VAR')!.getText())
     cmd = `scoreboard players operation ${varName} ${obj} = ${srcName} ${obj}\n`

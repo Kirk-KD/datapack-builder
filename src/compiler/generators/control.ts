@@ -1,3 +1,4 @@
+import * as Blockly from 'blockly'
 import { addFile } from '../fileRegistry'
 import { mcfunctionGenerator } from '../generator'
 import { nextId } from '../idGenerator'
@@ -12,6 +13,20 @@ const opMap: Record<string, string> = {
   GT: '>'
 }
 
+export function getConditionSetup(conditionBlock: Blockly.Block): string {
+  if (conditionBlock.type === 'mc_comp_score_compare') {
+    const valueBBlock = conditionBlock.getInputTargetBlock('VAR_B')
+    if (valueBBlock?.type === 'math_number') {
+      const num = valueBBlock.getFieldValue('NUM')
+      const tempName = scoreboardManager.getTempVar()
+      const obj = scoreboardManager.getObjectiveName()
+      const cmd = `scoreboard players set ${tempName} ${obj} ${num}\n`
+      return scoreboardManager.withObjective(cmd)
+    }
+  }
+  return ''
+}
+
 mcfunctionGenerator.forBlock['mc_comp_score_matches'] = function(block) {
   const varName = scoreboardManager.getVarName(block.getField('VAR')!.getText())
   const obj = scoreboardManager.getObjectiveName()
@@ -22,25 +37,41 @@ mcfunctionGenerator.forBlock['mc_comp_score_matches'] = function(block) {
 
 mcfunctionGenerator.forBlock['mc_comp_score_compare'] = function(block) {
   const varA = scoreboardManager.getVarName(block.getField('VAR_A')!.getText())
-  const varB = scoreboardManager.getVarName(block.getField('VAR_B')!.getText())
   const obj = scoreboardManager.getObjectiveName()
   const op = opMap[block.getFieldValue('OP')]
-  return [`score ${varA} ${obj} ${op} ${varB} ${obj}`, 0]
+  const valueBBlock = block.getInputTargetBlock('VAR_B')!
+
+  let fragment: string
+
+  if (valueBBlock.type === 'math_number') {
+    const tempName = scoreboardManager.getTempVar()
+    fragment = `score ${varA} ${obj} ${op} ${tempName} ${obj}`
+  } else {
+    const varB = scoreboardManager.getVarName(valueBBlock.getField('VAR')!.getText())
+    fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
+  }
+
+  return [fragment, 0]
 }
 
 mcfunctionGenerator.forBlock['mc_if'] = function(block) {
   const id = nextId('if')
+  const conditionBlock = block.getInputTargetBlock('CONDITION')!
+  const setup = getConditionSetup(conditionBlock)
   const condition = mcfunctionGenerator.valueToCode(block, 'CONDITION', 0)
   const doCode = mcfunctionGenerator.statementToCode(block, 'DO')
   const { namespace } = getProjectConfig()
 
   addFile(`data/${namespace}/function/internal/${id}_true.mcfunction`, doCode)
 
-  return `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
+  return setup
+       + `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
 }
 
 mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
   const id = nextId('if')
+  const conditionBlock = block.getInputTargetBlock('CONDITION')!
+  const setup = getConditionSetup(conditionBlock)
   const condition = mcfunctionGenerator.valueToCode(block, 'CONDITION', 0)
   const doCode = mcfunctionGenerator.statementToCode(block, 'DO')
   const elseCode = mcfunctionGenerator.statementToCode(block, 'ELSE')
@@ -49,6 +80,7 @@ mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
   addFile(`data/${namespace}/function/internal/${id}_true.mcfunction`, doCode)
   addFile(`data/${namespace}/function/internal/${id}_false.mcfunction`, elseCode)
 
-  return `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
+  return setup
+       + `execute if ${condition} run function ${namespace}:internal/${id}_true\n`
        + `execute unless ${condition} run function ${namespace}:internal/${id}_false\n`
 }

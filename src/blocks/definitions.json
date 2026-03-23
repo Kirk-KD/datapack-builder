@@ -61,11 +61,12 @@
           ]
         },
         {
-          "type": "field_variable",
+          "type": "input_value",
           "name": "VAR_B",
-          "variableTypes": [""]
+          "check": ["Number"]
         }
       ],
+      "inputsInline": true,
       "colour": 210,
       "output": "MCCondition"
     },
