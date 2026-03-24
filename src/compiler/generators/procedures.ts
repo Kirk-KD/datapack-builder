@@ -31,8 +31,8 @@ mcfunctionGenerator.forBlock['procedures_callnoreturn'] = function(block) {
     if (argBlock.type === 'mc_var_get') {
       const srcName = scoreboardManager.getVarName(argBlock.getField('VAR')!.getText())
       cmd += `scoreboard players operation ${scoreboardManager.getScopedArgName(procName, param)} ${obj} = ${srcName} ${obj}\n`
-    } else if (argBlock.type === 'math_number') {
-      const num = argBlock.getFieldValue('NUM')
+    } else if (argBlock.type === 'mc_int') {
+      const num = argBlock.getFieldValue('VALUE')
       cmd += `scoreboard players set ${scoreboardManager.getScopedArgName(procName, param)} ${obj} ${num}\n`
     }
   })

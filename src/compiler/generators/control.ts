@@ -16,8 +16,8 @@ const opMap: Record<string, string> = {
 export function getConditionSetup(conditionBlock: Blockly.Block): string {
   if (conditionBlock.type === 'mc_comp_score_compare') {
     const valueBBlock = conditionBlock.getInputTargetBlock('VAR_B')
-    if (valueBBlock?.type === 'math_number') {
-      const num = valueBBlock.getFieldValue('NUM')
+    if (valueBBlock?.type === 'mc_int') {
+      const num = valueBBlock.getFieldValue('VALUE')
       const tempName = scoreboardManager.getTempVar()
       const obj = scoreboardManager.getObjectiveName()
       const cmd = `scoreboard players set ${tempName} ${obj} ${num}\n`
@@ -43,7 +43,7 @@ mcfunctionGenerator.forBlock['mc_comp_score_compare'] = function(block) {
 
   let fragment: string
 
-  if (valueBBlock.type === 'math_number') {
+  if (valueBBlock.type === 'mc_int') {
     const tempName = scoreboardManager.getTempVar()
     fragment = `score ${varA} ${obj} ${op} ${tempName} ${obj}`
   } else {

@@ -23,9 +23,10 @@ mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
   } else if (valueBlock.type === 'mc_var_get') {
     const srcName = mcfunctionGenerator.valueToCode(block, 'VALUE', 0)
     cmd = `scoreboard players operation ${varName} ${obj} = ${srcName} ${obj}\n`
-  } else {
-    cmd = `scoreboard players set ${varName} ${obj} ${valueBlock.getFieldValue('NUM')}\n`
-  }
+  } else if (valueBlock.type === 'mc_int') {
+    const valueCode = mcfunctionGenerator.blockToCode(valueBlock)[0]
+    cmd = `scoreboard players set ${varName} ${obj} ${valueCode}\n`
+  } else cmd = ''
 
   return scoreboardManager.withObjective(cmd)
 }
@@ -35,8 +36,8 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
   const obj = scoreboardManager.getObjectiveName()
   const opType = block.getFieldValue('OP')
   const valueBlock = block.getInputTargetBlock('VALUE')!
-  const isLiteral = valueBlock.type === 'math_number'
-  const num = isLiteral ? valueBlock.getFieldValue('NUM') : null
+  const isLiteral = valueBlock.type === 'mc_int'
+  const num = isLiteral ? valueBlock.getFieldValue('VALUE') : null
   const srcName = !isLiteral ? mcfunctionGenerator.valueToCode(block, 'VALUE', 0) : null
 
   let cmd: string

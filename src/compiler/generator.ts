@@ -11,7 +11,3 @@ mcfunctionGenerator.scrub_ = function(block, code, thisOnly) {
   }
   return code
 }
-
-mcfunctionGenerator.forBlock['math_number'] = function(block) {
-  return [block.getFieldValue('NUM'), 0]
-}

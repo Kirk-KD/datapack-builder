@@ -3,26 +3,29 @@ import definitionsJson from './definitions.json'
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
 
-const { commands, control, variable, events } = definitionsJson as unknown as {
-  commands: { type: string, colour: string }[]
-  control: { type: string, colour: string }[]
-  variable: { type: string, colour: string }[]
-  events: { type: string, colour: string }[]
+type BlockDef = { type: string, colour?: string }
+
+type Definitions = {
+  commands: BlockDef[]
+  control: BlockDef[]
+  variable: BlockDef[]
+  events: BlockDef[]
+  literals: BlockDef[]
 }
+
+const { commands, control, variable, events, literals } = definitionsJson as Definitions
 
 commands.forEach(b => {b['colour'] = colours.commands})
 control.forEach(b => {b['colour'] = colours.control})
 variable.forEach(b => {b['colour'] = colours.variable})
 events.forEach(b => {b['colour'] = colours.events})
+literals.forEach(b => {b['colour'] = colours.literals})
 
 Blockly.defineBlocksWithJsonArray(commands)
 Blockly.defineBlocksWithJsonArray(control)
 Blockly.defineBlocksWithJsonArray(variable)
 Blockly.defineBlocksWithJsonArray(events)
-
-const builtinBlocks: string[] = [
-  'math_number'
-]
+Blockly.defineBlocksWithJsonArray(literals)
 
 export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
   return [
@@ -48,7 +51,7 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Literals',
       colour: colours.literals,
-      contents: builtinBlocks.map(type => ({ kind: 'block', type }))
+      contents: literals.map(block => ({ kind: 'block', type: block.type }))
     },
     {
       kind: 'category',
