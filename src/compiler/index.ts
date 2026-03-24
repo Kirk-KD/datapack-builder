@@ -4,15 +4,18 @@ import './generators/commands'
 import './generators/control'
 import './generators/variables'
 import './generators/events'
+import './generators/procedures'
 import { mcfunctionGenerator } from './generator'
 import { scoreboardManager } from './scoreboardManager'
-import { addFile, appendToFile, resetFiles, getFiles } from './fileRegistry'
+import { addFile, resetFiles, getFiles, prependToFile } from './fileRegistry'
 import { getProjectConfig, getInternalNamespace } from './projectConfig'
 import { resetIds } from './idGenerator'
 
 function compileChain(block: Blockly.Block): string {
   const next = block.nextConnection?.targetBlock()
-  if (!next) return ''
+  // If a starting block has no "next", it should have children
+  // Compile the block using the generator, the block will handle compilation of children
+  if (!next) return mcfunctionGenerator.blockToCode(block) as string
   return mcfunctionGenerator.blockToCode(next) as string
 }
 
@@ -41,11 +44,16 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
         `execute unless score ${initializedVar} ${obj} matches 1 run return\n`
         + compileChain(block)
       )
+    } else if (block.type === 'procedures_defnoreturn') {
+      addFile(
+        `data/${internalNs}/function/proc_${block.getFieldValue('NAME')}.mcfunction`,
+        compileChain(block)
+      )
     }
   }
 
   if (hasLoad || hasTick || scoreboardManager.isObjectiveRegistered()) {
-    appendToFile(
+    prependToFile(
       `data/${internalNs}/function/load.mcfunction`,
       `scoreboard objectives add ${obj} dummy\n`
       + `scoreboard players set ${initializedVar} ${obj} 1\n`

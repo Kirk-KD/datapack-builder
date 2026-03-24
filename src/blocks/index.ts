@@ -49,6 +49,12 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       name: 'Literals',
       colour: '65',
       contents: builtinBlocks.map(type => ({ kind: 'block', type }))
+    },
+    {
+      kind: "category",
+      name: "Procedures",
+      custom: "PROCEDURE",
+      colour: '100'
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
+import {blocks as procedureBlocks, unregisterProcedureBlocks} from '@blockly/block-shareable-procedures'
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import getVariablesCategory from '../blocks/categories/variables'
@@ -28,6 +29,14 @@ function WorkspacePanel() {
     workspaceRef.current.registerButtonCallback('CREATE_VARIABLE', () => {
       Blockly.Variables.createVariableButtonHandler(workspaceRef.current!)
     })
+
+    // Load built-in procedure blocks
+    unregisterProcedureBlocks()
+    Blockly.common.defineBlocks(procedureBlocks)
+    // Remove unwanted loaded procedure blocks
+    delete Blockly.Blocks['procedures_callreturn']
+    delete Blockly.Blocks['procedures_defreturn']
+    delete Blockly.Blocks['procedures_ifreturn']
 
     // Populate toolbox
     workspaceRef.current.updateToolbox({

@@ -1,4 +1,5 @@
 import { mcfunctionGenerator } from "../generator"
+import { getContextName, isParamInContext } from "../procedureContext"
 import { scoreboardManager } from '../scoreboardManager'
 import { getConditionSetup } from "./control"
 
@@ -20,7 +21,7 @@ mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
         + `execute if ${condition} run scoreboard players set ${varName} ${obj} 1\n`
         + `execute unless ${condition} run scoreboard players set ${varName} ${obj} 0\n`
   } else if (valueBlock.type === 'mc_var_get') {
-    const srcName = scoreboardManager.getVarName(valueBlock.getField('VAR')!.getText())
+    const srcName = mcfunctionGenerator.valueToCode(block, 'VALUE', 0)
     cmd = `scoreboard players operation ${varName} ${obj} = ${srcName} ${obj}\n`
   } else {
     cmd = `scoreboard players set ${varName} ${obj} ${valueBlock.getFieldValue('NUM')}\n`
@@ -36,7 +37,7 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
   const valueBlock = block.getInputTargetBlock('VALUE')!
   const isLiteral = valueBlock.type === 'math_number'
   const num = isLiteral ? valueBlock.getFieldValue('NUM') : null
-  const srcName = !isLiteral ? scoreboardManager.getVarName(valueBlock.getField('VAR')!.getText()) : null
+  const srcName = !isLiteral ? mcfunctionGenerator.valueToCode(block, 'VALUE', 0) : null
 
   let cmd: string
 
@@ -58,5 +59,9 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_var_get'] = function(block) {
-  return scoreboardManager.getVarName(block.getField('VAR')!.getText())
+  const name = block.getField('VAR')!.getText()
+  if (isParamInContext(name)) {
+    return [scoreboardManager.getScopedArgName(getContextName()!, name), 0]
+  }
+  return [scoreboardManager.getVarName(name), 0]
 }

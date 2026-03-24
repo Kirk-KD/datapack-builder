@@ -13,6 +13,11 @@ class ScoreboardManager {
     return `$__dpb_${namespace}_${name}`
   }
 
+  getScopedArgName(procName: string, paramName: string): string {
+    const { namespace } = getProjectConfig()
+    return `$__dpb_${namespace}_${procName}_$arg_${paramName}`
+  }
+
   getTempVar(): string {
     const { namespace } = getProjectConfig()
     return `$__dpb_${namespace}_$temp`
