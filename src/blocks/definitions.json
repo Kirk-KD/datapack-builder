@@ -5,11 +5,12 @@
       "message0": "say %1",
       "args0": [
         {
-          "type": "field_input",
+          "type": "input_value",
           "name": "MESSAGE",
-          "text": "Hello world"
+          "check": ["mc_string", "mc_int"]
         }
       ],
+      "inputsInline": true,
       "tooltip": "Broadcasts a message to all players",
       "previousStatement": null,
       "nextStatement": null
@@ -224,7 +225,27 @@
         },
         {
           "type": "input_value",
-          "name": "CHAIN_NEXT"
+          "name": "CHAIN_NEXT",
+          "check": ["mc_string", "mc_int"]
+        }
+      ],
+      "output": null
+    },
+    {
+      "type": "mc_string",
+      "tooltip": "",
+      "helpUrl": "",
+      "message0": "\" %1 \" %2",
+      "args0": [
+        {
+          "type": "field_input",
+          "name": "VALUE",
+          "text": "Hello world"
+        },
+        {
+          "type": "input_value",
+          "name": "CHAIN_NEXT",
+          "check": ["mc_string", "mc_int"]
         }
       ],
       "output": null
