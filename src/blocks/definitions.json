@@ -10,7 +10,6 @@
           "text": "Hello world"
         }
       ],
-      "colour": 160,
       "tooltip": "Broadcasts a message to all players",
       "previousStatement": null,
       "nextStatement": null
@@ -37,7 +36,6 @@
           "value": 10
         }
       ],
-      "colour": 210,
       "output": "MCCondition"
     },
     {
@@ -67,7 +65,6 @@
         }
       ],
       "inputsInline": true,
-      "colour": 210,
       "output": "MCCondition"
     },
     {
@@ -87,7 +84,6 @@
           "name": "DO"
         }
       ],
-      "colour": 210,
       "previousStatement": null,
       "nextStatement": null
     },
@@ -115,7 +111,6 @@
           "name": "ELSE"
         }
       ],
-      "colour": 210,
       "previousStatement": null,
       "nextStatement": null
     },
@@ -136,7 +131,6 @@
           "name": "DO"
         }
       ],
-      "colour": 210,
       "previousStatement": null,
       "nextStatement": null
     }
@@ -157,7 +151,6 @@
           "check": ["Number", "MCCondition"]
         }
       ],
-      "colour": 290,
       "previousStatement": null,
       "nextStatement": null
     },
@@ -187,7 +180,6 @@
           "check": "Number"
         }
       ],
-      "colour": 290,
       "previousStatement": null,
       "nextStatement": null
     },
@@ -201,7 +193,6 @@
           "variableTypes": [""]
         }
       ],
-      "colour": 290,
       "output": "Number"
     }
   ],
@@ -210,14 +201,12 @@
       "type": "mc_on_load",
       "message0": "on load",
       "args0": [],
-      "colour": 30,
       "nextStatement": null
     },
     {
       "type": "mc_on_tick",
       "message0": "every tick",
       "args0": [],
-      "colour": 30,
       "nextStatement": null
     }
   ]

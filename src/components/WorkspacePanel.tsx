@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
+import DarkTheme from '@blockly/theme-dark'
 import {blocks as procedureBlocks, unregisterProcedureBlocks} from '@blockly/block-shareable-procedures'
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import getVariablesCategory from '../blocks/categories/variables'
+import { colours } from '../blocks/blockColours'
 
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
@@ -12,11 +14,29 @@ function WorkspacePanel() {
   useEffect(() => {
     if (!divRef.current) return
 
+    const customTheme = Blockly.Theme.defineTheme('customDark', {
+      base: DarkTheme,
+      name: 'Custom',
+      blockStyles: {
+        math_blocks: {
+          colourPrimary: colours.literals.toString(),
+          colourSecondary: colours.literals.toString(),
+          colourTertiary: colours.literals.toString()
+        },
+        procedure_blocks: {
+          colourPrimary: colours.procedures.toString(),
+          colourSecondary: colours.procedures.toString(),
+          colourTertiary: colours.procedures.toString()
+        }
+      }
+    })
+
     workspaceRef.current = Blockly.inject(divRef.current, {
       toolbox: {
         kind: 'categoryToolbox',
         contents: getToolboxContents()
-      }
+      },
+      theme: customTheme
     })
 
     // Default placeholder variable
