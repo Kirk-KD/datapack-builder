@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
+import getVariablesCategory from '../blocks/categories/variables'
 
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
@@ -17,29 +18,24 @@ function WorkspacePanel() {
       }
     })
 
+    // Default placeholder variable
     workspaceRef.current.getVariableMap().createVariable('myVar')
 
+    // Custom dynamic category for variables
     workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', (workspace) => {
-      const vars = workspace.getVariableMap().getAllVariables()
-      const createButton = {
-        kind: 'button',
-        text: 'Create variable',
-        callbackKey: 'CREATE_VARIABLE'
-      }
-      if (vars.length === 0) return [createButton]
-      const firstName = vars[0].getName()
-      return [
-        createButton,
-        { kind: 'block', type: 'mc_var_set', fields: { VAR: { name: firstName, type: '' } } },
-        { kind: 'block', type: 'mc_var_change', fields: { VAR: { name: firstName, type: '' } } },
-        { kind: 'block', type: 'mc_var_get', fields: { VAR: { name: firstName, type: '' } } },
-      ]
+      return getVariablesCategory(workspace as Blockly.WorkspaceSvg)
     })
-
     workspaceRef.current.registerButtonCallback('CREATE_VARIABLE', () => {
       Blockly.Variables.createVariableButtonHandler(workspaceRef.current!)
     })
 
+    // Populate toolbox
+    workspaceRef.current.updateToolbox({
+      kind: 'categoryToolbox',
+      contents: getToolboxContents(workspaceRef.current)
+    })
+
+    // Update toolbox whenever variables are modified
     workspaceRef.current.addChangeListener((event) => {
       if (
         event.type === Blockly.Events.VAR_CREATE ||
@@ -51,11 +47,6 @@ function WorkspacePanel() {
           contents: getToolboxContents(workspaceRef.current!)
         })
       }
-    })
-
-    workspaceRef.current.updateToolbox({
-      kind: 'categoryToolbox',
-      contents: getToolboxContents(workspaceRef.current)
     })
 
     return () => {

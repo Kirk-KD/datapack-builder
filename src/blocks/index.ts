@@ -1,5 +1,6 @@
 import * as Blockly from 'blockly'
 import definitionsJson from './definitions.json'
+import getControlCategory from './categories/control'
 
 const { commands, control, variable, events } = definitionsJson as {
   commands: { type: string }[]
@@ -16,21 +17,6 @@ Blockly.defineBlocksWithJsonArray(events)
 const builtinBlocks: string[] = [
   'math_number'
 ]
-
-function bindFirstVar(blocks: { type: string }[], workspace?: Blockly.WorkspaceSvg) {
-  const firstVar = workspace?.getVariableMap().getAllVariables()[0]
-  if (!firstVar) return blocks.map(block => ({ kind: 'block', type: block.type }))
-  const name = firstVar.getName()
-  return blocks.map(block => ({
-    kind: 'block',
-    type: block.type,
-    fields: {
-      VAR: { name, type: '' },
-      VAR_A: { name, type: '' },
-      VAR_B: { name, type: '' }
-    }
-  }))
-}
 
 export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
   return [
@@ -56,7 +42,7 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Control',
       colour: '210',
-      contents: bindFirstVar(control, workspace)
+      contents: getControlCategory(workspace)
     },
     {
       kind: 'category',
