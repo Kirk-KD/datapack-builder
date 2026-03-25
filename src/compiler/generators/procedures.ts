@@ -1,19 +1,12 @@
 import { mcfunctionGenerator } from '../generator'
 import { scoreboardManager } from '../scoreboardManager'
 import { getInternalNamespace } from '../projectConfig'
-import { setProcedureContext, clearProcedureContext } from '../procedureContext'
 import { literalChain, snbtToString } from '../util'
 import { literalBlocks } from '../../blocks/definitions'
 import { nbtStorageManager } from '../nbtStorageManager'
 
 mcfunctionGenerator.forBlock['procedures_defnoreturn'] = function(block) {
-  const procName = block.getFieldValue('NAME')
-  const params: string[] = block.getVars() ?? []
-
-  setProcedureContext(procName, params)
   const body = mcfunctionGenerator.statementToCode(block, 'STACK')
-  clearProcedureContext()
-
   return body
 }
 
