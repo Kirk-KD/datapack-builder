@@ -15,3 +15,8 @@ export function literalChain(block: Blockly.Block): [string, boolean] {
   const [nextStr, nextHasMacro] = nextBlock ? literalChain(nextBlock) : ['', false]
   return [value + nextStr, nextHasMacro]
 }
+
+export function snbtToString(snbt: Record<string, string>): string {
+  const entries = Object.entries(snbt).map(([key, value]) => `${key}:"${value}"`)
+  return `{${entries.join(',')}}`
+}

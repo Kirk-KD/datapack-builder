@@ -13,6 +13,7 @@ class ScoreboardManager {
     return `$__dpb_${namespace}_${name}`
   }
 
+  // TODO: this is no longer needed
   getScopedArgName(procName: string, paramName: string): string {
     const { namespace } = getProjectConfig()
     return `$__dpb_${namespace}_${procName}_$arg_${paramName}`

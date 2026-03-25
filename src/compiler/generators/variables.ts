@@ -61,7 +61,7 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
 
 mcfunctionGenerator.forBlock['mc_var_get'] = function(block) {
   const name = block.getField('VAR_NAME')!.getText()
-  if (isParamInContext(name)) {
+  if (isParamInContext(name)) {  // TODO: remove
     return [scoreboardManager.getScopedArgName(getContextName()!, name), 0]
   }
   return [scoreboardManager.getVarName(name), 0]

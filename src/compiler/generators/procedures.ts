@@ -2,7 +2,9 @@ import { mcfunctionGenerator } from '../generator'
 import { scoreboardManager } from '../scoreboardManager'
 import { getInternalNamespace } from '../projectConfig'
 import { setProcedureContext, clearProcedureContext } from '../procedureContext'
-import { literalChain } from '../util'
+import { literalChain, snbtToString } from '../util'
+import { literalBlocks } from '../../blocks/definitions'
+import { nbtStorageManager } from '../nbtStorageManager'
 
 mcfunctionGenerator.forBlock['procedures_defnoreturn'] = function(block) {
   const procName = block.getFieldValue('NAME')
@@ -19,28 +21,45 @@ mcfunctionGenerator.forBlock['procedures_callnoreturn'] = function(block) {
   const procName = block.getFieldValue('NAME')
   const params: string[] = block.getVars() ?? []
   const internalNs = getInternalNamespace()
-  const obj = scoreboardManager.getObjectiveName()
+  const storageName = nbtStorageManager.getProcArgsStorageName()
 
   let cmd = ''
 
+  // literals can be passed directly in-line as SNBT
+  const snbt: Record<string, string> = {}
+
+  let cmdHasMacro = false
+  let cmdHasStorage = false
+
   params.forEach((param: string, i: number) => {
     const argBlock = block.getInputTargetBlock(`ARG${i}`)
+    
     if (!argBlock) {
-      cmd += `scoreboard players set ${scoreboardManager.getScopedArgName(procName, param)} ${obj} 0\n`
+      // TODO: handle missing/default args
+      snbt[param] = ''
       return
     }
+
     if (argBlock.type === 'mc_var_get') {
-      const srcName = scoreboardManager.getVarName(argBlock.getField('VAR')!.getText())
-      cmd += `scoreboard players operation ${scoreboardManager.getScopedArgName(procName, param)} ${obj} = ${srcName} ${obj}\n`
-    } else if (argBlock.type === 'mc_int') {
-      const num = argBlock.getFieldValue('VALUE')
-      cmd += `scoreboard players set ${scoreboardManager.getScopedArgName(procName, param)} ${obj} ${num}\n`
+      const objectiveName = scoreboardManager.getObjectiveName()
+      const varName = scoreboardManager.getVarName(argBlock.getFieldValue('VAR_NAME'))
+      const paramPath = nbtStorageManager.getProcArgPath(procName, param)
+      cmd += `execute store result storage ${storageName} ${paramPath} int 1 run scoreboard players get ${varName} ${objectiveName}\n`
+      cmdHasStorage = true
+    } else if ([...literalBlocks, 'mc_param'].includes(argBlock.type)) {
+      const [text, argHasMacro] = literalChain(argBlock)
+      snbt[param] = text
+      cmdHasMacro ||= argHasMacro
     }
   })
 
-  cmd += `function ${internalNs}:proc_${procName}\n`
+  if (cmdHasMacro) cmd += '$'
+  cmd += `function ${internalNs}:proc_${procName}`
+  if (Object.keys(snbt).length > 0) cmd += ` ${snbtToString(snbt)}`
+  if (cmdHasStorage) cmd += ` with storage ${storageName}`
+  cmd += '\n'
 
-  return params.length > 0 ? scoreboardManager.withObjective(cmd) : cmd
+  return cmd
 }
 
 mcfunctionGenerator.forBlock['mc_param'] = function(block) {
