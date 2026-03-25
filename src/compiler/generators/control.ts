@@ -28,7 +28,7 @@ export function getConditionSetup(conditionBlock: Blockly.Block): string {
 }
 
 mcfunctionGenerator.forBlock['mc_comp_score_matches'] = function(block) {
-  const varName = scoreboardManager.getVarName(block.getField('VAR')!.getText())
+  const varName = scoreboardManager.getVarName(block.getField('VAR_NAME')!.getText())
   const obj = scoreboardManager.getObjectiveName()
   const min = block.getFieldValue('MIN')
   const max = block.getFieldValue('MAX')
@@ -36,7 +36,7 @@ mcfunctionGenerator.forBlock['mc_comp_score_matches'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_comp_score_compare'] = function(block) {
-  const varA = scoreboardManager.getVarName(block.getField('VAR_A')!.getText())
+  const varA = scoreboardManager.getVarName(block.getField('VAR_NAME')!.getText())
   const obj = scoreboardManager.getObjectiveName()
   const op = opMap[block.getFieldValue('OP')]
   const valueBBlock = block.getInputTargetBlock('VAR_B')!
