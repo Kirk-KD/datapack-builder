@@ -6,7 +6,7 @@ import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import getVariablesCategory from '../blocks/categories/variables'
 import { colours } from '../blocks/blockColours'
-import { updateScoreboardVariables } from '../compiler/nameRegistry'
+import { updateProcedures, updateVariables } from '../compiler/workspaceRegistry'
 
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
@@ -65,8 +65,8 @@ function WorkspacePanel() {
       contents: getToolboxContents(workspaceRef.current!)
     })
 
-    // Update toolbox and variable list whenever variables are modified
     workspaceRef.current.addChangeListener((event) => {
+      // Update toolbox and variable list whenever variables are modified
       if (
         event.type === Blockly.Events.VAR_CREATE ||
         event.type === Blockly.Events.VAR_DELETE ||
@@ -76,7 +76,20 @@ function WorkspacePanel() {
           kind: 'categoryToolbox',
           contents: getToolboxContents(workspaceRef.current!)
         })
-        updateScoreboardVariables(workspaceRef.current!.getVariableMap().getAllVariables())
+        updateVariables(workspaceRef.current!.getVariableMap().getAllVariables())
+      }
+
+      // Update procedure list whenever procedures are modified
+      else if (
+        event.type === Blockly.Events.BLOCK_CREATE ||
+        event.type === Blockly.Events.BLOCK_DELETE ||
+        event.type === Blockly.Events.BLOCK_CHANGE
+      ) {
+        workspaceRef.current!.updateToolbox({
+          kind: 'categoryToolbox',
+          contents: getToolboxContents(workspaceRef.current!)
+        })
+        updateProcedures(workspaceRef.current!.getProcedureMap().getProcedures())
       }
     })
 

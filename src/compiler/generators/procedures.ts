@@ -41,3 +41,9 @@ mcfunctionGenerator.forBlock['procedures_callnoreturn'] = function(block) {
 
   return params.length > 0 ? scoreboardManager.withObjective(cmd) : cmd
 }
+
+mcfunctionGenerator.forBlock['mc_param'] = function(block) {
+  const paramName = block.getFieldValue('PARAM_NAME')
+  const cmd = `$(${paramName})`
+  return [cmd, 0]
+}
