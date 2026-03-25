@@ -1,21 +1,8 @@
 import * as Blockly from 'blockly'
-import definitionsJson from './definitions.json'
+import { commands, control, variable, events, literals, procedures } from './definitions'
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
 import './extensions'
-
-type BlockDef = { type: string, colour?: string }
-
-type Definitions = {
-  commands: BlockDef[]
-  control: BlockDef[]
-  variable: BlockDef[]
-  events: BlockDef[]
-  literals: BlockDef[]
-  procedures: BlockDef[]
-}
-
-const { commands, control, variable, events, literals, procedures } = definitionsJson as Definitions
 
 commands.forEach(b => {b['colour'] = colours.commands})
 control.forEach(b => {b['colour'] = colours.control})

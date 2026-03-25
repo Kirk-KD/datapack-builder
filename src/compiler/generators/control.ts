@@ -47,7 +47,7 @@ mcfunctionGenerator.forBlock['mc_comp_score_compare'] = function(block) {
     const tempName = scoreboardManager.getTempVar()
     fragment = `score ${varA} ${obj} ${op} ${tempName} ${obj}`
   } else {
-    const varB = scoreboardManager.getVarName(valueBBlock.getField('VAR')!.getText())
+    const varB = scoreboardManager.getVarName(valueBBlock.getField('VAR_NAME')!.getText())
     fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
   }
 
