@@ -142,9 +142,14 @@
       "message0": "set %1 to %2",
       "args0": [
         {
-          "type": "field_variable",
-          "name": "VAR",
-          "variableTypes": [""]
+          "type": "field_dropdown",
+          "name": "VAR_NAME",
+          "options": [
+            [
+              "x",
+              "X"
+            ]
+          ]
         },
         {
           "type": "input_value",
@@ -153,16 +158,22 @@
         }
       ],
       "previousStatement": null,
-      "nextStatement": null
+      "nextStatement": null,
+      "extensions": ["mc_scoreboard_variable_dropdown"]
     },
     {
       "type": "mc_var_change",
       "message0": "change %1 %2 by %3",
       "args0": [
         {
-          "type": "field_variable",
-          "name": "VAR",
-          "variableTypes": [""]
+          "type": "field_dropdown",
+          "name": "VAR_NAME",
+          "options": [
+            [
+              "x",
+              "X"
+            ]
+          ]
         },
         {
           "type": "field_dropdown",
@@ -182,19 +193,34 @@
         }
       ],
       "previousStatement": null,
-      "nextStatement": null
+      "nextStatement": null,
+      "extensions": ["mc_scoreboard_variable_dropdown"]
     },
     {
       "type": "mc_var_get",
-      "message0": "%1",
+      "tooltip": "",
+      "helpUrl": "",
+      "message0": "%1 %2",
       "args0": [
         {
-          "type": "field_variable",
-          "name": "VAR",
-          "variableTypes": [""]
+          "type": "field_dropdown",
+          "name": "VAR_NAME",
+          "options": [
+            [
+              "x",
+              "X"
+            ]
+          ]
+        },
+        {
+          "type": "input_value",
+          "name": "VAR_NAME"
         }
       ],
-      "output": "Number"
+      "output": null,
+      "previousStatement": null,
+      "nextStatement": null,
+      "extensions": ["mc_scoreboard_variable_dropdown"]
     }
   ],
   "events": [

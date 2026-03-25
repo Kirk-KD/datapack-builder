@@ -8,7 +8,7 @@ function isConditionBlock(type: string): boolean {
 }
 
 mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
-  const varName = scoreboardManager.getVarName(block.getField('VAR')!.getText())
+  const varName = scoreboardManager.getVarName(block.getField('VAR_NAME')!.getText())
   const obj = scoreboardManager.getObjectiveName()
   const valueBlock = block.getInputTargetBlock('VALUE')!
 
@@ -32,7 +32,7 @@ mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
-  const varName = scoreboardManager.getVarName(block.getField('VAR')!.getText())
+  const varName = scoreboardManager.getVarName(block.getField('VAR_NAME')!.getText())
   const obj = scoreboardManager.getObjectiveName()
   const opType = block.getFieldValue('OP')
   const valueBlock = block.getInputTargetBlock('VALUE')!
@@ -60,7 +60,7 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_var_get'] = function(block) {
-  const name = block.getField('VAR')!.getText()
+  const name = block.getField('VAR_NAME')!.getText()
   if (isParamInContext(name)) {
     return [scoreboardManager.getScopedArgName(getContextName()!, name), 0]
   }

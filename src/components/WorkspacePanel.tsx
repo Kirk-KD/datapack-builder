@@ -6,6 +6,7 @@ import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import getVariablesCategory from '../blocks/categories/variables'
 import { colours } from '../blocks/blockColours'
+import { updateScoreboardVariables } from '../compiler/nameRegistry'
 
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
@@ -40,14 +41,14 @@ function WorkspacePanel() {
     })
 
     // Default placeholder variable
-    workspaceRef.current.getVariableMap().createVariable('myVar')
+    workspaceRef.current.getVariableMap().createVariable('myVar', 'mc_scoreboard_variable')
 
     // Custom dynamic category for variables
     workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', (workspace) => {
       return getVariablesCategory(workspace as Blockly.WorkspaceSvg)
     })
     workspaceRef.current.registerButtonCallback('CREATE_VARIABLE', () => {
-      Blockly.Variables.createVariableButtonHandler(workspaceRef.current!)
+      Blockly.Variables.createVariableButtonHandler(workspaceRef.current!, undefined, 'mc_scoreboard_variable')
     })
 
     // Load built-in procedure blocks
@@ -61,10 +62,10 @@ function WorkspacePanel() {
     // Populate toolbox
     workspaceRef.current.updateToolbox({
       kind: 'categoryToolbox',
-      contents: getToolboxContents(workspaceRef.current)
+      contents: getToolboxContents(workspaceRef.current!)
     })
 
-    // Update toolbox whenever variables are modified
+    // Update toolbox and variable list whenever variables are modified
     workspaceRef.current.addChangeListener((event) => {
       if (
         event.type === Blockly.Events.VAR_CREATE ||
@@ -75,6 +76,7 @@ function WorkspacePanel() {
           kind: 'categoryToolbox',
           contents: getToolboxContents(workspaceRef.current!)
         })
+        updateScoreboardVariables(workspaceRef.current!.getVariableMap().getAllVariables())
       }
     })
 

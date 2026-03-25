@@ -2,6 +2,7 @@ import * as Blockly from 'blockly'
 import definitionsJson from './definitions.json'
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
+import './extensions/variable'
 
 type BlockDef = { type: string, colour?: string }
 
