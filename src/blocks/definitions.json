@@ -308,7 +308,7 @@
         },
         {
           "type": "input_value",
-          "name": "PARAM_NAME"
+          "name": "CHAIN_NEXT"
         }
       ],
       "output": null,

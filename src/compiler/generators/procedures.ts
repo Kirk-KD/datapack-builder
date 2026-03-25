@@ -2,6 +2,7 @@ import { mcfunctionGenerator } from '../generator'
 import { scoreboardManager } from '../scoreboardManager'
 import { getInternalNamespace } from '../projectConfig'
 import { setProcedureContext, clearProcedureContext } from '../procedureContext'
+import { literalChain } from '../util'
 
 mcfunctionGenerator.forBlock['procedures_defnoreturn'] = function(block) {
   const procName = block.getFieldValue('NAME')
@@ -43,7 +44,6 @@ mcfunctionGenerator.forBlock['procedures_callnoreturn'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_param'] = function(block) {
-  const paramName = block.getFieldValue('PARAM_NAME')
-  const cmd = `$(${paramName})`
-  return [cmd, 0]
+  const [text, _] = literalChain(block)
+  return [text, 0]
 }
