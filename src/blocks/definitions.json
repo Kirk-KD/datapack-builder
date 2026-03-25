@@ -22,9 +22,14 @@
       "message0": "%1 matches %2 to %3",
       "args0": [
         {
-          "type": "field_variable",
-          "name": "VAR",
-          "variableTypes": [""]
+          "type": "field_dropdown",
+          "name": "VAR_NAME",
+          "options": [
+            [
+              "x",
+              "X"
+            ]
+          ]
         },
         {
           "type": "field_number",
@@ -37,16 +42,22 @@
           "value": 10
         }
       ],
-      "output": "MCCondition"
+      "output": "MCCondition",
+      "extensions": ["mc_scoreboard_variable_dropdown"]
     },
     {
       "type": "mc_comp_score_compare",
       "message0": "%1 %2 %3",
       "args0": [
         {
-          "type": "field_variable",
-          "name": "VAR_A",
-          "variableTypes": [""]
+          "type": "field_dropdown",
+          "name": "VAR_NAME",
+          "options": [
+            [
+              "x",
+              "X"
+            ]
+          ]
         },
         {
           "type": "field_dropdown",
@@ -66,7 +77,8 @@
         }
       ],
       "inputsInline": true,
-      "output": "MCCondition"
+      "output": "MCCondition",
+      "extensions": ["mc_scoreboard_variable_dropdown"]
     },
     {
       "type": "mc_if",
