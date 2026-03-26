@@ -3,7 +3,8 @@ import type Blockly from 'blockly'
 
 export default function getVariablesCategory(_: Blockly.WorkspaceSvg) {
   const vars = getVariables().filter(v => v.getType() === 'mc_scoreboard_variable')
-  const params = getParameters()
+  const procedureParameters = getParameters()
+  const hasAnyProcedureParams = procedureParameters.some(([, params]) => params.length > 0)
 
   const createButton = {
     kind: 'button',
@@ -20,7 +21,7 @@ export default function getVariablesCategory(_: Blockly.WorkspaceSvg) {
     { kind: 'block', type: 'mc_var_get' }
   ]
 
-  if (params.length !== 0) {
+  if (hasAnyProcedureParams) {
     blocks.push({ kind: 'block', type: 'mc_param' })
   }
 
