@@ -1,6 +1,7 @@
 import * as Blockly from "blockly"
 import { getParametersForProcedure, getVariables } from "../compiler/workspaceRegistry"
 import { shouldTrimChainTail } from "./chainPolicy"
+import { validateInt } from "./validators"
 
 function getContainingProcedureName(block: Blockly.Block | null): string | null {
   let current = block
@@ -108,4 +109,8 @@ Blockly.Extensions.register('mc_trim_chain_tail', function(this: Blockly.Block) 
       chainNextConnection.disconnect()
     }
   })
+})
+
+Blockly.Extensions.register('mc_int_validator', function(this: Blockly.Block) {
+  this.getField('VALUE')!.setValidator(validateInt)
 })

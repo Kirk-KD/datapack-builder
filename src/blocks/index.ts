@@ -3,7 +3,7 @@ import { commands, control, variable, events, literals, procedures } from './def
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
 import './extensions'
-import './connectionChecker'
+import './validators'
 
 commands.forEach(b => {b['colour'] = colours.commands})
 control.forEach(b => {b['colour'] = colours.control})

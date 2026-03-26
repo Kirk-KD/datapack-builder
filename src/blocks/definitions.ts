@@ -269,7 +269,7 @@ export const literals: any[] = [
       }
     ],
     "output": "mc_int",
-    "extensions": ["mc_trim_chain_tail"]
+    "extensions": ["mc_trim_chain_tail", "mc_int_validator"]
   },
   {
     "type": "mc_string",
