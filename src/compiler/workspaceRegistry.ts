@@ -32,3 +32,12 @@ export function getParametersForProcedure(procedureName: string): Blockly.Proced
   const pair = getParameters().find(([proc]) => proc.getName() === procedureName)
   return pair?.[1] ?? []
 }
+
+export function getParameterNameById(parameterId: string): string | null {
+  for (const proc of procedures) {
+    const found = proc.getParameters().find((param) => param.getId() === parameterId)
+    if (found) return found.getName()
+  }
+
+  return null
+}

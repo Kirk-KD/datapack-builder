@@ -77,6 +77,8 @@ function WorkspacePanel() {
           contents: getToolboxContents(workspaceRef.current!)
         })
         updateVariables(workspaceRef.current!.getVariableMap().getAllVariables())
+        // Also update procedures when a parameter is renamed (VAR_RENAME fires for param renames)
+        updateProcedures(workspaceRef.current!.getProcedureMap().getProcedures())
       }
 
       // Update procedure list whenever procedures are modified

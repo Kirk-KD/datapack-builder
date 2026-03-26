@@ -19,7 +19,7 @@ function getProcedureParamOptions(block: Blockly.Block): [string, string][] | nu
   if (!containingProcedureName) return null
 
   const params = getParametersForProcedure(containingProcedureName)
-  return params.map(param => [param.getName(), param.getName()])
+  return params.map(param => [param.getName(), param.getId()])
 }
 
 function areDropdownOptionsEqual(a: [string, string][], b: [string, string][]): boolean {
@@ -61,7 +61,10 @@ Blockly.Extensions.register('mc_procedure_parameter_dropdown', function() {
     if (
       event.type !== Blockly.Events.BLOCK_MOVE &&
       event.type !== Blockly.Events.BLOCK_CHANGE &&
-      event.type !== Blockly.Events.BLOCK_CREATE
+      event.type !== Blockly.Events.BLOCK_CREATE &&
+      event.type !== Blockly.Events.VAR_RENAME &&
+      event.type !== Blockly.Events.VAR_CREATE &&
+      event.type !== Blockly.Events.VAR_DELETE
     ) return
 
     const options = getProcedureParamOptions(this)
@@ -75,6 +78,7 @@ Blockly.Extensions.register('mc_procedure_parameter_dropdown', function() {
 
         if (previousValue != null && nextValues.has(previousValue)) {
           paramField.setValue(previousValue)
+          paramField.forceRerender()
         }
       }
 
