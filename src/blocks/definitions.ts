@@ -3,6 +3,9 @@ export const scoreboardVarSetBlocks = ['mc_int', 'MCCondition', 'mc_var_get', 'm
 export const literalBlocks = ['mc_string', 'mc_int', 'mc_number']
 export const procArgBlocks = [...literalBlocks, 'mc_var_get', 'mc_param']
 
+// Disconnect chains when trying to attach
+export const trimChainTailBlocks = ['mc_var_set', 'mc_var_change']
+
 export const commands: any[] = [
   {
     "type": "mc_say",
@@ -265,7 +268,8 @@ export const literals: any[] = [
         "check": chainableBlocks
       }
     ],
-    "output": "mc_int"
+    "output": "mc_int",
+    "extensions": ["mc_trim_chain_tail"]
   },
   {
     "type": "mc_string",
@@ -284,7 +288,8 @@ export const literals: any[] = [
         "check": chainableBlocks
       }
     ],
-    "output": "mc_string"
+    "output": "mc_string",
+    "extensions": ["mc_trim_chain_tail"]
   }
 ]
 export const procedures: any[] = [
@@ -311,6 +316,6 @@ export const procedures: any[] = [
       }
     ],
     "output": "mc_param",
-    "extensions": ["mc_procedure_parameter_dropdown"]
+    "extensions": ["mc_procedure_parameter_dropdown", "mc_trim_chain_tail"]
   }    
 ]
