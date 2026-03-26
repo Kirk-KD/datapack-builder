@@ -28,7 +28,7 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   const { namespace, packFormat, description } = getProjectConfig()
   const internalNs = getInternalNamespace()
   const obj = scoreboardManager.getObjectiveName()
-  const initializedVar = `$__dpb_${namespace}_initialized`
+  const initializedVar = scoreboardManager.getInitializedVarName()
 
   const topBlocks = workspace.getTopBlocks(true)
   let hasLoad = false
