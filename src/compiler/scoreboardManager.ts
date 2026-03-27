@@ -1,8 +1,6 @@
 import { getProjectConfig } from './projectConfig'
 
 class ScoreboardManager {
-  private objectiveRegistered = false
-
   getObjectiveName(): string {
     const { namespace, noNameMangling } = getProjectConfig()
     return noNameMangling ? 'dpb_vars' : `__dpb_${namespace}_vars`
@@ -25,19 +23,6 @@ class ScoreboardManager {
 
   getObjectiveNamePublic(): string {
     return this.getObjectiveName()
-  }
-
-  withObjective(command: string): string {
-    this.objectiveRegistered = true
-    return command
-  }
-
-  reset() {
-    this.objectiveRegistered = false
-  }
-
-  isObjectiveRegistered() {
-    return this.objectiveRegistered
   }
 }
 

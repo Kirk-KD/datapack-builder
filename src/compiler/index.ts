@@ -26,7 +26,6 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   resetFiles()
   resetIds()
   resetContext()
-  scoreboardManager.reset()
 
   const { packFormat, description } = getProjectConfig()
   const internalNs = getInternalNamespace()
@@ -34,12 +33,10 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   const initializedVar = scoreboardManager.getInitializedVarName()
 
   const topBlocks = workspace.getTopBlocks(true)
-  let hasLoad = false
   let hasTick = false
 
   for (const block of topBlocks) {
     if (block.type === 'mc_on_load') {
-      hasLoad = true
       addFile(`data/${internalNs}/function/load.mcfunction`, compileChain(block))
     } else if (block.type === 'mc_on_tick') {
       hasTick = true
@@ -56,17 +53,15 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
     }
   }
 
-  if (hasLoad || hasTick || scoreboardManager.isObjectiveRegistered()) {
-    prependToFile(
-      `data/${internalNs}/function/load.mcfunction`,
-      `scoreboard objectives add ${obj} dummy\n`
-      + `scoreboard players set ${initializedVar} ${obj} 1\n`
-    )
-    addFile(
-      'data/minecraft/tags/function/load.json',
-      JSON.stringify({ values: [`${internalNs}:load`] }, null, 2)
-    )
-  }
+  prependToFile(
+    `data/${internalNs}/function/load.mcfunction`,
+    `scoreboard objectives add ${obj} dummy\n`
+    + `scoreboard players set ${initializedVar} ${obj} 1\n`
+  )
+  addFile(
+    'data/minecraft/tags/function/load.json',
+    JSON.stringify({ values: [`${internalNs}:load`] }, null, 2)
+  )
 
   if (hasTick) {
     addFile(

@@ -1,7 +1,6 @@
 import { mcfunctionGenerator } from "../generator"
 import { scoreboardManager } from '../scoreboardManager'
 import { getConditionSetup } from "./control"
-import { markNoExecCtx } from '../executeContext'
 
 function isConditionBlock(type: string): boolean {
   return type.startsWith('mc_comp_')
@@ -28,7 +27,7 @@ mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
     cmd = `scoreboard players set ${varName} ${obj} ${valueCode}\n`
   } else cmd = ''
 
-  return scoreboardManager.withObjective(cmd)
+  return cmd
 }
 
 mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
@@ -56,7 +55,7 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
     cmd = `scoreboard players operation ${varName} ${obj} ${opMap[opType]} ${srcName} ${obj}\n`
   }
 
-  return scoreboardManager.withObjective(cmd)
+  return cmd
 }
 
 mcfunctionGenerator.forBlock['mc_var_get'] = function(block) {

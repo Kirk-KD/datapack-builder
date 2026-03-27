@@ -22,7 +22,7 @@ export function getConditionSetup(conditionBlock: Blockly.Block): string {
       const tempName = scoreboardManager.getTempVar()
       const obj = scoreboardManager.getObjectiveName()
       const cmd = `scoreboard players set ${tempName} ${obj} ${num}\n`
-      return scoreboardManager.withObjective(markNoExecCtx(cmd))
+      return markNoExecCtx(cmd)
     }
   }
   return ''
