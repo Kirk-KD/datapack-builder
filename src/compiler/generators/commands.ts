@@ -8,8 +8,9 @@ mcfunctionGenerator.forBlock['mc_say'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_teleport'] = function(block) {
+  const selector = block.getFieldValue('SELECTOR')
   const x = block.getFieldValue('X')
   const y = block.getFieldValue('Y')
   const z = block.getFieldValue('Z')
-  return `teleport ${x} ${y} ${z}\n`
+  return `teleport ${selector} ${x} ${y} ${z}\n`
 }

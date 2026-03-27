@@ -18,8 +18,13 @@ const commands: any[] = [
   },
   {
     "type": "mc_teleport",
-    "message0": "teleport %1 %2 %3",
+    "message0": "teleport %1 %2 %3 %4",
     "args0": [
+      {
+        "type": "field_input",
+        "name": "SELECTOR",
+        "text": "@s"
+      },
       {
         "type": "field_input",
         "name": "X",
