@@ -1,10 +1,14 @@
+import { popExecuteContext, pushExecuteContext } from '../executeContext'
 import { mcfunctionGenerator } from '../generator'
 
 mcfunctionGenerator.forBlock['execute_root'] = function(block) {
   const modString = mcfunctionGenerator.statementToCode(block, 'MODIFIER_STACK').trim()
-  const runStringRaw = mcfunctionGenerator.statementToCode(block, 'RUN_STACK')
-  const code = runStringRaw.trim().split('\n').map(line => `execute ${modString} run ${line}`).join('\n') + '\n'
-  return code
+  pushExecuteContext(modString)
+  const runString = mcfunctionGenerator.statementToCode(block, 'RUN_STACK')
+  popExecuteContext()
+  // const code = runString.trim().split('\n').map(line => `execute ${modString} run ${line}`).join('\n') + '\n'
+  // return code
+  return runString
 }
 
 mcfunctionGenerator.forBlock['execute_mod_align'] = function(block) {

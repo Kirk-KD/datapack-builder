@@ -4,6 +4,7 @@ import { mcfunctionGenerator } from '../generator'
 import { nextId } from '../idGenerator'
 import { getInternalNamespace } from '../projectConfig'
 import { scoreboardManager } from '../scoreboardManager'
+import { markNoExecCtx } from '../executeContext'
 
 const opMap: Record<string, string> = {
   LT: '<',
@@ -21,7 +22,7 @@ export function getConditionSetup(conditionBlock: Blockly.Block): string {
       const tempName = scoreboardManager.getTempVar()
       const obj = scoreboardManager.getObjectiveName()
       const cmd = `scoreboard players set ${tempName} ${obj} ${num}\n`
-      return scoreboardManager.withObjective(cmd)
+      return scoreboardManager.withObjective(markNoExecCtx(cmd))
     }
   }
   return ''
@@ -65,7 +66,7 @@ mcfunctionGenerator.forBlock['mc_if'] = function(block) {
   addFile(`data/${internalNs}/function/${id}_true.mcfunction`, doCode)
 
   return setup
-       + `execute if ${condition} run function ${internalNs}:${id}_true\n`
+       + markNoExecCtx(`execute if ${condition} run function ${internalNs}:${id}_true\n`)
 }
 
 mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
@@ -81,8 +82,8 @@ mcfunctionGenerator.forBlock['mc_if_else'] = function(block) {
   addFile(`data/${internalNs}/function/${id}_false.mcfunction`, elseCode)
 
   return setup
-       + `execute if ${condition} run function ${internalNs}:${id}_true\n`
-       + `execute unless ${condition} run function ${internalNs}:${id}_false\n`
+       + markNoExecCtx(`execute if ${condition} run function ${internalNs}:${id}_true\n`)
+       + markNoExecCtx(`execute unless ${condition} run function ${internalNs}:${id}_false\n`)
 }
 
 mcfunctionGenerator.forBlock['mc_while'] = function(block) {
@@ -106,5 +107,5 @@ mcfunctionGenerator.forBlock['mc_while'] = function(block) {
   )
 
   return setup
-       + `function ${internalNs}:${id}\n`
+       + markNoExecCtx(`function ${internalNs}:${id}\n`)
 }
