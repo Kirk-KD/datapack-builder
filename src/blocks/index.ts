@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { commands, control, variable, events, literals, procedures, execute } from './definitions'
+import { commands, control, variable, events, literals, procedures, execute, targetSelectors } from './definitions'
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
 import './extensions'
@@ -12,6 +12,7 @@ events.forEach(b => {b['colour'] = colours.events})
 literals.forEach(b => {b['colour'] = colours.literals})
 procedures.forEach(b => {b['colour'] = colours.procedures})
 execute.forEach(b => {b['colour'] = colours.execute})
+targetSelectors.forEach(b => {b['colour'] = colours.targetSelectors})
 
 Blockly.defineBlocksWithJsonArray(commands)
 Blockly.defineBlocksWithJsonArray(control)
@@ -20,6 +21,7 @@ Blockly.defineBlocksWithJsonArray(events)
 Blockly.defineBlocksWithJsonArray(literals)
 Blockly.defineBlocksWithJsonArray(procedures)
 Blockly.defineBlocksWithJsonArray(execute)
+Blockly.defineBlocksWithJsonArray(targetSelectors)
 
 export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
   return [
@@ -64,6 +66,12 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       name: 'Execute',
       colour: colours.execute,
       contents: execute.map(block => ({ kind: 'block', type: block.type }))
+    },
+    {
+      kind: 'category',
+      name: 'Target Selector',
+      colour: colours.targetSelectors,
+      contents: targetSelectors.map(block => ({ kind: 'block', type: block.type }))
     }
   ]
 }

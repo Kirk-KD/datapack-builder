@@ -1,7 +1,5 @@
-import * as Blockly from "blockly"
-import { getParametersForProcedure, getVariables } from "../compiler/workspaceRegistry"
-import { shouldTrimChainTail } from "./validators/chainPolicy"
-import { validateInt } from "./validators"
+import * as Blockly from 'blockly'
+import { getParametersForProcedure } from '../../compiler/workspaceRegistry'
 
 function getContainingProcedureName(block: Blockly.Block | null): string | null {
   let current = block
@@ -37,17 +35,8 @@ function optionValues(options: [string, string][]): Set<string> {
   return new Set(options.map(([, value]) => value))
 }
 
-Blockly.Extensions.register('mc_scoreboard_variable_dropdown', function() {
-  // All blocks using this extension must have a dropdwn field named 'VAR_NAME'
-  (this.getField('VAR_NAME')! as Blockly.FieldDropdown).setOptions(function() {
-    return getVariables()
-      .filter(variable => variable.getType() === 'mc_scoreboard_variable')
-      .map(variable => [variable.getName(), variable.getName()])
-  })
-})
-
 Blockly.Extensions.register('mc_procedure_parameter_dropdown', function() {
-  // All blocks using this extension must have a dropdwn field named 'PARAM_NAME'
+  // All blocks using this extension must have a dropdown field named 'PARAM_NAME'.
   const paramField = this.getField('PARAM_NAME')! as Blockly.FieldDropdown
   const initialOptions = getProcedureParamOptions(this)
   let appliedOptions: [string, string][] = initialOptions ?? [['...', '...']]
@@ -60,12 +49,12 @@ Blockly.Extensions.register('mc_procedure_parameter_dropdown', function() {
     if (!event || this.isInFlyout) return
 
     if (
-      event.type !== Blockly.Events.BLOCK_MOVE &&
-      event.type !== Blockly.Events.BLOCK_CHANGE &&
-      event.type !== Blockly.Events.BLOCK_CREATE &&
-      event.type !== Blockly.Events.VAR_RENAME &&
-      event.type !== Blockly.Events.VAR_CREATE &&
-      event.type !== Blockly.Events.VAR_DELETE
+      event.type !== Blockly.Events.BLOCK_MOVE
+      && event.type !== Blockly.Events.BLOCK_CHANGE
+      && event.type !== Blockly.Events.BLOCK_CREATE
+      && event.type !== Blockly.Events.VAR_RENAME
+      && event.type !== Blockly.Events.VAR_CREATE
+      && event.type !== Blockly.Events.VAR_DELETE
     ) return
 
     const options = getProcedureParamOptions(this)
@@ -86,31 +75,4 @@ Blockly.Extensions.register('mc_procedure_parameter_dropdown', function() {
       this.setWarningText(null)
     } else this.setWarningText('Parameter can only be used inside a procedure')
   })
-})
-
-Blockly.Extensions.register('mc_trim_chain_tail', function(this: Blockly.Block) {
-  const previousOnChange = this.onchange ?? (() => {})
-  this.setOnChange(function(this: Blockly.Block, event: Blockly.Events.Abstract) {
-    previousOnChange.call(this, event)
-
-    if (!event || this.isInFlyout) return
-
-    if (
-      event.type !== Blockly.Events.BLOCK_MOVE &&
-      event.type !== Blockly.Events.BLOCK_CHANGE &&
-      event.type !== Blockly.Events.BLOCK_CREATE
-    ) return
-
-    if (!shouldTrimChainTail(this)) return
-
-    // Keep only the first chainable value when used in mc_var_set
-    const chainNextConnection = this.getInput('CHAIN_NEXT')?.connection
-    if (chainNextConnection?.isConnected()) {
-      chainNextConnection.disconnect()
-    }
-  })
-})
-
-Blockly.Extensions.register('mc_int_validator', function(this: Blockly.Block) {
-  this.getField('VALUE')!.setValidator(validateInt)
 })

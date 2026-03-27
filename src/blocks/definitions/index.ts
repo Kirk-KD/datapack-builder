@@ -5,6 +5,7 @@ import events from './events'
 import literals from './literals'
 import procedures from './procedures'
 import execute from './execute'
+import targetSelectors from './selectors'
 
 export {
 	chainableBlocks,
@@ -14,4 +15,4 @@ export {
 	trimChainTailBlocks,
 } from './shared'
 
-export { commands, control, variable, events, literals, procedures, execute }
+export { commands, control, variable, events, literals, procedures, execute, targetSelectors }
