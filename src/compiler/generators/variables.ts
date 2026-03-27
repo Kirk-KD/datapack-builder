@@ -28,7 +28,7 @@ mcfunctionGenerator.forBlock['mc_var_set'] = function(block) {
     cmd = `scoreboard players set ${varName} ${obj} ${valueCode}\n`
   } else cmd = ''
 
-  return markNoExecCtx(scoreboardManager.withObjective(cmd))
+  return scoreboardManager.withObjective(cmd)
 }
 
 mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
@@ -56,7 +56,7 @@ mcfunctionGenerator.forBlock['mc_var_change'] = function(block) {
     cmd = `scoreboard players operation ${varName} ${obj} ${opMap[opType]} ${srcName} ${obj}\n`
   }
 
-  return markNoExecCtx(scoreboardManager.withObjective(cmd))
+  return scoreboardManager.withObjective(cmd)
 }
 
 mcfunctionGenerator.forBlock['mc_var_get'] = function(block) {
