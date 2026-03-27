@@ -1,5 +1,6 @@
 import * as Blockly from 'blockly'
 import { shouldDisallowChainConnection } from './chainPolicy'
+import { shouldDisallowExecuteConnection } from './executePolicy'
 
 class GlobalChecker extends Blockly.ConnectionChecker {
   doTypeChecks(a: Blockly.Connection, b: Blockly.Connection): boolean {
@@ -13,6 +14,7 @@ class GlobalChecker extends Blockly.ConnectionChecker {
     const superiorBlock = superior.getSourceBlock()
     const inferiorBlock = inferior.getSourceBlock()
     if (shouldDisallowChainConnection(superiorBlock, inferiorBlock)) return false
+    if (shouldDisallowExecuteConnection(superior, superiorBlock, inferiorBlock)) return false
 
     return super.doTypeChecks(a, b)
   }

@@ -1,6 +1,6 @@
 import * as Blockly from "blockly"
 import { getParametersForProcedure, getVariables } from "../compiler/workspaceRegistry"
-import { shouldTrimChainTail } from "./chainPolicy"
+import { shouldTrimChainTail } from "./validators/chainPolicy"
 import { validateInt } from "./validators"
 
 function getContainingProcedureName(block: Blockly.Block | null): string | null {

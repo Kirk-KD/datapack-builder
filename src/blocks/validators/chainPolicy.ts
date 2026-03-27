@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { chainableBlocks, trimChainTailBlocks } from './definitions'
+import { chainableBlocks, trimChainTailBlocks } from '../definitions'
 
 export function isChainableBlock(block: Blockly.Block | null): block is Blockly.Block {
   if (!block) return false
