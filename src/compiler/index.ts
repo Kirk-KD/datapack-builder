@@ -28,7 +28,7 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   resetContext()
   scoreboardManager.reset()
 
-  const { namespace, packFormat, description } = getProjectConfig()
+  const { packFormat, description } = getProjectConfig()
   const internalNs = getInternalNamespace()
   const obj = scoreboardManager.getObjectiveName()
   const initializedVar = scoreboardManager.getInitializedVarName()

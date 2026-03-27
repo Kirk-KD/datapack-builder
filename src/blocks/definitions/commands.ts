@@ -15,6 +15,31 @@ const commands: any[] = [
     "tooltip": "Broadcasts a message to all players",
     "previousStatement": null,
     "nextStatement": null
+  },
+  {
+    "type": "mc_teleport",
+    "message0": "teleport %1 %2 %3",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "X",
+        "text": "0"
+      },
+      {
+        "type": "field_input",
+        "name": "Y",
+        "text": "0"
+      },
+      {
+        "type": "field_input",
+        "name": "Z",
+        "text": "0"
+      }
+    ],
+    "inputsInline": true,
+    "tooltip": "Teleports to coordinates",
+    "previousStatement": null,
+    "nextStatement": null
   }
 ]
 
