@@ -1,5 +1,5 @@
 const executeRootBlock = {
-  "type": "execute_mod_root",
+  "type": "execute_root",
   "tooltip": "",
   "helpUrl": "",
   "message0": "execute %1 run %2",
