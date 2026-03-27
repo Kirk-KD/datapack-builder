@@ -5,4 +5,5 @@ export const colours: Record<string, string> = {
   literals: '#006676',
   variable: '#ff6200',
   procedures: '#ff2c64',
+  execute: '#3381ff'
 }

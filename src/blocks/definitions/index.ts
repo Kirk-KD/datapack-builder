@@ -4,6 +4,7 @@ import variable from './variable'
 import events from './events'
 import literals from './literals'
 import procedures from './procedures'
+import execute from './execute'
 
 export {
 	chainableBlocks,
@@ -13,4 +14,4 @@ export {
 	trimChainTailBlocks,
 } from './shared'
 
-export { commands, control, variable, events, literals, procedures }
+export { commands, control, variable, events, literals, procedures, execute }

@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { commands, control, variable, events, literals, procedures } from './definitions'
+import { commands, control, variable, events, literals, procedures, execute } from './definitions'
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
 import './extensions'
@@ -11,6 +11,7 @@ variable.forEach(b => {b['colour'] = colours.variable})
 events.forEach(b => {b['colour'] = colours.events})
 literals.forEach(b => {b['colour'] = colours.literals})
 procedures.forEach(b => {b['colour'] = colours.procedures})
+execute.forEach(b => {b['colour'] = colours.execute})
 
 Blockly.defineBlocksWithJsonArray(commands)
 Blockly.defineBlocksWithJsonArray(control)
@@ -18,6 +19,7 @@ Blockly.defineBlocksWithJsonArray(variable)
 Blockly.defineBlocksWithJsonArray(events)
 Blockly.defineBlocksWithJsonArray(literals)
 Blockly.defineBlocksWithJsonArray(procedures)
+Blockly.defineBlocksWithJsonArray(execute)
 
 export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
   return [
@@ -56,6 +58,12 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       name: "Procedures",
       custom: "PROCEDURE",
       colour: colours.procedures
+    },
+    {
+      kind: 'category',
+      name: 'Execute',
+      colour: colours.execute,
+      contents: execute.map(block => ({ kind: 'block', type: block.type }))
     }
   ]
 }
