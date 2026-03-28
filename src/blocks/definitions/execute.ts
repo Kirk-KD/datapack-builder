@@ -17,7 +17,7 @@ const executeRootBlock = {
   "nextStatement": null
 }
 
-export const executeModifierBlocks: any[] = [
+export const executeModifierBlocks = [
   {
     "type": "execute_mod_align",
     "tooltip": "",
@@ -284,5 +284,5 @@ export const executeModifierBlocks: any[] = [
   }
 ]
 
-const execute: any[] = [executeRootBlock, ...executeModifierBlocks]
+const execute = [executeRootBlock, ...executeModifierBlocks]
 export default execute

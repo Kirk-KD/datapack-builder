@@ -1,6 +1,6 @@
 import { chainableBlocks } from './shared'
 
-const procedures: any[] = [
+const procedures = [
   {
     "type": "mc_param",
     "tooltip": "",

@@ -1,6 +1,6 @@
 import { scoreboardVarSetBlocks } from './shared'
 
-const variable: any[] = [
+const variable = [
   {
     "type": "mc_var_set",
     "message0": "set %1 to %2",

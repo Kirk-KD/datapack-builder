@@ -44,8 +44,8 @@ function WorkspacePanel() {
     workspaceRef.current.getVariableMap().createVariable('myVar', 'mc_scoreboard_variable')
 
     // Custom dynamic category for variables
-    workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', (workspace) => {
-      return getVariablesCategory(workspace as Blockly.WorkspaceSvg)
+    workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', () => {
+      return getVariablesCategory()
     })
     workspaceRef.current.registerButtonCallback('CREATE_VARIABLE', () => {
       Blockly.Variables.createVariableButtonHandler(workspaceRef.current!, undefined, 'mc_scoreboard_variable')

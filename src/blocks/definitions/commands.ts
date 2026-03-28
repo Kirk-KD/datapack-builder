@@ -1,6 +1,6 @@
 import { chainableBlocks } from './shared'
 
-const commands: any[] = [
+const commands = [
   {
     "type": "mc_say",
     "message0": "say %1",

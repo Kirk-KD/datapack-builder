@@ -1,4 +1,4 @@
-const control: any[] = [
+const control = [
   {
     "type": "mc_comp_score_matches",
     "message0": "%1 matches %2 to %3",

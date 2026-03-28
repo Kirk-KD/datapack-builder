@@ -16,14 +16,25 @@ import { colours } from './blockColours'
 import './extensions'
 import './validators'
 
-commands.forEach(b => {b['colour'] = colours.commands})
-control.forEach(b => {b['colour'] = colours.control})
-variable.forEach(b => {b['colour'] = colours.variable})
-events.forEach(b => {b['colour'] = colours.events})
-literals.forEach(b => {b['colour'] = colours.literals})
-procedures.forEach(b => {b['colour'] = colours.procedures})
-execute.forEach(b => {b['colour'] = colours.execute})
-targetSelectors.forEach(b => {b['colour'] = colours.targetSelectors})
+type ColourableBlockDefinition = {
+  type: string
+  colour?: string
+}
+
+function applyColour(blocks: readonly ColourableBlockDefinition[], colour: string) {
+  blocks.forEach(block => {
+    block.colour = colour
+  })
+}
+
+applyColour(commands, colours.commands)
+applyColour(control, colours.control)
+applyColour(variable, colours.variable)
+applyColour(events, colours.events)
+applyColour(literals, colours.literals)
+applyColour(procedures, colours.procedures)
+applyColour(execute, colours.execute)
+applyColour(targetSelectors, colours.targetSelectors)
 
 registerTargetSelectorBlock()
 Blockly.defineBlocksWithJsonArray(commands)

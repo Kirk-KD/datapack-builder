@@ -6,8 +6,7 @@ import { literalBlocks } from '../../blocks/definitions'
 import { nbtStorageManager } from '../nbtStorageManager'
 
 mcfunctionGenerator.forBlock['procedures_defnoreturn'] = function(block) {
-  const body = mcfunctionGenerator.statementToCode(block, 'STACK')
-  return body
+  return mcfunctionGenerator.statementToCode(block, 'STACK')
 }
 
 mcfunctionGenerator.forBlock['procedures_callnoreturn'] = function(block) {
@@ -56,6 +55,6 @@ mcfunctionGenerator.forBlock['procedures_callnoreturn'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['mc_param'] = function(block) {
-  const [text, _] = literalChain(block)
+  const [text] = literalChain(block)
   return [text, 0]
 }

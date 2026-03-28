@@ -1,4 +1,4 @@
-const events: any[] = [
+const events = [
   {
     "type": "mc_on_load",
     "message0": "on load",

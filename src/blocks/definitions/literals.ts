@@ -1,6 +1,6 @@
 import { chainableBlocks } from './shared'
 
-const literals: any[] = [
+const literals = [
   {
     "type": "mc_int",
     "tooltip": "",

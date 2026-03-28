@@ -76,7 +76,7 @@ export function registerTargetSelectorBlock() {
   }
 }
 
-const targetSelectors: any[] = [
+const targetSelectors = [
   // Basic
   {
     "type": "mc_target_filter_limit",
