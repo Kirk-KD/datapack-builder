@@ -1,56 +1,82 @@
-import { chainableBlocks } from "./shared"
+import * as Blockly from 'blockly'
+import { colours } from '../blockColours'
+import { ToggleImageField } from '../fields/toggleImage'
+import { chainableBlocks } from './shared'
+
+export const targetSelectorRootType = 'mc_target_selector'
+
+const selectorBaseOptions: [string, string][] = [
+  ['command executer (@s)', '@s'],
+  ['nearest player (@p)', '@p'],
+  ['random player (@r)', '@r'],
+  ['all players (@a)', '@a'],
+  ['nearest entity (@n)', '@n'],
+  ['all entities (@e)', '@e'],
+]
+
+type TargetSelectorBlock = Blockly.BlockSvg & {
+  showFilters_: boolean
+  updateShape_: () => void
+}
+
+export function registerTargetSelectorBlock() {
+  Blockly.Blocks[targetSelectorRootType] = {
+    init(this: TargetSelectorBlock) {
+      this.showFilters_ = false
+      this.setOutput(true, targetSelectorRootType)
+      this.setColour(colours.targetSelectors)
+      this.setTooltip('')
+      this.setHelpUrl('')
+      this.setInputsInline(false)
+
+      this.appendValueInput('CHAIN_NEXT')
+        .setCheck(chainableBlocks)
+        .appendField(new Blockly.FieldDropdown(selectorBaseOptions), 'BASE')
+        .appendField(new ToggleImageField({
+          collapsedSrc: '/expand.svg',
+          expandedSrc: '/collapse.svg',
+          width: 16,
+          height: 16,
+          collapsedAlt: 'Show filters',
+          expandedAlt: 'Hide filters',
+          initialExpanded: this.showFilters_,
+          onToggle: (expanded) => {
+            this.showFilters_ = expanded
+            this.updateShape_()
+          },
+        }), 'SHOW_FILTERS_TOGGLE')
+
+      this.appendStatementInput('FILTER_STACK')
+        .appendField('with')
+
+      Blockly.Extensions.apply('mc_trim_chain_tail', this, false)
+
+      this.updateShape_()
+    },
+
+    updateShape_(this: TargetSelectorBlock) {
+      this.getInput('FILTER_STACK')?.setVisible(this.showFilters_)
+      if (this.rendered) {
+        this.render()
+      }
+    },
+
+    saveExtraState(this: TargetSelectorBlock) {
+      return this.showFilters_ ? { showFilters: true } : null
+    },
+
+    loadExtraState(this: TargetSelectorBlock, state: { showFilters?: boolean } | null) {
+      this.showFilters_ = !!state?.showFilters
+      const toggleField = this.getField('SHOW_FILTERS_TOGGLE')
+      if (toggleField instanceof ToggleImageField) {
+        toggleField.setExpanded(this.showFilters_)
+      }
+      this.updateShape_()
+    },
+  }
+}
 
 const targetSelectors: any[] = [
-  {
-    "type": "mc_target_selector",
-    "tooltip": "",
-    "helpUrl": "",
-    "message0": "select %1 %2 %3",
-    "args0": [
-      {
-        "type": "field_dropdown",
-        "name": "BASE",
-        "options": [
-          [
-            "command executer (@s)",
-            "@s"
-          ],
-          [
-            "nearest player (@p)",
-            "@p"
-          ],
-          [
-            "random player (@r)",
-            "@r"
-          ],
-          [
-            "all players (@a)",
-            "@a"
-          ],
-          [
-            "nearest entity (@n)",
-            "@n"
-          ],
-          [
-            "all entities (@e)",
-            "@e"
-          ]
-        ]
-      },
-      {
-        "type": "input_value",
-        "name": "CHAIN_NEXT",
-        "check": chainableBlocks
-      },
-      {
-        "type": "input_statement",
-        "name": "FILTER_STACK"
-      }
-    ],
-    "output": 'mc_target_selector',
-    "extensions": ["mc_trim_chain_tail"]
-  },
-
   // Basic
   {
     "type": "mc_target_filter_limit",
