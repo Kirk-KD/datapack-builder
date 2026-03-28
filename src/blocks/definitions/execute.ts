@@ -74,13 +74,14 @@ export const executeModifierBlocks: any[] = [
     "message0": "at %1",
     "args0": [
       {
-        "type": "field_input",
+        "type": "input_value",
         "name": "TARGET",
-        "text": "@s"
+        "check": ["mc_string", "mc_target_selector"], // TODO custom coordinates block
       }
     ],
     "previousStatement": null,
-    "nextStatement": null
+    "nextStatement": null,
+    "extensions": ["execute_mod_at_shadow"]
   },
   {
     "type": "execute_mod_facing",
@@ -114,9 +115,9 @@ export const executeModifierBlocks: any[] = [
     "message0": "facing entity %1 %2",
     "args0": [
       {
-        "type": "field_input",
+        "type": "input_value",
         "name": "TARGET",
-        "text": "@s"
+        "check": ["mc_string", "mc_target_selector"],
       },
       {
         "type": "field_dropdown",
@@ -128,7 +129,8 @@ export const executeModifierBlocks: any[] = [
       }
     ],
     "previousStatement": null,
-    "nextStatement": null
+    "nextStatement": null,
+    "extensions": ["execute_mod_facing_entity_shadow"]
   },
   {
     "type": "execute_mod_in",
@@ -201,13 +203,13 @@ export const executeModifierBlocks: any[] = [
     "message0": "positioned as %1",
     "args0": [
       {
-        "type": "field_input",
+        "type": "input_value",
         "name": "TARGET",
-        "text": "@s"
       }
     ],
     "previousStatement": null,
-    "nextStatement": null
+    "nextStatement": null,
+    "extensions": ["execute_mod_positioned_as_shadow"]
   },
   {
     "type": "execute_mod_positioned_over",
@@ -256,13 +258,14 @@ export const executeModifierBlocks: any[] = [
     "message0": "rotated as %1",
     "args0": [
       {
-        "type": "field_input",
+        "type": "input_value",
         "name": "TARGET",
-        "text": "@s"
+        "check": ["mc_string", "mc_target_selector"]
       }
     ],
     "previousStatement": null,
-    "nextStatement": null
+    "nextStatement": null,
+    "extensions": ["execute_mod_rotated_as_shadow"]
   },
   {
     "type": "execute_mod_summon",

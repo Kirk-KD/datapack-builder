@@ -13,18 +13,18 @@ const commands: any[] = [
     ],
     "inputsInline": true,
     "tooltip": "Broadcasts a message to all players",
-    "extensions": ["mc_say_shadows"],
+    "extensions": ["mc_say_shadow"],
     "previousStatement": null,
     "nextStatement": null
   },
   {
     "type": "mc_teleport",
-    "message0": "teleport %1 %2 %3 %4",
+    "message0": "teleport %1 to %2 %3 %4", // TODO not always to coordinates
     "args0": [
       {
-        "type": "field_input",
+        "type": "input_value",
         "name": "SELECTOR",
-        "text": "@s"
+        "check": ["mc_string", "mc_target_selector"]
       },
       {
         "type": "field_input",
@@ -45,7 +45,8 @@ const commands: any[] = [
     "inputsInline": true,
     "tooltip": "Teleports to coordinates",
     "previousStatement": null,
-    "nextStatement": null
+    "nextStatement": null,
+    "extensions": ["mc_teleport_shadow"],
   }
 ]
 

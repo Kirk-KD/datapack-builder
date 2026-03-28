@@ -23,7 +23,7 @@ const variable: any[] = [
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "extensions": ["mc_scoreboard_variable_dropdown"]
+    "extensions": ["mc_scoreboard_variable_dropdown", "mc_var_set_shadow"]
   },
   {
     "type": "mc_var_change",
@@ -58,7 +58,7 @@ const variable: any[] = [
     ],
     "previousStatement": null,
     "nextStatement": null,
-    "extensions": ["mc_scoreboard_variable_dropdown"]
+    "extensions": ["mc_scoreboard_variable_dropdown", "mc_var_change_shadow"]
   },
   {
     "type": "mc_var_get",

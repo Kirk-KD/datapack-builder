@@ -12,25 +12,60 @@ function setShadowState(block: Block, inputName: string, shadowBlock: ShadowBloc
   connection.setShadowState(shadowBlock)
 }
 
-const shadows: Record<string, ShadowBlock> = {
-  stringLiteral: {
+function shadowString(s: string): ShadowBlock {
+  return {
     type: 'mc_string',
     fields: {
-      VALUE: 'Hello world',
-    },
-  },
-  targetSelectorString: {
-    type: 'mc_string',
+      VALUE: s
+    }
+  }
+}
+function shadowTargetSelector(): ShadowBlock {
+  return {
+    type: 'mc_target_selector'
+  }
+}
+function shadowInt(n?: number): ShadowBlock {
+  return {
+    type: 'mc_int',
     fields: {
-      VALUE: '@s'
+      VALUE: n || 0
     }
   }
 }
 
-Blockly.Extensions.register('mc_say_shadows', function(this: Blockly.Block) {
-  setShadowState(this, 'MESSAGE', shadows.stringLiteral)
+const register = Blockly.Extensions.register
+
+register('mc_say_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'MESSAGE', shadowString('Hello world'))
+})
+register('mc_teleport_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'SELECTOR', shadowTargetSelector())
 })
 
-Blockly.Extensions.register('execute_mod_as_shadow', function(this: Blockly.Block) {
-  setShadowState(this, 'TARGET', shadows.targetSelectorString)
+register('execute_mod_as_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'TARGET', shadowTargetSelector())
+})
+register('execute_mod_at_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'TARGET', shadowString('~ ~ ~'))
+})
+register('execute_mod_facing_entity_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'TARGET', shadowTargetSelector())
+})
+register('execute_mod_positioned_as_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'TARGET', shadowTargetSelector())
+})
+register('execute_mod_rotated_as_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'TARGET', shadowTargetSelector())
+})
+
+register('mc_comp_score_compare_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'VAR_B', shadowInt())
+})
+
+register('mc_var_set_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'VALUE', shadowInt())
+})
+register('mc_var_change_shadow', function(this: Blockly.Block) {
+  setShadowState(this, 'VALUE', shadowInt(1))
 })

@@ -25,7 +25,7 @@ const literals: any[] = [
     "type": "mc_string",
     "tooltip": "",
     "helpUrl": "",
-    "message0": "\" %1 \" %2",
+    "message0": "%1 %2",
     "args0": [
       {
         "type": "field_input",

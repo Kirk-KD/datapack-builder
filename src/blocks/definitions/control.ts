@@ -60,7 +60,7 @@ const control: any[] = [
     ],
     "inputsInline": true,
     "output": "MCCondition",
-    "extensions": ["mc_scoreboard_variable_dropdown"]
+    "extensions": ["mc_scoreboard_variable_dropdown", "mc_comp_score_compare_shadow"]
   },
   {
     "type": "mc_if",
