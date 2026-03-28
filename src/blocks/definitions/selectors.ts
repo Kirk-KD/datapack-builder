@@ -1,5 +1,7 @@
+import { chainableBlocks } from "./shared"
+
 const targetSelectors: any[] = [
-	{
+  {
     "type": "mc_target_selector",
     "tooltip": "",
     "helpUrl": "",
@@ -36,8 +38,9 @@ const targetSelectors: any[] = [
         ]
       },
       {
-        "type": "input_dummy",
-        "name": "BASE"
+        "type": "input_value",
+        "name": "CHAIN_NEXT",
+        "check": chainableBlocks
       },
       {
         "type": "input_statement",
@@ -45,6 +48,7 @@ const targetSelectors: any[] = [
       }
     ],
     "output": 'mc_target_selector',
+    "extensions": ["mc_trim_chain_tail"]
   },
 
   // Basic
@@ -228,7 +232,7 @@ const targetSelectors: any[] = [
     "args0": [
       {
         "type": "field_input",
-        "name": "TYPE",
+        "name": "NAME",
         "text": ""
       }
     ],
@@ -244,7 +248,7 @@ const targetSelectors: any[] = [
     "args0": [
       {
         "type": "field_input",
-        "name": "TYPE",
+        "name": "PREDICATE",
         "text": ""
       }
     ],
@@ -260,7 +264,7 @@ const targetSelectors: any[] = [
     "args0": [
       {
         "type": "field_input",
-        "name": "TYPE",
+        "name": "NBT",
         "text": ""
       }
     ],
@@ -278,7 +282,7 @@ const targetSelectors: any[] = [
     "args0": [
       {
         "type": "field_input",
-        "name": "TYPE",
+        "name": "SCORES",
         "text": ""
       }
     ],
@@ -294,7 +298,7 @@ const targetSelectors: any[] = [
     "args0": [
       {
         "type": "field_input",
-        "name": "TYPE",
+        "name": "TAG",
         "text": ""
       }
     ],
@@ -310,7 +314,7 @@ const targetSelectors: any[] = [
     "args0": [
       {
         "type": "field_input",
-        "name": "TYPE",
+        "name": "TEAM",
         "text": ""
       }
     ],
