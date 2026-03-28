@@ -13,6 +13,7 @@ const commands: any[] = [
     ],
     "inputsInline": true,
     "tooltip": "Broadcasts a message to all players",
+    "extensions": ["mc_say_shadows"],
     "previousStatement": null,
     "nextStatement": null
   },

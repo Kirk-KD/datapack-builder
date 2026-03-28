@@ -58,13 +58,14 @@ export const executeModifierBlocks: any[] = [
     "message0": "as %1",
     "args0": [
       {
-        "type": "field_input",
+        "type": "input_value",
         "name": "TARGET",
-        "text": "@s"
+        "check": ["mc_string", "mc_target_selector"],
       }
     ],
     "previousStatement": null,
-    "nextStatement": null
+    "nextStatement": null,
+    "extensions": ["execute_mod_as_shadow"]
   },
   {
     "type": "execute_mod_at",

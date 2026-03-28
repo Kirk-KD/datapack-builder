@@ -22,23 +22,30 @@ function isExecuteModifierStackConnection(superior: Blockly.Connection): boolean
   return getInputNameForConnection(superiorBlock, superior) === EXECUTE_MODIFIER_STACK_INPUT
 }
 
+function isExecuteModifierNextConnection(connection: Blockly.Connection): boolean {
+  const block = connection.getSourceBlock()
+  return isExecuteModifierBlock(block) && connection === block.nextConnection
+}
+
 export function shouldDisallowExecuteConnection(
   superior: Blockly.Connection,
-  superiorBlock: Blockly.Block,
+  _superiorBlock: Blockly.Block,
   inferiorBlock: Blockly.Block,
 ): boolean {
-  const superiorIsModifier = isExecuteModifierBlock(superiorBlock)
   const inferiorIsModifier = isExecuteModifierBlock(inferiorBlock)
+  const isModifierChainConnection =
+    isExecuteModifierStackConnection(superior) || isExecuteModifierNextConnection(superior)
 
-  if (!superiorIsModifier && !inferiorIsModifier) {
-    // Also enforce that MODIFIER_STACK only accepts execute modifier blocks.
-    return isExecuteModifierStackConnection(superior)
-  }
-
-  if (superiorIsModifier) {
-    // execute modifiers can only chain to other execute modifiers.
+  if (isModifierChainConnection) {
+    // execute modifier stacks/chains only accept execute modifier blocks.
     return !inferiorIsModifier
   }
 
-  return !isExecuteModifierStackConnection(superior)
+  if (inferiorIsModifier) {
+    // execute modifiers cannot connect into any other kind of stack.
+    return true
+  }
+
+  // Value inputs on execute modifier blocks should use normal Blockly type checks.
+  return false
 }
