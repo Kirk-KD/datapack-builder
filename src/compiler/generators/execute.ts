@@ -22,12 +22,12 @@ mcfunctionGenerator.forBlock['execute_mod_anchored'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['execute_mod_as'] = function(block) {
-  const target = block.getFieldValue('TARGET')
+  const target = (mcfunctionGenerator.valueToCode(block, 'TARGET', 0) || '').trim()
   return `as ${target} `
 }
 
 mcfunctionGenerator.forBlock['execute_mod_at'] = function(block) {
-  const target = block.getFieldValue('TARGET')
+  const target = (mcfunctionGenerator.valueToCode(block, 'TARGET', 0) || '').trim()
   return `at ${target} `
 }
 
@@ -39,7 +39,7 @@ mcfunctionGenerator.forBlock['execute_mod_facing'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['execute_mod_facing_entity'] = function(block) {
-  const target = block.getFieldValue('TARGET')
+  const target = (mcfunctionGenerator.valueToCode(block, 'TARGET', 0) || '').trim()
   const anchor = block.getFieldValue('ANCHOR')
   return `facing entity ${target} ${anchor} `
 }
@@ -62,7 +62,7 @@ mcfunctionGenerator.forBlock['execute_mod_positioned'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['execute_mod_positioned_as'] = function(block) {
-  const target = block.getFieldValue('TARGET')
+  const target = (mcfunctionGenerator.valueToCode(block, 'TARGET', 0) || '').trim()
   return `positioned as ${target} `
 }
 
@@ -78,7 +78,7 @@ mcfunctionGenerator.forBlock['execute_mod_rotated'] = function(block) {
 }
 
 mcfunctionGenerator.forBlock['execute_mod_rotated_as'] = function(block) {
-  const target = block.getFieldValue('TARGET')
+  const target = (mcfunctionGenerator.valueToCode(block, 'TARGET', 0) || '').trim()
   return `rotated as ${target} `
 }
 
