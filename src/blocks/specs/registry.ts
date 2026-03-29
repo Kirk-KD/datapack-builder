@@ -36,6 +36,10 @@ export function getBlockSpecsByCategory(category: BlockSpecCategory): readonly B
   return specsByCategory.get(category) ?? []
 }
 
+export function getBlockTypesByCategory(category: BlockSpecCategory): string[] {
+  return getBlockSpecsByCategory(category).map(spec => spec.type)
+}
+
 export function getBlockTypesByTag(tag: string): string[] {
   return allBlockSpecs
     .filter(spec => spec.tags?.includes(tag))

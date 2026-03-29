@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly'
 import getControlCategory from './categories/control'
 import { colours } from './blockColours'
-import { getBlockJsonByCategory, registerBlockSpecs, targetSelectorRootType } from './specs/registry'
+import { getBlockJsonByCategory, getBlockTypesByCategory, registerBlockSpecs } from './specs/registry'
 import './extensions'
 import './validators'
 
@@ -33,7 +33,7 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Events',
       colour: colours.events,
-      contents: getBlockJsonByCategory('events').map(block => ({ kind: 'block', type: block.type }))
+      contents: getBlockTypesByCategory('events').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',
@@ -45,13 +45,13 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Commands',
       colour: colours.commands,
-      contents: getBlockJsonByCategory('commands').map(block => ({ kind: 'block', type: block.type! }))
+      contents: getBlockTypesByCategory('commands').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',
       name: 'Literals',
       colour: colours.literals,
-      contents: getBlockJsonByCategory('literals').map(block => ({ kind: 'block', type: block.type }))
+      contents: getBlockTypesByCategory('literals').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',
@@ -69,18 +69,13 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Execute',
       colour: colours.execute,
-      contents: getBlockJsonByCategory('execute').map(block => ({ kind: 'block', type: block.type }))
+      contents: getBlockTypesByCategory('execute').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',
       name: 'Target Selector',
       colour: colours.targetSelectors,
-      contents: [
-        { kind: 'block', type: targetSelectorRootType },
-        ...getBlockJsonByCategory('targetSelectors')
-          .filter(block => block.type !== targetSelectorRootType)
-          .map(block => ({ kind: 'block', type: block.type })),
-      ]
+      contents: getBlockTypesByCategory('targetSelectors').map(type => ({ kind: 'block', type }))
     }
   ]
 }

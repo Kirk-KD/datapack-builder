@@ -2,10 +2,14 @@ import * as Blockly from 'blockly'
 
 const EXECUTE_ROOT_TYPE = 'execute_root'
 const EXECUTE_MODIFIER_PREFIX = 'execute_mod_'
+const EXECUTE_CONDITION_PREFIX = 'execute_cond_'
 const EXECUTE_MODIFIER_STACK_INPUT = 'MODIFIER_STACK'
 
 function isExecuteModifierBlock(block: Blockly.Block | null): block is Blockly.Block {
-  return !!block && block.type.startsWith(EXECUTE_MODIFIER_PREFIX)
+  return !!block && (
+    block.type.startsWith(EXECUTE_MODIFIER_PREFIX)
+    || block.type.startsWith(EXECUTE_CONDITION_PREFIX)
+  )
 }
 
 function getInputNameForConnection(block: Blockly.Block, connection: Blockly.Connection): string | null {
