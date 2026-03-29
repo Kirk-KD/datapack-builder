@@ -1,6 +1,8 @@
 import * as Blockly from 'blockly'
-import { popExecuteContext, pushExecuteContext } from '../../compiler/executeContext'
+import { addFile } from '../../compiler/fileRegistry'
 import { mcfunctionGenerator } from '../../compiler/generator'
+import { nextId } from '../../compiler/idGenerator'
+import { getInternalNamespace } from '../../compiler/projectConfig'
 import type { BlockSpec } from './types'
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
@@ -64,10 +66,17 @@ export const executeBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       const modString = mcfunctionGenerator.statementToCode(block, INPUT_MODIFIER_STACK).trim()
-      pushExecuteContext(modString)
       const runString = mcfunctionGenerator.statementToCode(block, INPUT_RUN_STACK)
-      popExecuteContext()
-      return runString
+      const internalNs = getInternalNamespace()
+      const id = nextId('execute')
+
+      addFile(`data/${internalNs}/function/${id}.mcfunction`, runString)
+
+      if (modString === '') {
+        return `function ${internalNs}:${id}\n`
+      }
+
+      return `execute ${modString} run function ${internalNs}:${id}\n`
     },
   },
   scalarModifierSpec(

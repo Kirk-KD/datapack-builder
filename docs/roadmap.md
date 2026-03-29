@@ -93,6 +93,13 @@ Incomplete:
 ### Testing `Not started`
 
 ### Execute Helper `In progress`
+The `execute` block and sub-blocks is a native-layer feature to achieve the following behaviours not present or difficult to implement in Minecraft:
+- An interface for complex execute parameters
+- Multi-command and nested execute `run` code blocks
+
+The code in the `run` stack should run once per every target selected by the `execute` command.
+Since it supports multiple commands to be run, it requires a depth-first behaviour achieved by calling a function via `run function ...`.
+For this, an internal mcfunction file will be generated at compile time, in which the execute context does not need to be prepended for each command.
 
 Complete:
 - Basic code generation
