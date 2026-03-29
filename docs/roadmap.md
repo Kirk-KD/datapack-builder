@@ -45,6 +45,61 @@ Deferred for now.
 - Native blocks expose Minecraft semantics, but with strong validation and UX support.
 - The editor should prevent invalid structures where possible.
 
+## Data Types
+Data types are key to Minecraft commands.
+Blocks responsible for the definition and validation of these types are considered to be in the Native layer.
+See https://minecraft.wiki/w/Argument_types. Basic literal data types such as int and string are not discussed here.
+
+Elementary data types are defined as their own specific blocks whenever they are meaningfully reusable across commands.
+Examples: `tilde_and_caret`, `tilde`, `caret`, `angle`, `pitch`, `swizzle`, `range`.
+These blocks carry their own validation and compilation behaviour, and composite blocks should explicitly choose which elementary blocks they accept.
+
+Composite data types will have their own blocks, built from elementary and/or literal data types.
+For example, `mc_block_pos` would explicitly accept three `tilde_and_caret` inputs rather than attaching validators to generic inputs.
+
+Complex data types will have complete block-systems or dedicated editors that act as helpers for the user.
+Example: Target Selectors, NBT Tags, Predicates.
+These are still considered data types, since they are reusable structured definitions within the workspace and correspond to Minecraft argument types.
+Special complex data types may receive explicit presets or editors instead of a block-system where the domain is too large or context-sensitive.
+For example, NBT Tags used in Target Selectors have different keys depending on the entity type.
+
+Elementary:
+- Tilde-and-Caret
+    - A tilde/caret, or a number, or a tilde/caret followed by a number
+- Tilde
+    - A tilde, or a tilde followed by a number
+- Caret
+    - A caret, or a caret followed by a number
+- Angle/yaw
+    - [-180.0, 179.9]
+    - Tilde notation
+- Pitch
+    - [-90.0, 90.0]
+    - Tilde notation
+- Rotation
+    - Yaw and Pitch
+- Swizzle
+    - Any non-repeating combination of the characters 'x', 'y', and 'z'
+
+Composite:
+- Block position
+    - Three tilde-and-carets
+    - As `mc_block_pos`
+- Range
+    - "a" for x=a
+    - "a.." for x>=a
+    - "..b" for x<=b
+    - "a..b" for a<=x<=b
+    - As `mc_range`
+
+Complex:
+- Target Selector
+    - Reusable structured selector definition
+- NBT
+    - Reusable structured NBT definition/editor
+- Predicate
+    - Reusable structured predicate definition
+
 ## Subsystem Status
 
 ### Main IDE Workspace `Not started`
@@ -121,3 +176,5 @@ Incomplete:
 - Some argument blocks are only useful with certain base selectors
 
 ### NBT Helper `Not started`
+
+### Minecraft Data Types `In progress`
