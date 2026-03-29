@@ -13,15 +13,12 @@ export type BlockSpecCategory =
 export type BlockGeneratorResult = ReturnType<Blockly.CodeGenerator['blockToCode']>
 export type BlockGeneratorFunction = (block: Blockly.Block) => BlockGeneratorResult
 export type BlockJsonDefinition = Record<string, unknown> & { type: string }
-export type BlockCodeKind = 'command' | 'value' | 'fragment'
 
 export type BlockSpec = {
   type: string
   category: BlockSpecCategory
-  codeKind: BlockCodeKind
   json?: BlockJsonDefinition
   init?: (this: Blockly.Block) => void
   generator?: BlockGeneratorFunction
-  extensions?: string[]
   tags?: string[]
 }

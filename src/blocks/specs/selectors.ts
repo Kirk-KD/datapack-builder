@@ -35,7 +35,6 @@ function createFilterSpec(
   return {
     type,
     category: 'targetSelectors',
-    codeKind: 'fragment',
     tags: ['selectorFilter'],
     json: {
       type,
@@ -65,7 +64,6 @@ export const selectorBlockSpecs: BlockSpec[] = [
   {
     type: targetSelectorRootType,
     category: 'targetSelectors',
-    codeKind: 'value',
     tags: ['chainable'],
     init(this: Blockly.Block) {
       const block = this as TargetSelectorBlock

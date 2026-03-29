@@ -14,7 +14,6 @@ export const procedureBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_param',
     category: 'procedures',
-    codeKind: 'value',
     tags: ['chainable', 'procArg', 'scoreboardVarSet'],
     json: {
       type: 'mc_param',
@@ -44,7 +43,6 @@ export const procedureBlockSpecs: BlockSpec[] = [
   {
     type: 'procedures_defnoreturn',
     category: 'procedures',
-    codeKind: 'command',
     generator(block) {
       return mcfunctionGenerator.statementToCode(block, 'STACK')
     },
@@ -52,7 +50,6 @@ export const procedureBlockSpecs: BlockSpec[] = [
   {
     type: 'procedures_callnoreturn',
     category: 'procedures',
-    codeKind: 'command',
     generator(block) {
       const procName = block.getFieldValue('NAME')
       const params: string[] = block.getVars() ?? []

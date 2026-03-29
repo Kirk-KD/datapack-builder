@@ -4,7 +4,6 @@ export const eventBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_on_load',
     category: 'events',
-    codeKind: 'command',
     json: {
       type: 'mc_on_load',
       message0: 'on load',
@@ -18,7 +17,6 @@ export const eventBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_on_tick',
     category: 'events',
-    codeKind: 'command',
     json: {
       type: 'mc_on_tick',
       message0: 'every tick',

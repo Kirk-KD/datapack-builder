@@ -27,7 +27,6 @@ function scalarModifierSpec(
   return {
     type,
     category: 'execute',
-    codeKind: 'fragment',
     tags: ['executeModifier'],
     json: {
       type,
@@ -47,7 +46,6 @@ export const executeBlockSpecs: BlockSpec[] = [
   {
     type: 'execute_root',
     category: 'execute',
-    codeKind: 'fragment',
     json: {
       type: 'execute_root',
       tooltip: '',

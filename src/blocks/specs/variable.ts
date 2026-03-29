@@ -16,7 +16,6 @@ export const variableBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_var_set',
     category: 'variable',
-    codeKind: 'command',
     tags: ['trimChainTail'],
     json: {
       type: 'mc_var_set',
@@ -66,7 +65,6 @@ export const variableBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_var_change',
     category: 'variable',
-    codeKind: 'command',
     tags: ['trimChainTail'],
     json: {
       type: 'mc_var_change',
@@ -127,7 +125,6 @@ export const variableBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_var_get',
     category: 'variable',
-    codeKind: 'value',
     tags: ['scoreboardVarSet', 'procArg'],
     json: {
       type: 'mc_var_get',

@@ -5,7 +5,6 @@ import { eventBlockSpecs } from './events'
 import { executeBlockSpecs } from './execute'
 import { literalBlockSpecs } from './literals'
 import { procedureBlockSpecs } from './procedures'
-import { registerRuntimeBlockSpec } from './runtimeMetadata'
 import { selectorBlockSpecs, targetSelectorRootType } from './selectors'
 import { variableBlockSpecs } from './variable'
 import type { BlockGeneratorFunction, BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
@@ -57,7 +56,6 @@ export function registerBlockSpecs() {
   }
 
   for (const spec of allBlockSpecs) {
-    registerRuntimeBlockSpec(spec)
     if (spec.init) {
       Blockly.Blocks[spec.type] = { init: spec.init }
     }

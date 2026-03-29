@@ -13,8 +13,6 @@ export const commandBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_say',
     category: 'commands',
-    codeKind: 'command',
-    extensions: ['mc_say_shadow'],
     json: {
       type: 'mc_say',
       message0: 'say %1',
@@ -40,8 +38,6 @@ export const commandBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_teleport',
     category: 'commands',
-    codeKind: 'command',
-    extensions: ['mc_teleport_shadow'],
     json: {
       type: 'mc_teleport',
       message0: 'teleport %1 to %2 %3 %4',

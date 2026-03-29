@@ -9,7 +9,6 @@ export const literalBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_int',
     category: 'literals',
-    codeKind: 'value',
     tags: ['chainable', 'literal', 'scoreboardVarSet', 'procArg'],
     json: {
       type: 'mc_int',
@@ -39,7 +38,6 @@ export const literalBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_string',
     category: 'literals',
-    codeKind: 'value',
     tags: ['chainable', 'literal', 'procArg'],
     json: {
       type: 'mc_string',

@@ -40,7 +40,6 @@ export const controlBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_comp_score_matches',
     category: 'control',
-    codeKind: 'value',
     json: {
       type: 'mc_comp_score_matches',
       message0: '%1 matches %2 to %3',
@@ -75,7 +74,6 @@ export const controlBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_comp_score_compare',
     category: 'control',
-    codeKind: 'value',
     json: {
       type: 'mc_comp_score_compare',
       message0: '%1 %2 %3',
@@ -128,7 +126,6 @@ export const controlBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_if',
     category: 'control',
-    codeKind: 'command',
     json: {
       type: 'mc_if',
       message0: 'if %1',
@@ -166,7 +163,6 @@ export const controlBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_if_else',
     category: 'control',
-    codeKind: 'command',
     json: {
       type: 'mc_if_else',
       message0: 'if %1',
@@ -214,7 +210,6 @@ export const controlBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_while',
     category: 'control',
-    codeKind: 'command',
     json: {
       type: 'mc_while',
       message0: 'repeat while %1',
