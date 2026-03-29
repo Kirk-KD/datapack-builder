@@ -7,7 +7,7 @@ mcfunctionGenerator.INDENT = ''
 
 mcfunctionGenerator.scrub_ = function(block, code, thisOnly) {
   const codeKind = getRuntimeBlockCodeKind(block.type)
-  const shouldApplyExecuteContext = codeKind === 'command' || true
+  const shouldApplyExecuteContext = codeKind === 'command'
 
   if (shouldApplyExecuteContext) {
     code = applyExecuteContextPrefixToCode(code)
