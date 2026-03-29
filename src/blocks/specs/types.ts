@@ -10,15 +10,20 @@ export type BlockSpecCategory =
   | 'execute'
   | 'targetSelectors'
 
+export type BlockInitFunction = (this: Blockly.Block) => void
 export type BlockGeneratorResult = ReturnType<Blockly.CodeGenerator['blockToCode']>
 export type BlockGeneratorFunction = (block: Blockly.Block) => BlockGeneratorResult
 export type BlockJsonDefinition = Record<string, unknown> & { type: string }
+export type BlockShadowStatesFunction = (this: Blockly.Block) => void
+
+export type ShadowInputBlockValidatorFunction = (value: string) => string | null
 
 export type BlockSpec = {
   type: string
-  category: BlockSpecCategory
+  category?: BlockSpecCategory
   json?: BlockJsonDefinition
-  init?: (this: Blockly.Block) => void
+  init?: BlockInitFunction
   generator?: BlockGeneratorFunction
-  tags?: string[]
+  tags?: string[],
+  setShadowBlocks?: BlockShadowStatesFunction
 }

@@ -8,6 +8,7 @@ import { procedureBlockSpecs } from './procedures'
 import { selectorBlockSpecs, targetSelectorRootType } from './selectors'
 import { variableBlockSpecs } from './variable'
 import type { BlockGeneratorFunction, BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
+import {shadowInputBlockSpecs} from "./shadowInputs.ts";
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
@@ -18,11 +19,13 @@ const allBlockSpecs = [
   ...procedureBlockSpecs,
   ...executeBlockSpecs,
   ...selectorBlockSpecs,
+  ...shadowInputBlockSpecs,
 ]
 
 const specsByCategory = new Map<BlockSpecCategory, BlockSpec[]>()
 
 for (const spec of allBlockSpecs) {
+  if (!spec.category) continue
   const specs = specsByCategory.get(spec.category) ?? []
   specs.push(spec)
   specsByCategory.set(spec.category, specs)
@@ -62,6 +65,12 @@ export function registerBlockSpecs() {
   for (const spec of allBlockSpecs) {
     if (spec.init) {
       Blockly.Blocks[spec.type] = { init: spec.init }
+    }
+
+    if (spec.setShadowBlocks) {
+      const extName = `shadows_${spec.type}`
+      Blockly.Blocks[spec.type].extensions.append(extName)
+      Blockly.Extensions.register(extName, spec.setShadowBlocks)
     }
   }
 }

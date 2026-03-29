@@ -67,17 +67,10 @@ Elementary:
 - Tilde-and-Caret
     - A tilde/caret, or a number, or a tilde/caret followed by a number
 - Tilde
-    - A tilde, or a tilde followed by a number
-- Caret
-    - A caret, or a caret followed by a number
-- Angle/yaw
+    - A tilde, or a number, or a tilde followed by a number
+- Angle
     - [-180.0, 179.9]
     - Tilde notation
-- Pitch
-    - [-90.0, 90.0]
-    - Tilde notation
-- Rotation
-    - Yaw and Pitch
 - Swizzle
     - Any non-repeating combination of the characters 'x', 'y', and 'z'
 
@@ -91,6 +84,8 @@ Composite:
     - "..b" for x<=b
     - "a..b" for a<=x<=b
     - As `mc_range`
+- Rotation
+  - Yaw and Pitch
 
 Complex:
 - Target Selector
