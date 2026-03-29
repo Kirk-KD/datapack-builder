@@ -22,6 +22,7 @@ function scalarModifierSpec(
   message0: string,
   args0: Record<string, unknown>[],
   generator: (block: Blockly.Block) => string,
+  jsonExtras: Record<string, unknown> = {},
 ): BlockSpec {
   return {
     type,
@@ -36,6 +37,7 @@ function scalarModifierSpec(
       args0,
       previousStatement: null,
       nextStatement: null,
+      ...jsonExtras,
     },
     generator,
   }
@@ -95,40 +97,20 @@ export const executeBlockSpecs: BlockSpec[] = [
     }],
     block => `anchored ${block.getFieldValue('ANCHOR')} `,
   ),
-  {
-    ...scalarModifierSpec(
-      'execute_mod_as',
-      'as %1',
-      [targetInput(['mc_string', 'mc_target_selector'])],
-      block => `as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    ),
-    json: {
-      ...scalarModifierSpec(
-        'execute_mod_as',
-        'as %1',
-        [targetInput(['mc_string', 'mc_target_selector'])],
-        () => '',
-      ).json!,
-      extensions: ['execute_mod_as_shadow'],
-    },
-  },
-  {
-    ...scalarModifierSpec(
-      'execute_mod_at',
-      'at %1',
-      [targetInput(['mc_string', 'mc_target_selector'])],
-      block => `at ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    ),
-    json: {
-      ...scalarModifierSpec(
-        'execute_mod_at',
-        'at %1',
-        [targetInput(['mc_string', 'mc_target_selector'])],
-        () => '',
-      ).json!,
-      extensions: ['execute_mod_at_shadow'],
-    },
-  },
+  scalarModifierSpec(
+    'execute_mod_as',
+    'as %1',
+    [targetInput(['mc_string', 'mc_target_selector'])],
+    block => `as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    { extensions: ['execute_mod_as_shadow'] },
+  ),
+  scalarModifierSpec(
+    'execute_mod_at',
+    'at %1',
+    [targetInput(['mc_string', 'mc_target_selector'])],
+    block => `at ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    { extensions: ['execute_mod_at_shadow'] },
+  ),
   scalarModifierSpec(
     'execute_mod_facing',
     'facing %1 %2 %3',
@@ -139,37 +121,20 @@ export const executeBlockSpecs: BlockSpec[] = [
     ],
     block => `facing ${block.getFieldValue('X')} ${block.getFieldValue('Y')} ${block.getFieldValue('Z')} `,
   ),
-  {
-    ...scalarModifierSpec(
-      'execute_mod_facing_entity',
-      'facing entity %1 %2',
-      [
-        targetInput(['mc_string', 'mc_target_selector']),
-        {
-          type: 'field_dropdown',
-          name: 'ANCHOR',
-          options: [['eyes', 'eyes'], ['feet', 'feet']],
-        },
-      ],
-      block => `facing entity ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} ${block.getFieldValue('ANCHOR')} `,
-    ),
-    json: {
-      ...scalarModifierSpec(
-        'execute_mod_facing_entity',
-        'facing entity %1 %2',
-        [
-          targetInput(['mc_string', 'mc_target_selector']),
-          {
-            type: 'field_dropdown',
-            name: 'ANCHOR',
-            options: [['eyes', 'eyes'], ['feet', 'feet']],
-          },
-        ],
-        () => '',
-      ).json!,
-      extensions: ['execute_mod_facing_entity_shadow'],
-    },
-  },
+  scalarModifierSpec(
+    'execute_mod_facing_entity',
+    'facing entity %1 %2',
+    [
+      targetInput(['mc_string', 'mc_target_selector']),
+      {
+        type: 'field_dropdown',
+        name: 'ANCHOR',
+        options: [['eyes', 'eyes'], ['feet', 'feet']],
+      },
+    ],
+    block => `facing entity ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} ${block.getFieldValue('ANCHOR')} `,
+    { extensions: ['execute_mod_facing_entity_shadow'] },
+  ),
   scalarModifierSpec(
     'execute_mod_in',
     'in %1',
@@ -205,23 +170,13 @@ export const executeBlockSpecs: BlockSpec[] = [
     ],
     block => `positioned ${block.getFieldValue('X')} ${block.getFieldValue('Y')} ${block.getFieldValue('Z')} `,
   ),
-  {
-    ...scalarModifierSpec(
-      'execute_mod_positioned_as',
-      'positioned as %1',
-      [targetInput()],
-      block => `positioned as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    ),
-    json: {
-      ...scalarModifierSpec(
-        'execute_mod_positioned_as',
-        'positioned as %1',
-        [targetInput()],
-        () => '',
-      ).json!,
-      extensions: ['execute_mod_positioned_as_shadow'],
-    },
-  },
+  scalarModifierSpec(
+    'execute_mod_positioned_as',
+    'positioned as %1',
+    [targetInput()],
+    block => `positioned as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    { extensions: ['execute_mod_positioned_as_shadow'] },
+  ),
   scalarModifierSpec(
     'execute_mod_positioned_over',
     'positioned over %1',
@@ -246,23 +201,13 @@ export const executeBlockSpecs: BlockSpec[] = [
     ],
     block => `rotated ${block.getFieldValue('YAW')} ${block.getFieldValue('PITCH')} `,
   ),
-  {
-    ...scalarModifierSpec(
-      'execute_mod_rotated_as',
-      'rotated as %1',
-      [targetInput(['mc_string', 'mc_target_selector'])],
-      block => `rotated as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    ),
-    json: {
-      ...scalarModifierSpec(
-        'execute_mod_rotated_as',
-        'rotated as %1',
-        [targetInput(['mc_string', 'mc_target_selector'])],
-        () => '',
-      ).json!,
-      extensions: ['execute_mod_rotated_as_shadow'],
-    },
-  },
+  scalarModifierSpec(
+    'execute_mod_rotated_as',
+    'rotated as %1',
+    [targetInput(['mc_string', 'mc_target_selector'])],
+    block => `rotated as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    { extensions: ['execute_mod_rotated_as_shadow'] },
+  ),
   scalarModifierSpec(
     'execute_mod_summon',
     'summon %1',
