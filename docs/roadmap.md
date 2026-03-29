@@ -111,5 +111,6 @@ Complete:
 
 Incomplete:
 - Filter argument blocks input validation
+- Some argument blocks are only useful with certain base selectors
 
 ### NBT Helper `Not started`

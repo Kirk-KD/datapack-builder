@@ -1,17 +1,15 @@
 import * as Blockly from 'blockly'
+import { getRuntimeBlockCodeKind } from '../blocks/specs/runtimeMetadata'
 import { applyExecuteContextPrefixToCode } from './executeContext'
 
 export const mcfunctionGenerator = new Blockly.CodeGenerator('mcfunction')
 mcfunctionGenerator.INDENT = ''
 
-// scrub enables compiling next block
 mcfunctionGenerator.scrub_ = function(block, code, thisOnly) {
-  const isValueBlock = !!block.outputConnection
-  const isExecuteRoot = block.type === 'execute_root'
-  const isExecuteModifier = block.type.startsWith('execute_mod_')
+  const codeKind = getRuntimeBlockCodeKind(block.type)
+  const shouldApplyExecuteContext = codeKind === 'command' || true
 
-  // Full command lines adopt the current execute context automatically
-  if (!isValueBlock && !isExecuteRoot && !isExecuteModifier) {
+  if (shouldApplyExecuteContext) {
     code = applyExecuteContextPrefixToCode(code)
   }
 

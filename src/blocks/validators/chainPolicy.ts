@@ -1,5 +1,8 @@
 import * as Blockly from 'blockly'
-import { chainableBlocks, trimChainTailBlocks } from '../definitions'
+import { getBlockTypesByTag } from '../specs/registry'
+
+const chainableBlocks = getBlockTypesByTag('chainable')
+const trimChainTailBlocks = getBlockTypesByTag('trimChainTail')
 
 export function isChainableBlock(block: Blockly.Block | null): block is Blockly.Block {
   if (!block) return false

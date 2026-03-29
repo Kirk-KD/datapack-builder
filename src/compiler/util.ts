@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly'
 import { getParameterNameById } from './workspaceRegistry'
-import { compileSelector } from './generators/selectors'
+import { compileSelector } from '../blocks/specs/selectors'
 
 export function literalChain(block: Blockly.Block): [string, boolean] {
   let value: string

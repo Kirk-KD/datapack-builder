@@ -1,19 +1,16 @@
 import * as Blockly from 'blockly'
 import './generator'
-import './generators/commands'
-import './generators/control'
-import './generators/variables'
-import './generators/events'
-import './generators/procedures'
-import './generators/literals'
-import './generators/execute'
-import './generators/selectors'
 import { mcfunctionGenerator } from './generator'
+import { registerBlockSpecGenerators } from '../blocks/specs/registry'
 import { scoreboardManager } from './scoreboardManager'
 import { resetContext } from './executeContext'
 import { addFile, resetFiles, getFiles, prependToFile } from './fileRegistry'
 import { getProjectConfig, getInternalNamespace } from './projectConfig'
 import { resetIds } from './idGenerator'
+
+registerBlockSpecGenerators((type, generator) => {
+  mcfunctionGenerator.forBlock[type] = generator
+})
 
 function compileChain(block: Blockly.Block): string {
   const next = block.nextConnection?.targetBlock()
