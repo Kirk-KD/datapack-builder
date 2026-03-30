@@ -75,13 +75,13 @@ export const selectorBlockSpecs: BlockSpec[] = [
 
       block.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(selectorBaseOptions), FIELD_BASE)
-        .appendField(new ToggleImageField({ // TODO change svg to simple vs complex instead of collapse vs expand
-          collapsedSrc: '/expand.svg',
-          expandedSrc: '/collapse.svg',
+        .appendField(new ToggleImageField({
+          collapsedSrc: '/filter_on.svg',
+          expandedSrc: '/filter_off.svg',
           width: 16,
           height: 16,
-          collapsedAlt: 'Show filters',
-          expandedAlt: 'Hide filters',
+          collapsedAlt: '',
+          expandedAlt: 'with filters',
           initialExpanded: block.showFilters_,
           onToggle: (expanded) => {
             block.showFilters_ = expanded
