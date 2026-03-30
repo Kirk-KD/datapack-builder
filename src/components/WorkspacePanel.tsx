@@ -38,7 +38,22 @@ function WorkspacePanel() {
         contents: getToolboxContents()
       },
       theme: customTheme,
-      renderer: 'custom_renderer'
+      renderer: 'custom_renderer',
+      zoom: {
+        controls: true,
+        wheel: true,
+        startScale: 1.0,
+        maxScale: 2,
+        minScale: 0.4,
+        scaleSpeed: 1.2,
+        pinch: true
+      },
+      grid: {
+        spacing: 20,
+        length: 3,
+        colour: '#555',
+        snap: true
+      }
     })
 
     // Default placeholder variable
