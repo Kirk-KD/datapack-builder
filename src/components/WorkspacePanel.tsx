@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
 import DarkTheme from '@blockly/theme-dark'
 import {blocks as procedureBlocks, unregisterProcedureBlocks} from '@blockly/block-shareable-procedures'
+import {shadowBlockConversionChangeListener} from '@blockly/shadow-block-converter'
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import getVariablesCategory from '../blocks/categories/variables'
@@ -56,8 +57,7 @@ function WorkspacePanel() {
       }
     })
 
-    // Default placeholder variable
-    workspaceRef.current.getVariableMap().createVariable('myVar', 'mc_scoreboard_variable')
+    workspaceRef.current.addChangeListener(shadowBlockConversionChangeListener)
 
     // Custom dynamic category for variables
     workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', () => {
