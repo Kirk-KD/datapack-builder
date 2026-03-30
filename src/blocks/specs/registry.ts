@@ -54,9 +54,23 @@ export function getBlockJsonByCategory(category: BlockSpecCategory): BlockJsonDe
     .flatMap(spec => (spec.json ? [spec.json] : []))
 }
 
+/**
+ * Returns the extension name used to attach a spec's shadow setup hook.
+ */
+function getShadowExtensionName(type: string) {
+  return `shadows_${type}`
+}
+
 export function registerBlockSpecs() {
   const jsonBlocks = allBlockSpecs
-    .flatMap(spec => (spec.json ? [spec.json] : []))
+    .flatMap(spec => {
+      if (!spec.json) return []
+      if (!spec.setShadowBlocks) return [spec.json]
+      return [{
+        ...spec.json,
+        extensions: [...((spec.json.extensions as string[] | undefined) ?? []), getShadowExtensionName(spec.type)],
+      }]
+    })
 
   if (jsonBlocks.length > 0) {
     Blockly.defineBlocksWithJsonArray(jsonBlocks)
@@ -64,13 +78,16 @@ export function registerBlockSpecs() {
 
   for (const spec of allBlockSpecs) {
     if (spec.init) {
-      Blockly.Blocks[spec.type] = { init: spec.init }
+      Blockly.Blocks[spec.type] = {
+        init() {
+          spec.init!.call(this)
+          spec.setShadowBlocks?.call(this)
+        },
+      }
     }
 
     if (spec.setShadowBlocks) {
-      const extName = `shadows_${spec.type}`
-      Blockly.Blocks[spec.type].extensions.append(extName)
-      Blockly.Extensions.register(extName, spec.setShadowBlocks)
+      Blockly.Extensions.register(getShadowExtensionName(spec.type), spec.setShadowBlocks)
     }
   }
 }

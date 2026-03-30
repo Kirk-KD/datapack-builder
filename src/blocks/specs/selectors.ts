@@ -3,6 +3,7 @@ import { colours } from '../blockColours'
 import { ToggleImageField } from '../fields/toggleImage'
 import { mcfunctionGenerator } from '../../compiler/generator'
 import type { BlockSpec } from './types'
+import { setShadowState } from '../extensions/shadows.ts'
 
 const INPUT_CHAIN_NEXT = 'CHAIN_NEXT'
 const INPUT_FILTER_STACK = 'FILTER_STACK'
@@ -31,6 +32,7 @@ function createFilterSpec(
   message0: string,
   args0: Record<string, unknown>[],
   generator: (block: Blockly.Block) => string,
+  setShadowBlocks?: (this: Blockly.Block) => void,
 ): BlockSpec {
   return {
     type,
@@ -47,6 +49,7 @@ function createFilterSpec(
       inputsInline: true,
     },
     generator,
+    setShadowBlocks,
   }
 }
 
@@ -139,10 +142,11 @@ export const selectorBlockSpecs: BlockSpec[] = [
     { type: 'field_input', name: 'Y', text: '' },
     { type: 'field_input', name: 'Z', text: '' },
   ], block => `x=${block.getFieldValue('X')},y=${block.getFieldValue('Y')},z=${block.getFieldValue('Z')},`),
-  createFilterSpec('mc_target_filter_distance', 'radius min %1 max %2', [
-    { type: 'field_input', name: 'MIN', text: '' },
-    { type: 'field_input', name: 'MAX', text: '' },
-  ], block => `distance=${block.getFieldValue('MIN')}..${block.getFieldValue('MAX')},`),
+  createFilterSpec('mc_target_filter_distance', 'distance %1', [
+    { type: 'input_value', name: 'RANGE', check: ['mc_range'] },
+  ], block => `distance=${mcfunctionGenerator.valueToCode(block, 'RANGE', 0)},`, function(this: Blockly.Block) {
+    setShadowState(this, 'RANGE', { type: 'mc_range' })
+  }),
   createFilterSpec('mc_target_filter_volume', 'volume dx %1 dy %2 dz %3', [
     { type: 'field_input', name: 'DX', text: '' },
     { type: 'field_input', name: 'DY', text: '' },
@@ -163,10 +167,11 @@ export const selectorBlockSpecs: BlockSpec[] = [
   createFilterSpec('mc_target_filter_scores', 'scores %1', [{ type: 'field_input', name: 'SCORES', text: '' }], block => `scores=${block.getFieldValue('SCORES')},`),
   createFilterSpec('mc_target_filter_tags', 'tags %1', [{ type: 'field_input', name: 'TAG', text: '' }], block => `tag=${block.getFieldValue('TAG')},`),
   createFilterSpec('mc_target_filter_team', 'team %1', [{ type: 'field_input', name: 'TEAM', text: '' }], block => `team=${block.getFieldValue('TEAM')},`),
-  createFilterSpec('mc_target_filter_xp', 'xp min %1 max %2', [
-    { type: 'field_input', name: 'MIN', text: '' },
-    { type: 'field_input', name: 'MAX', text: '' },
-  ], block => `level=${block.getFieldValue('MIN')}..${block.getFieldValue('MAX')},`),
+  createFilterSpec('mc_target_filter_xp', 'xp %1', [
+    { type: 'input_value', name: 'RANGE', check: ['mc_range'] },
+  ], block => `level=${mcfunctionGenerator.valueToCode(block, 'RANGE', 0)},`, function(this: Blockly.Block) {
+    setShadowState(this, 'RANGE', { type: 'mc_range' })
+  }),
   createFilterSpec('mc_target_filter_gamemode', 'gamemode %1', [{
     type: 'field_dropdown',
     name: 'GAMEMODE',

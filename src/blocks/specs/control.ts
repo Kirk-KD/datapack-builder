@@ -5,10 +5,9 @@ import { nextId } from '../../compiler/idGenerator'
 import { getInternalNamespace } from '../../compiler/projectConfig'
 import { scoreboardManager } from '../../compiler/scoreboardManager'
 import type { BlockSpec } from './types'
+import { setShadowState } from '../extensions/shadows.ts'
 
 const FIELD_VAR_NAME = 'VAR_NAME'
-const FIELD_MIN = 'MIN'
-const FIELD_MAX = 'MAX'
 const FIELD_OP = 'OP'
 const INPUT_VAR_B = 'VAR_B'
 const INPUT_CONDITION = 'CONDITION'
@@ -42,7 +41,7 @@ export const controlBlockSpecs: BlockSpec[] = [
     category: 'control',
     json: {
       type: 'mc_comp_score_matches',
-      message0: '%1 matches %2 to %3',
+      message0: '%1 matches %2',
       args0: [
         {
           type: 'field_dropdown',
@@ -50,25 +49,23 @@ export const controlBlockSpecs: BlockSpec[] = [
           options: [['x', 'X']],
         },
         {
-          type: 'field_number',
-          name: FIELD_MIN,
-          value: 0,
-        },
-        {
-          type: 'field_number',
-          name: FIELD_MAX,
-          value: 10,
+          type: 'input_value',
+          name: 'RANGE',
+          check: ['mc_range'],
         },
       ],
+      inputsInline: true,
       output: 'MCCondition',
       extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
       const varName = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
       const obj = scoreboardManager.getObjectiveName()
-      const min = block.getFieldValue(FIELD_MIN)
-      const max = block.getFieldValue(FIELD_MAX)
-      return [`score ${varName} ${obj} matches ${min}..${max}`, 0]
+      const range = mcfunctionGenerator.valueToCode(block, 'RANGE', 0) || ''
+      return [`score ${varName} ${obj} matches ${range}`, 0]
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, 'RANGE', { type: 'mc_range' })
     },
   },
   {
@@ -102,7 +99,7 @@ export const controlBlockSpecs: BlockSpec[] = [
       ],
       inputsInline: true,
       output: 'MCCondition',
-      extensions: ['mc_scoreboard_variable_dropdown', 'mc_comp_score_compare_shadow'],
+      extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
       const varA = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
@@ -121,6 +118,12 @@ export const controlBlockSpecs: BlockSpec[] = [
       }
 
       return [fragment, 0]
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, INPUT_VAR_B, {
+        type: 'mc_int',
+        fields: { VALUE: 0 },
+      })
     },
   },
   {

@@ -2,6 +2,7 @@ import { mcfunctionGenerator } from '../../compiler/generator'
 import { scoreboardManager } from '../../compiler/scoreboardManager'
 import { getConditionSetup } from './control'
 import type { BlockSpec } from './types'
+import { setShadowState } from '../extensions/shadows.ts'
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
@@ -34,7 +35,7 @@ export const variableBlockSpecs: BlockSpec[] = [
       ],
       previousStatement: null,
       nextStatement: null,
-      extensions: ['mc_scoreboard_variable_dropdown', 'mc_var_set_shadow'],
+      extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
       const varName = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
@@ -60,6 +61,12 @@ export const variableBlockSpecs: BlockSpec[] = [
       }
 
       return ''
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, INPUT_VALUE, {
+        type: 'mc_int',
+        fields: { VALUE: 0 },
+      })
     },
   },
   {
@@ -94,7 +101,7 @@ export const variableBlockSpecs: BlockSpec[] = [
       ],
       previousStatement: null,
       nextStatement: null,
-      extensions: ['mc_scoreboard_variable_dropdown', 'mc_var_change_shadow'],
+      extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
       const varName = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
@@ -120,6 +127,12 @@ export const variableBlockSpecs: BlockSpec[] = [
 
       const opMap: Record<string, string> = { ADD: '+=', SUB: '-=', MUL: '*=', DIV: '/=', MOD: '%=' }
       return `scoreboard players operation ${varName} ${obj} ${opMap[opType]} ${srcName} ${obj}\n`
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, INPUT_VALUE, {
+        type: 'mc_int',
+        fields: { VALUE: 1 },
+      })
     },
   },
   {

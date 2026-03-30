@@ -1,12 +1,8 @@
 import { mcfunctionGenerator } from '../../compiler/generator'
 import { literalChain } from '../../compiler/util'
 import type { BlockSpec } from './types'
+import {setShadowState} from "../extensions/shadows.ts";
 
-const INPUT_MESSAGE = 'MESSAGE'
-const INPUT_SELECTOR = 'SELECTOR'
-const FIELD_X = 'X'
-const FIELD_Y = 'Y'
-const FIELD_Z = 'Z'
 const chainableChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector']
 
 export const commandBlockSpecs: BlockSpec[] = [
@@ -19,7 +15,7 @@ export const commandBlockSpecs: BlockSpec[] = [
       args0: [
         {
           type: 'input_value',
-          name: INPUT_MESSAGE,
+          name: 'MESSAGE',
           check: chainableChecks,
         },
       ],
@@ -27,12 +23,17 @@ export const commandBlockSpecs: BlockSpec[] = [
       tooltip: 'Broadcasts a message to all players',
       previousStatement: null,
       nextStatement: null,
-      extensions: ['mc_say_shadow'],
     },
     generator(block) {
-      const msgBlock = block.getInputTargetBlock(INPUT_MESSAGE)!
+      const msgBlock = block.getInputTargetBlock('MESSAGE')!
       const [msg, hasMacro] = literalChain(msgBlock)
       return (hasMacro ? '$' : '') + `say ${msg}\n`
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, 'MESSAGE', {
+        type: 'mc_string',
+        fields: { VALUE: 'Hello world' },
+      })
     },
   },
   {
@@ -40,41 +41,32 @@ export const commandBlockSpecs: BlockSpec[] = [
     category: 'commands',
     json: {
       type: 'mc_teleport',
-      message0: 'teleport %1 to %2 %3 %4',
+      message0: 'teleport %1 to %2',
       args0: [
         {
           type: 'input_value',
-          name: INPUT_SELECTOR,
+          name: 'SELECTOR',
           check: ['mc_string', 'mc_target_selector'],
         },
         {
-          type: 'field_input',
-          name: FIELD_X,
-          text: '0',
-        },
-        {
-          type: 'field_input',
-          name: FIELD_Y,
-          text: '0',
-        },
-        {
-          type: 'field_input',
-          name: FIELD_Z,
-          text: '0',
-        },
+          type: 'input_value',
+          name: 'TARGET',
+          check: ['mc_param', 'mc_block_pos']
+        }
       ],
       inputsInline: true,
       tooltip: 'Teleports to coordinates',
       previousStatement: null,
       nextStatement: null,
-      extensions: ['mc_teleport_shadow'],
     },
     generator(block) {
-      const selector = mcfunctionGenerator.valueToCode(block, INPUT_SELECTOR, 0) || ''
-      const x = block.getFieldValue(FIELD_X)
-      const y = block.getFieldValue(FIELD_Y)
-      const z = block.getFieldValue(FIELD_Z)
-      return `teleport ${selector.trim()} ${x} ${y} ${z}\n`
+      const selector = mcfunctionGenerator.valueToCode(block, 'SELECTOR', 0)
+      const target = mcfunctionGenerator.valueToCode(block, 'TARGET', 0)
+      return `teleport ${selector} ${target}\n`
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, 'SELECTOR', { type: 'mc_target_selector' })
+      setShadowState(this, 'TARGET', { type: 'mc_block_pos' })
     },
   },
 ]

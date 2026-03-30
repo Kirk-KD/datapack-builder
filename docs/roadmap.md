@@ -86,6 +86,7 @@ Composite:
     - As `mc_range`
 - Rotation
   - Yaw and Pitch
+  - As `mc_rotation`
 
 Complex:
 - Target Selector

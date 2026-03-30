@@ -22,21 +22,23 @@ function isSelectorFilterStackConnection(superior: Blockly.Connection): boolean 
     return getInputNameForConnection(superiorBlock, superior) === SELECTOR_FILTER_STACK_INPUT
 }
 
+function isSelectorFilterNextConnection(connection: Blockly.Connection): boolean {
+    const block = connection.getSourceBlock()
+    return isSelectorFilterBlock(block) && connection === block.nextConnection
+}
+
 export function shouldDisallowSelectorConnection(
     superior: Blockly.Connection,
-    superiorBlock: Blockly.Block,
+    _superiorBlock: Blockly.Block,
     inferiorBlock: Blockly.Block,
 ): boolean {
-    const superiorIsModifier = isSelectorFilterBlock(superiorBlock)
     const inferiorIsModifier = isSelectorFilterBlock(inferiorBlock)
+    const isSelectorFilterChainConnection =
+        isSelectorFilterStackConnection(superior) || isSelectorFilterNextConnection(superior)
 
-    if (!superiorIsModifier && !inferiorIsModifier) {
-        return isSelectorFilterStackConnection(superior)
-    }
-
-    if (superiorIsModifier) {
+    if (isSelectorFilterChainConnection) {
         return !inferiorIsModifier
     }
 
-    return !isSelectorFilterStackConnection(superior)
+    return inferiorIsModifier
 }

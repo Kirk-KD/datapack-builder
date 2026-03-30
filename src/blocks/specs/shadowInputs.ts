@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import type { BlockGeneratorFunction, BlockSpec, ShadowInputBlockValidatorFunction } from './types'
+import type { BlockSpec, ShadowInputBlockValidatorFunction } from './types'
 
 const INPUT_VALUE = 'VALUE'
 
@@ -22,7 +22,7 @@ function registerValidatorExtension(type: string, validator: ShadowInputBlockVal
 /**
  * Creates a standard single-field shadow input BlockSpec with an attached validator.
  */
-function makeShadowInputBlockSpec(type: string, validator: ShadowInputBlockValidatorFunction, generator?: BlockGeneratorFunction): BlockSpec {
+function makeShadowInputBlockSpec(type: string, validator: ShadowInputBlockValidatorFunction, defaultValue?: string, message?: string): BlockSpec {
   registerValidatorExtension(type, validator)
   return {
     type,
@@ -30,17 +30,18 @@ function makeShadowInputBlockSpec(type: string, validator: ShadowInputBlockValid
       type,
       tooltip: '',
       helpUrl: '',
-      message0: '%1',
+      message0: message ?? '%1',
       args0: [
         {
           type: 'field_input',
           name: INPUT_VALUE,
+          text: defaultValue
         },
       ],
       output: type,
       extensions: [getValidatorExtensionName(type)],
     },
-    generator: generator ?? (block => block.getFieldValue(INPUT_VALUE)),
+    generator: block => [block.getFieldValue(INPUT_VALUE), 0],
   }
 }
 
@@ -60,21 +61,21 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
   makeShadowInputBlockSpec('number', input => {
     if (input === '') return input
     return validateNumber(input)
-  }),
+  }, '0'),
   makeShadowInputBlockSpec('tilde_caret', input => {
     if (input === '') return input
-    return validateTilde(input) ?? validateCaret(input)
-  }),
+    return validateNumber(input) ?? validateTilde(input) ?? validateCaret(input)
+  }, '~'),
   makeShadowInputBlockSpec('tilde', input => {
     if (input === '') return input
-    return validateTilde(input)
-  }),
+    return validateNumber(input) ?? validateTilde(input)
+  }, '~'),
   makeShadowInputBlockSpec('swizzle', input => {
     if (input === '') return input
     return /^(?!.*(.).*\1)[xyz]{1,3}$/.test(input) ? input : null
-  }),
+  }, 'xyz'),
   makeShadowInputBlockSpec('angle', input => {
     if (input === '') return input
-    return validateTilde(input)
-  })
+    return validateNumber(input) ?? validateTilde(input)
+  }, '0', '%1°')
 ]

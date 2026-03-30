@@ -5,6 +5,7 @@ import { mcfunctionGenerator } from '../../compiler/generator'
 import { nextId } from '../../compiler/idGenerator'
 import { getInternalNamespace } from '../../compiler/projectConfig'
 import type { BlockSpec } from './types'
+import { setShadowState } from '../extensions/shadows.ts'
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'
@@ -32,6 +33,7 @@ function executeModifierSpec(
   args0: Record<string, unknown>[],
   generator: (block: Blockly.Block) => string,
   jsonExtras: Record<string, unknown> = {},
+  setShadowBlocks?: (this: Blockly.Block) => void,
 ): BlockSpec {
   return {
     type,
@@ -48,6 +50,7 @@ function executeModifierSpec(
       ...jsonExtras,
     },
     generator,
+    setShadowBlocks,
   }
 }
 
@@ -94,59 +97,41 @@ type ExecuteConditionModeConfig = {
  */
 const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteConditionModeConfig> = {
   biome: {
-    message: 'at %1 %2 %3 is %4',
+    message: 'at %1 is %2',
     args: [
-      { kind: 'field_input', name: 'X', text: '0' },
-      { kind: 'field_input', name: 'Y', text: '0' },
-      { kind: 'field_input', name: 'Z', text: '0' },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'field_input', name: 'BIOME', text: 'minecraft:plains' },
     ],
     partialGenerator(block) {
       return [
-        block.getFieldValue('X'),
-        block.getFieldValue('Y'),
-        block.getFieldValue('Z'),
+        mcfunctionGenerator.valueToCode(block, 'POS', 0),
         block.getFieldValue('BIOME')
       ].join(' ')
     },
   },
   block: {
-    message: 'at %1 %2 %3 is %4',
+    message: 'at %1 is %2',
     args: [
-      { kind: 'field_input', name: 'X', text: '0' },
-      { kind: 'field_input', name: 'Y', text: '0' },
-      { kind: 'field_input', name: 'Z', text: '0' },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'field_input', name: 'BLOCK', text: 'minecraft:stone' },
     ],
     partialGenerator(block) {
-      return `${block.getFieldValue('X')} ${block.getFieldValue('Y')} ${block.getFieldValue('Z')} ${block.getFieldValue('BLOCK')}`
+      return `${mcfunctionGenerator.valueToCode(block, 'POS', 0)} ${block.getFieldValue('BLOCK')}`
     },
   },
   blocks: { // TODO clean up display
-    message: 'from %1 %2 %3 to %4 %5 %6 = %7 %8 %9 with equal volume, %10',
+    message: 'from %1 to %2 = %3 with equal volume, %4',
     args: [
-      { kind: 'field_input', name: 'START_X', text: '0' },
-      { kind: 'field_input', name: 'START_Y', text: '0' },
-      { kind: 'field_input', name: 'START_Z', text: '0' },
-      { kind: 'field_input', name: 'END_X', text: '0' },
-      { kind: 'field_input', name: 'END_Y', text: '0' },
-      { kind: 'field_input', name: 'END_Z', text: '0' },
-      { kind: 'field_input', name: 'DEST_X', text: '0' },
-      { kind: 'field_input', name: 'DEST_Y', text: '0' },
-      { kind: 'field_input', name: 'DEST_Z', text: '0' },
+      { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'field_dropdown', name: 'SCAN_MODE', options: [['all', 'all'], ['masked', 'masked']] },
     ],
     partialGenerator(block) {
       return [
-        block.getFieldValue('START_X'),
-        block.getFieldValue('START_Y'),
-        block.getFieldValue('START_Z'),
-        block.getFieldValue('END_X'),
-        block.getFieldValue('END_Y'),
-        block.getFieldValue('END_Z'),
-        block.getFieldValue('DEST_X'),
-        block.getFieldValue('DEST_Y'),
-        block.getFieldValue('DEST_Z'),
+        mcfunctionGenerator.valueToCode(block, 'START_POS', 0),
+        mcfunctionGenerator.valueToCode(block, 'END_POS', 0),
+        mcfunctionGenerator.valueToCode(block, 'DEST_POS', 0),
         block.getFieldValue('SCAN_MODE'),
       ].join(' ')
     },
@@ -197,14 +182,12 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
     },
   },
   loaded: {
-    message: 'at %1 %2 %3',
+    message: 'at %1',
     args: [
-      { kind: 'field_input', name: 'X', text: '0' },
-      { kind: 'field_input', name: 'Y', text: '0' },
-      { kind: 'field_input', name: 'Z', text: '0' },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
     ],
     partialGenerator(block) {
-      return `${block.getFieldValue('X')} ${block.getFieldValue('Y')} ${block.getFieldValue('Z')}`
+      return String(mcfunctionGenerator.valueToCode(block, 'POS', 0))
     },
   },
   predicate: {
@@ -350,6 +333,14 @@ export const executeBlockSpecs: BlockSpec[] = [
 
         conditionKindField.setValue(this.conditionKind_)
         modeField.setValue(this.mode_)
+
+        if (this.mode_ === 'biome' || this.mode_ === 'block' || this.mode_ === 'loaded') {
+          setShadowState(this, 'POS', { type: 'mc_block_pos' })
+        } else if (this.mode_ === 'blocks') {
+          setShadowState(this, 'START_POS', { type: 'mc_block_pos' })
+          setShadowState(this, 'END_POS', { type: 'mc_block_pos' })
+          setShadowState(this, 'DEST_POS', { type: 'mc_block_pos' })
+        }
       }
 
       block.saveExtraState = function(this: ExecuteConditionBlock) {
@@ -376,8 +367,12 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_align',
     'align %1',
-    [{ type: 'field_input', name: 'AXES', text: 'xyz' }],
-    block => `align ${block.getFieldValue('AXES')} `,
+    [{ type: 'input_value', name: 'AXES', check: ['swizzle'] }],
+    block => `align ${mcfunctionGenerator.valueToCode(block, 'AXES', 0)} `,
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, 'AXES', { type: 'swizzle' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_anchored',
@@ -394,24 +389,30 @@ export const executeBlockSpecs: BlockSpec[] = [
     'as %1',
     [targetInput(['mc_string', 'mc_target_selector'])],
     block => `as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    { extensions: ['execute_mod_as_shadow'] },
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_at',
     'at %1',
     [targetInput(['mc_string', 'mc_target_selector'])],
     block => `at ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    { extensions: ['execute_mod_at_shadow'] },
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_facing',
-    'facing %1 %2 %3',
-    [
-      { type: 'field_input', name: 'X', text: '0' },
-      { type: 'field_input', name: 'Y', text: '0' },
-      { type: 'field_input', name: 'Z', text: '0' },
-    ],
-    block => `facing ${block.getFieldValue('X')} ${block.getFieldValue('Y')} ${block.getFieldValue('Z')} `,
+    'facing %1',
+    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
+    block => `facing ${mcfunctionGenerator.valueToCode(block, 'POS', 0)} `,
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, 'POS', { type: 'mc_block_pos' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_facing_entity',
@@ -425,7 +426,10 @@ export const executeBlockSpecs: BlockSpec[] = [
       },
     ],
     block => `facing entity ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} ${block.getFieldValue('ANCHOR')} `,
-    { extensions: ['execute_mod_facing_entity_shadow'] },
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_in',
@@ -454,20 +458,23 @@ export const executeBlockSpecs: BlockSpec[] = [
   ),
   executeModifierSpec(
     'execute_mod_positioned',
-    'positioned %1 %2 %3',
-    [
-      { type: 'field_input', name: 'X', text: '0' },
-      { type: 'field_input', name: 'Y', text: '0' },
-      { type: 'field_input', name: 'Z', text: '0' },
-    ],
-    block => `positioned ${block.getFieldValue('X')} ${block.getFieldValue('Y')} ${block.getFieldValue('Z')} `,
+    'positioned %1',
+    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
+    block => `positioned ${mcfunctionGenerator.valueToCode(block, 'POS', 0)} `,
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, 'POS', { type: 'mc_block_pos' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_positioned_as',
     'positioned as %1',
     [targetInput()],
     block => `positioned as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    { extensions: ['execute_mod_positioned_as_shadow'] },
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_positioned_over',
@@ -486,19 +493,23 @@ export const executeBlockSpecs: BlockSpec[] = [
   ),
   executeModifierSpec(
     'execute_mod_rotated',
-    'rotated %1 %2',
-    [
-      { type: 'field_input', name: 'YAW', text: '0' },
-      { type: 'field_input', name: 'PITCH', text: '0' },
-    ],
-    block => `rotated ${block.getFieldValue('YAW')} ${block.getFieldValue('PITCH')} `,
+    'rotated %1',
+    [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_param'] }],
+    block => `rotated ${mcfunctionGenerator.valueToCode(block, 'ROTATION', 0)} `,
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, 'ROTATION', { type: 'mc_rotation' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_rotated_as',
     'rotated as %1',
     [targetInput(['mc_string', 'mc_target_selector'])],
     block => `rotated as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
-    { extensions: ['execute_mod_rotated_as_shadow'] },
+    {},
+    function(this: Blockly.Block) {
+      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+    },
   ),
   executeModifierSpec(
     'execute_mod_summon',
