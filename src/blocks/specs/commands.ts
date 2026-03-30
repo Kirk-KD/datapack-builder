@@ -45,7 +45,7 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'SELECTOR',
-          check: ['mc_string', 'mc_target_selector'],
+          check: ['mc_param', 'mc_string', 'mc_target_selector'],
         },
         {
           type: 'input_value',

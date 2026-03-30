@@ -1,3 +1,5 @@
+// TODO shadow blocks for inputs
+// TODO accept `mc_param`
 import * as Blockly from 'blockly'
 import { colours } from '../blockColours'
 import { ToggleImageField } from '../fields/toggleImage'

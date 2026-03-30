@@ -115,10 +115,12 @@ const executeScoreModeOptions: [string, string][] = [
   ['matches', 'MATCHES'],
 ]
 
+const selectorLikeChecks = ['mc_string', 'mc_target_selector', 'mc_param']
+
 const scoreTargetArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'TARGET',
-  check: ['mc_string', 'mc_target_selector'],
+  check: selectorLikeChecks,
 }
 
 const scoreTargetObjectiveArg: ExecuteConditionInputConfig = {
@@ -130,7 +132,7 @@ const scoreTargetObjectiveArg: ExecuteConditionInputConfig = {
 const scoreSourceArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'SOURCE',
-  check: ['mc_string', 'mc_target_selector'],
+  check: selectorLikeChecks,
 }
 
 const scoreSourceObjectiveArg: ExecuteConditionInputConfig = {
@@ -215,7 +217,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   entity: {
     message: '%1 exists',
     args: [
-      { kind: 'value', name: INPUT_TARGET, check: ['mc_string', 'mc_target_selector'] },
+      { kind: 'value', name: INPUT_TARGET, check: selectorLikeChecks },
     ],
     partialGenerator(block) {
       return mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0)
@@ -278,7 +280,7 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
   entity: {
     message: '%1 has %2',
     args: [
-      { kind: 'value', name: INPUT_TARGET, check: ['mc_string', 'mc_target_selector'] },
+      { kind: 'value', name: INPUT_TARGET, check: selectorLikeChecks },
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
@@ -314,7 +316,7 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     message: '%1 in %2 matching %3',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'SOURCE', check: ['mc_string', 'mc_target_selector'] },
+      { kind: 'value', name: 'SOURCE', check: selectorLikeChecks },
       { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
       { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
     ],
@@ -747,7 +749,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_as',
     'as %1',
-    [targetInput(['mc_string', 'mc_target_selector'])],
+    [targetInput(selectorLikeChecks)],
     block => `as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
     {},
     function(this: Blockly.Block) {
@@ -757,7 +759,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_at',
     'at %1',
-    [targetInput(['mc_string', 'mc_target_selector'])],
+    [targetInput(selectorLikeChecks)],
     block => `at ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
     {},
     function(this: Blockly.Block) {
@@ -778,7 +780,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_facing_entity',
     'facing entity %1 %2',
     [
-      targetInput(['mc_string', 'mc_target_selector']),
+      targetInput(selectorLikeChecks),
       {
         type: 'field_dropdown',
         name: 'ANCHOR',
@@ -864,7 +866,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_rotated_as',
     'rotated as %1',
-    [targetInput(['mc_string', 'mc_target_selector'])],
+    [targetInput(selectorLikeChecks)],
     block => `rotated as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
     {},
     function(this: Blockly.Block) {

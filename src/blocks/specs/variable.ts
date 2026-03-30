@@ -96,7 +96,7 @@ export const variableBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_VALUE,
-          check: ['mc_int', 'mc_var_get'],
+          check: ['mc_param', 'mc_int', 'mc_var_get'],
         },
       ],
       previousStatement: null,
