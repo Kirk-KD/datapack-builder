@@ -5,7 +5,7 @@ import {setShadowState} from "../extensions/shadows.ts";
 const FIELD_VALUE = 'VALUE'
 
 export const literalBlockSpecs: BlockSpec[] = [
-  { // TODO remove
+  {
     type: 'mc_int',
     category: 'literals',
     tags: ['literal', 'scoreboardVarSet', 'procArg'],
@@ -28,7 +28,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       return [String(block.getFieldValue(FIELD_VALUE)), 0]
     },
   },
-  { // TODO make shadow input
+  {
     type: 'mc_string',
     category: 'literals',
     tags: ['literal', 'procArg'],
