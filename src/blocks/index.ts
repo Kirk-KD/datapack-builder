@@ -4,6 +4,7 @@ import { colours } from './blockColours'
 import { getBlockJsonByCategory, getBlockTypesByCategory, registerBlockSpecs } from './specs/registry'
 import './extensions'
 import './validators'
+import './renderer.ts'
 
 type ColourableBlockDefinition = {
   type: string

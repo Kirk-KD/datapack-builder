@@ -38,7 +38,7 @@ function WorkspacePanel() {
         contents: getToolboxContents()
       },
       theme: customTheme,
-      renderer: 'Zelos'
+      renderer: 'custom_renderer'
     })
 
     // Default placeholder variable

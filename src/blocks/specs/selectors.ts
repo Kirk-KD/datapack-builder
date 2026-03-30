@@ -77,7 +77,7 @@ export const selectorBlockSpecs: BlockSpec[] = [
 
       block.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(selectorBaseOptions), FIELD_BASE)
-        .appendField(new ToggleImageField({
+        .appendField(new ToggleImageField({ // TODO change svg to simple vs complex instead of collapse vs expand
           collapsedSrc: '/expand.svg',
           expandedSrc: '/collapse.svg',
           width: 16,
@@ -93,7 +93,22 @@ export const selectorBlockSpecs: BlockSpec[] = [
 
       block.appendStatementInput(INPUT_FILTER_STACK).appendField('with')
       block.updateShape_ = function(this: TargetSelectorBlock) {
-        this.getInput(INPUT_FILTER_STACK)?.setVisible(this.showFilters_)
+        const existingInput = this.getInput(INPUT_FILTER_STACK)
+
+        if (!this.showFilters_) {
+          if (existingInput) {
+            const connection = existingInput.connection
+            if (connection) {
+              connection.disconnect()
+            }
+            this.removeInput(INPUT_FILTER_STACK)
+          }
+        } else {
+          if (!existingInput) {
+            this.appendStatementInput(INPUT_FILTER_STACK)
+          }
+        }
+
         if (this.rendered) {
           this.render()
         }
