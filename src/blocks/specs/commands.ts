@@ -1,9 +1,8 @@
 import { mcfunctionGenerator } from '../../compiler/generator'
-import { literalChain } from '../../compiler/util'
 import type { BlockSpec } from './types'
 import {setShadowState} from "../extensions/shadows.ts";
 
-const chainableChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector']
+const sayChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 
 export const commandBlockSpecs: BlockSpec[] = [
   {
@@ -16,7 +15,7 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'MESSAGE',
-          check: chainableChecks,
+          check: sayChecks,
         },
       ],
       inputsInline: true,
@@ -25,9 +24,9 @@ export const commandBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const msgBlock = block.getInputTargetBlock('MESSAGE')!
-      const [msg, hasMacro] = literalChain(msgBlock)
-      return (hasMacro ? '$' : '') + `say ${msg}\n`
+      const message = mcfunctionGenerator.valueToCode(block, 'MESSAGE', 0) || ''
+      const hasMacro = block.getInputTargetBlock('MESSAGE')?.type === 'mc_param'
+      return (hasMacro ? '$' : '') + `say ${message}\n`
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MESSAGE', {

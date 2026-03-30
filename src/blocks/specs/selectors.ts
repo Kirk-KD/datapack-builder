@@ -5,11 +5,8 @@ import { mcfunctionGenerator } from '../../compiler/generator'
 import type { BlockSpec } from './types'
 import { setShadowState } from '../extensions/shadows.ts'
 
-const INPUT_CHAIN_NEXT = 'CHAIN_NEXT'
 const INPUT_FILTER_STACK = 'FILTER_STACK'
 const FIELD_BASE = 'BASE'
-
-const chainableChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector']
 
 export const targetSelectorRootType = 'mc_target_selector'
 
@@ -67,7 +64,6 @@ export const selectorBlockSpecs: BlockSpec[] = [
   {
     type: targetSelectorRootType,
     category: 'targetSelectors',
-    tags: ['chainable'],
     init(this: Blockly.Block) {
       const block = this as TargetSelectorBlock
       block.showFilters_ = false
@@ -77,8 +73,7 @@ export const selectorBlockSpecs: BlockSpec[] = [
       block.setHelpUrl('')
       block.setInputsInline(false)
 
-      block.appendValueInput(INPUT_CHAIN_NEXT)
-        .setCheck(chainableChecks)
+      block.appendDummyInput()
         .appendField(new Blockly.FieldDropdown(selectorBaseOptions), FIELD_BASE)
         .appendField(new ToggleImageField({
           collapsedSrc: '/expand.svg',
@@ -95,8 +90,6 @@ export const selectorBlockSpecs: BlockSpec[] = [
         }), 'SHOW_FILTERS_TOGGLE')
 
       block.appendStatementInput(INPUT_FILTER_STACK).appendField('with')
-      Blockly.Extensions.apply('mc_trim_chain_tail', block, false)
-
       block.updateShape_ = function(this: TargetSelectorBlock) {
         this.getInput(INPUT_FILTER_STACK)?.setVisible(this.showFilters_)
         if (this.rendered) {
@@ -120,10 +113,7 @@ export const selectorBlockSpecs: BlockSpec[] = [
       block.updateShape_()
     },
     generator(block) {
-      const selectorStr = compileSelector(block)
-      const nextBlock = block.getInputTargetBlock(INPUT_CHAIN_NEXT)
-      const nextStr = nextBlock ? mcfunctionGenerator.blockToCode(nextBlock)[0] : ''
-      return [selectorStr + nextStr, 0]
+      return [compileSelector(block), 0]
     },
   },
   createFilterSpec('mc_target_filter_limit', 'limit %1', [{ type: 'field_input', name: 'LIMIT', text: '' }], block => `limit=${block.getFieldValue('LIMIT')},`),
