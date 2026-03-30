@@ -19,16 +19,16 @@ function WorkspacePanel() {
       base: DarkTheme,
       name: 'Custom',
       blockStyles: {
-        math_blocks: {
-          colourPrimary: colours.literals.toString(),
-          colourSecondary: colours.literals.toString(),
-          colourTertiary: colours.literals.toString()
-        },
         procedure_blocks: {
           colourPrimary: colours.procedures.toString(),
           colourSecondary: colours.procedures.toString(),
           colourTertiary: colours.procedures.toString()
         }
+      },
+      fontStyle: {
+        family: "Helvetica Neue",
+        weight: "500",
+        size: 9,
       }
     })
 
@@ -37,7 +37,8 @@ function WorkspacePanel() {
         kind: 'categoryToolbox',
         contents: getToolboxContents()
       },
-      theme: customTheme
+      theme: customTheme,
+      renderer: 'Zelos'
     })
 
     // Default placeholder variable

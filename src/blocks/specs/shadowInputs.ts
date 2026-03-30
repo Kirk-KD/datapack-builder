@@ -77,5 +77,5 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
   makeShadowInputBlockSpec('angle', input => {
     if (input === '') return input
     return validateNumber(input) ?? validateTilde(input)
-  }, '0', '%1°')
+  }, '~')
 ]

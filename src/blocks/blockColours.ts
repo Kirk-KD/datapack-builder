@@ -1,10 +1,10 @@
 export const colours: Record<string, string> = {
-  events: '#ffae00',
-  control: '#f58c0b',
-  commands: '#3381ff',
+  events: '#ffbf00',
+  control: '#ffab19',
+  commands: '#4c97ff',
   literals: '#006676',
-  variable: '#ff6200',
-  procedures: '#ff2c64',
-  execute: '#3381ff',
-  targetSelectors: '#f58c0b'
+  variable: '#ff8c1a',
+  procedures: '#ff6680',
+  execute: '#4c97ff',
+  targetSelectors: '#5cb1d6'
 }
