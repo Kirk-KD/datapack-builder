@@ -59,12 +59,14 @@ type ExecuteConditionMode = 'biome' | 'block' | 'blocks' | 'data' | 'dimension' 
 
 type ExecuteConditionDataKind = 'block' | 'entity' | 'storage'
 type ExecuteConditionItemsKind = 'block' | 'entity'
+type ExecuteConditionScoreMode = 'LT' | 'LTE' | 'EQ' | 'GTE' | 'GT' | 'MATCHES'
 
 type ExecuteConditionBlock = Blockly.BlockSvg & {
   conditionKind_: 'if' | 'unless'
   mode_: ExecuteConditionMode
   dataKind_: ExecuteConditionDataKind
   itemsKind_: ExecuteConditionItemsKind
+  scoreMode_: ExecuteConditionScoreMode
   updateShape_: () => void
 }
 
@@ -97,6 +99,50 @@ type ExecuteConditionConfig = {
   partialGenerator: (block: Blockly.Block) => string
   customAppender?: (block: ExecuteConditionBlock, args: ExecuteConditionInputConfig[]) => void
   inputsInline?: boolean
+}
+
+const executeBlocksScanModeOptions: [string, string][] = [
+  ['all blocks', 'all'],
+  ['non-air blocks', 'masked'],
+]
+
+const executeScoreModeOptions: [string, string][] = [
+  ['<', 'LT'],
+  ['<=', 'LTE'],
+  ['=', 'EQ'],
+  ['>=', 'GTE'],
+  ['>', 'GT'],
+  ['matches', 'MATCHES'],
+]
+
+const scoreTargetArg: ExecuteConditionInputConfig = {
+  kind: 'value',
+  name: 'TARGET',
+  check: ['mc_string', 'mc_target_selector'],
+}
+
+const scoreTargetObjectiveArg: ExecuteConditionInputConfig = {
+  kind: 'value',
+  name: 'TARGET_OBJECTIVE',
+  check: ['mc_string', 'mc_param'],
+}
+
+const scoreSourceArg: ExecuteConditionInputConfig = {
+  kind: 'value',
+  name: 'SOURCE',
+  check: ['mc_string', 'mc_target_selector'],
+}
+
+const scoreSourceObjectiveArg: ExecuteConditionInputConfig = {
+  kind: 'value',
+  name: 'SOURCE_OBJECTIVE',
+  check: ['mc_string', 'mc_param'],
+}
+
+const scoreRangeArg: ExecuteConditionInputConfig = {
+  kind: 'value',
+  name: 'RANGE',
+  check: ['mc_range'],
 }
 
 /**
@@ -133,10 +179,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'field_dropdown', name: 'SCAN_MODE', options: [
-        ['all blocks', 'all'],
-        ['non-air blocks', 'masked'],
-      ] },
+      { kind: 'field_dropdown', name: 'SCAN_MODE', options: executeBlocksScanModeOptions },
     ],
     partialGenerator(block) {
       return [
@@ -212,11 +255,11 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       return block.getFieldValue('PREDICATE')
     },
   },
-  score: { // TODO implement `score`
-    message: '%1',
-    args: [{ kind: 'field_input', name: 'X', text: '' }],
-    partialGenerator(block) {
-      return `placeholder ${block.getFieldValue('X')}`
+  score: {
+    message: '',
+    args: [],
+    partialGenerator() {
+      return ''
     },
   },
 }
@@ -277,6 +320,57 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     ],
     partialGenerator(block) {
       return `entity ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SLOTS', 0)} ${mcfunctionGenerator.valueToCode(block, 'ITEM_PREDICATE', 0)}`
+    },
+  },
+}
+
+const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, ExecuteConditionConfig> = {
+  LT: {
+    message: '',
+    inputsInline: false,
+    args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
+    partialGenerator(block) {
+      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} < ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+    },
+  },
+  LTE: {
+    message: '',
+    inputsInline: false,
+    args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
+    partialGenerator(block) {
+      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} <= ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+    },
+  },
+  EQ: {
+    message: '',
+    inputsInline: false,
+    args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
+    partialGenerator(block) {
+      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} = ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+    },
+  },
+  GTE: {
+    message: '',
+    inputsInline: false,
+    args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
+    partialGenerator(block) {
+      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} >= ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+    },
+  },
+  GT: {
+    message: '',
+    inputsInline: false,
+    args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
+    partialGenerator(block) {
+      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} > ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+    },
+  },
+  MATCHES: {
+    message: '',
+    inputsInline: false,
+    args: [scoreTargetArg, scoreTargetObjectiveArg, scoreRangeArg],
+    partialGenerator(block) {
+      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} matches ${mcfunctionGenerator.valueToCode(block, 'RANGE', 0)}`
     },
   },
 }
@@ -366,6 +460,29 @@ function appendExecuteConditionArg(
   }
 }
 
+/**
+ * Appends the score condition layout with the operator dropdown between the two sides.
+ */
+function appendScoreModeInputs(
+  block: ExecuteConditionBlock,
+  scoreModeField: Blockly.FieldDropdown,
+  scoreMode: ExecuteConditionScoreMode,
+) {
+  appendExecuteConditionArg(block, scoreTargetArg)
+  appendExecuteConditionArg(block, scoreTargetObjectiveArg, 'in')
+
+  const operatorInput = block.appendDummyInput('SCORE_MODE_ROW')
+  operatorInput.appendField(scoreModeField, 'SCORE_MODE')
+
+  if (scoreMode === 'MATCHES') {
+    appendExecuteConditionArg(block, scoreRangeArg)
+    return
+  }
+
+  appendExecuteConditionArg(block, scoreSourceArg)
+  appendExecuteConditionArg(block, scoreSourceObjectiveArg, 'in')
+}
+
 export const executeBlockSpecs: BlockSpec[] = [
   {
     type: 'execute_root',
@@ -413,6 +530,7 @@ export const executeBlockSpecs: BlockSpec[] = [
       block.mode_ = 'biome'
       block.dataKind_ = 'block'
       block.itemsKind_ = 'block'
+      block.scoreMode_ = 'LT'
       block.setPreviousStatement(true)
       block.setNextStatement(true)
       block.setColour(colours.execute)
@@ -463,6 +581,15 @@ export const executeBlockSpecs: BlockSpec[] = [
             return newItemsKind
           }
         )
+        const scoreModeField = new Blockly.FieldDropdown(
+          executeScoreModeOptions,
+          (newScoreMode) => {
+            if (!newScoreMode || newScoreMode === block.scoreMode_) return newScoreMode
+            block.scoreMode_ = newScoreMode as ExecuteConditionScoreMode
+            block.updateShape_()
+            return newScoreMode
+          }
+        )
 
         if (this.mode_ === 'data') {
           const headerInput = this.appendDummyInput('HEADER')
@@ -499,6 +626,13 @@ export const executeBlockSpecs: BlockSpec[] = [
           this.setInputsInline(itemsConfig.inputsInline ?? true)
           appendExecuteConditionInputs(this, itemsConfig.message, itemsConfig.args)
           itemsKindField.setValue(this.itemsKind_)
+        } else if (this.mode_ === 'score') {
+          const scoreConfig = executeConditionScoreModeConfigs[this.scoreMode_]
+          this.setInputsInline(scoreConfig.inputsInline ?? true)
+          const headerInput = this.appendDummyInput('HEADER')
+          headerInput.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
+          appendScoreModeInputs(this, scoreModeField, this.scoreMode_)
+          scoreModeField.setValue(this.scoreMode_)
         }
 
         conditionKindField.setValue(this.conditionKind_)
@@ -532,6 +666,21 @@ export const executeBlockSpecs: BlockSpec[] = [
             type: 'mc_string',
             fields: { VALUE: 'minecraft:stone' },
           })
+        } else if (this.mode_ === 'score') {
+          setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
+          setShadowState(this, 'TARGET_OBJECTIVE', {
+            type: 'mc_string',
+            fields: { VALUE: 'objective' },
+          })
+          if (this.scoreMode_ === 'MATCHES') {
+            setShadowState(this, 'RANGE', { type: 'mc_range' })
+          } else {
+            setShadowState(this, 'SOURCE', { type: 'mc_target_selector' })
+            setShadowState(this, 'SOURCE_OBJECTIVE', {
+              type: 'mc_string',
+              fields: { VALUE: 'objective' },
+            })
+          }
         }
       }
 
@@ -541,6 +690,7 @@ export const executeBlockSpecs: BlockSpec[] = [
           mode: this.mode_,
           dataKind: this.dataKind_,
           itemsKind: this.itemsKind_,
+          scoreMode: this.scoreMode_,
         }
       }
 
@@ -549,11 +699,13 @@ export const executeBlockSpecs: BlockSpec[] = [
         mode?: ExecuteConditionMode
         dataKind?: ExecuteConditionDataKind
         itemsKind?: ExecuteConditionItemsKind
+        scoreMode?: ExecuteConditionScoreMode
       } | null) {
         this.conditionKind_ = state?.conditionKind ?? 'if'
         this.mode_ = state?.mode ?? 'biome'
         this.dataKind_ = state?.dataKind ?? 'block'
         this.itemsKind_ = state?.itemsKind ?? 'block'
+        this.scoreMode_ = state?.scoreMode ?? 'LT'
         this.updateShape_()
       }
 
@@ -566,6 +718,8 @@ export const executeBlockSpecs: BlockSpec[] = [
         ? executeConditionDataKindConfigs[(block as ExecuteConditionBlock).dataKind_].partialGenerator(block)
         : mode === 'items'
           ? executeConditionItemsKindConfigs[(block as ExecuteConditionBlock).itemsKind_].partialGenerator(block)
+          : mode === 'score'
+            ? executeConditionScoreModeConfigs[(block as ExecuteConditionBlock).scoreMode_].partialGenerator(block)
         : executeConditionModeConfigs[mode].partialGenerator(block)
       return `${conditionKind} ${mode} ${suffix} `
     }
