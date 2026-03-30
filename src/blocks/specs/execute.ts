@@ -58,11 +58,13 @@ type ExecuteConditionMode = 'biome' | 'block' | 'blocks' | 'data' | 'dimension' 
   | 'loaded' | 'predicate' | 'score'
 
 type ExecuteConditionDataKind = 'block' | 'entity' | 'storage'
+type ExecuteConditionItemsKind = 'block' | 'entity'
 
 type ExecuteConditionBlock = Blockly.BlockSvg & {
   conditionKind_: 'if' | 'unless'
   mode_: ExecuteConditionMode
   dataKind_: ExecuteConditionDataKind
+  itemsKind_: ExecuteConditionItemsKind
   updateShape_: () => void
 }
 
@@ -185,13 +187,11 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       return block.getFieldValue('FUNCTION')
     },
   },
-  items: { // TODO implement `items`
-    message: '%1',
-    args: [
-      { kind: 'field_input', name: 'X', text: '' },
-    ],
-    partialGenerator(block) {
-      return `placeholder ${block.getFieldValue('X')}`
+  items: {
+    message: '',
+    args: [],
+    partialGenerator() {
+      return ''
     },
   },
   loaded: {
@@ -250,6 +250,33 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
     ],
     partialGenerator(block) {
       return `storage ${block.getFieldValue('SOURCE')} ${block.getFieldValue('PATH')}`
+    },
+  },
+}
+
+const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, ExecuteConditionConfig> = {
+  block: {
+    message: 'at %1 in %2 matching %3',
+    inputsInline: false,
+    args: [
+      { kind: 'value', name: 'SOURCE_POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
+    ],
+    partialGenerator(block) {
+      return `block ${mcfunctionGenerator.valueToCode(block, 'SOURCE_POS', 0)} ${mcfunctionGenerator.valueToCode(block, 'SLOTS', 0)} ${mcfunctionGenerator.valueToCode(block, 'ITEM_PREDICATE', 0)}`
+    },
+  },
+  entity: {
+    message: '%1 in %2 matching %3',
+    inputsInline: false,
+    args: [
+      { kind: 'value', name: 'SOURCE', check: ['mc_string', 'mc_target_selector'] },
+      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
+    ],
+    partialGenerator(block) {
+      return `entity ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SLOTS', 0)} ${mcfunctionGenerator.valueToCode(block, 'ITEM_PREDICATE', 0)}`
     },
   },
 }
@@ -385,6 +412,7 @@ export const executeBlockSpecs: BlockSpec[] = [
       block.conditionKind_ = 'if'
       block.mode_ = 'biome'
       block.dataKind_ = 'block'
+      block.itemsKind_ = 'block'
       block.setPreviousStatement(true)
       block.setNextStatement(true)
       block.setColour(colours.execute)
@@ -426,8 +454,20 @@ export const executeBlockSpecs: BlockSpec[] = [
             return newDataKind
           }
         )
+        const itemsKindField = new Blockly.FieldDropdown(
+          [['block', 'block'], ['entity', 'entity']],
+          (newItemsKind) => {
+            if (!newItemsKind || newItemsKind === block.itemsKind_) return newItemsKind
+            block.itemsKind_ = newItemsKind as ExecuteConditionItemsKind
+            block.updateShape_()
+            return newItemsKind
+          }
+        )
 
         if (this.mode_ === 'data') {
+          const headerInput = this.appendDummyInput('HEADER')
+          headerInput.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
+        } else if (this.mode_ === 'items') {
           const headerInput = this.appendDummyInput('HEADER')
           headerInput.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
         } else {
@@ -444,11 +484,21 @@ export const executeBlockSpecs: BlockSpec[] = [
 
         if (this.mode_ === 'data') {
           const firstDataInput = this.appendDummyInput('DATA_KIND_ROW')
+          firstDataInput.appendField('of')
           firstDataInput.appendField(dataKindField, 'DATA_KIND')
 
           const dataConfig = executeConditionDataKindConfigs[this.dataKind_]
           appendExecuteConditionInputs(this, dataConfig.message, dataConfig.args)
           dataKindField.setValue(this.dataKind_)
+        } else if (this.mode_ === 'items') {
+          const firstItemsInput = this.appendDummyInput('ITEMS_KIND_ROW')
+          firstItemsInput.appendField('of')
+          firstItemsInput.appendField(itemsKindField, 'ITEMS_KIND')
+
+          const itemsConfig = executeConditionItemsKindConfigs[this.itemsKind_]
+          this.setInputsInline(itemsConfig.inputsInline ?? true)
+          appendExecuteConditionInputs(this, itemsConfig.message, itemsConfig.args)
+          itemsKindField.setValue(this.itemsKind_)
         }
 
         conditionKindField.setValue(this.conditionKind_)
@@ -468,21 +518,42 @@ export const executeBlockSpecs: BlockSpec[] = [
           } else if (this.dataKind_ === 'entity') {
             setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
           }
+        } else if (this.mode_ === 'items') {
+          if (this.itemsKind_ === 'block') {
+            setShadowState(this, 'SOURCE_POS', { type: 'mc_block_pos' })
+          } else if (this.itemsKind_ === 'entity') {
+            setShadowState(this, 'SOURCE', { type: 'mc_target_selector' })
+          }
+          setShadowState(this, 'SLOTS', {
+            type: 'mc_string',
+            fields: { VALUE: 'container.*' },
+          })
+          setShadowState(this, 'ITEM_PREDICATE', {
+            type: 'mc_string',
+            fields: { VALUE: 'minecraft:stone' },
+          })
         }
       }
 
       block.saveExtraState = function(this: ExecuteConditionBlock) {
-        return { conditionKind: this.conditionKind_, mode: this.mode_, dataKind: this.dataKind_ }
+        return {
+          conditionKind: this.conditionKind_,
+          mode: this.mode_,
+          dataKind: this.dataKind_,
+          itemsKind: this.itemsKind_,
+        }
       }
 
       block.loadExtraState = function(this: ExecuteConditionBlock, state: {
         conditionKind?: 'if' | 'unless'
         mode?: ExecuteConditionMode
         dataKind?: ExecuteConditionDataKind
+        itemsKind?: ExecuteConditionItemsKind
       } | null) {
         this.conditionKind_ = state?.conditionKind ?? 'if'
         this.mode_ = state?.mode ?? 'biome'
         this.dataKind_ = state?.dataKind ?? 'block'
+        this.itemsKind_ = state?.itemsKind ?? 'block'
         this.updateShape_()
       }
 
@@ -493,6 +564,8 @@ export const executeBlockSpecs: BlockSpec[] = [
       const mode = block.getFieldValue(FIELD_MODE) as ExecuteConditionMode
       const suffix = mode === 'data'
         ? executeConditionDataKindConfigs[(block as ExecuteConditionBlock).dataKind_].partialGenerator(block)
+        : mode === 'items'
+          ? executeConditionItemsKindConfigs[(block as ExecuteConditionBlock).itemsKind_].partialGenerator(block)
         : executeConditionModeConfigs[mode].partialGenerator(block)
       return `${conditionKind} ${mode} ${suffix} `
     }
