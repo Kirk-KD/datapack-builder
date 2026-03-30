@@ -112,11 +112,12 @@ export const literalBlockSpecs: BlockSpec[] = [
     generator(block) {
       const min = mcfunctionGenerator.valueToCode(block, 'MIN', 0)
       const max = mcfunctionGenerator.valueToCode(block, 'MAX', 0)
+      if (min === '' && max === '') return ['', 0]
       return [`${min}..${max}`, 0]
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'MIN', {type: 'number'})
-      setShadowState(this, 'MAX', {type: 'number'})
+      setShadowState(this, 'MIN', {type: 'number', fields: { VALUE: '' }})
+      setShadowState(this, 'MAX', {type: 'number', fields: { VALUE: '' }})
     }
   },
   {
