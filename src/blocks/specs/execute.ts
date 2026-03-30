@@ -57,9 +57,12 @@ function executeModifierSpec(
 type ExecuteConditionMode = 'biome' | 'block' | 'blocks' | 'data' | 'dimension' | 'entity' | 'function' | 'items'
   | 'loaded' | 'predicate' | 'score'
 
+type ExecuteConditionDataKind = 'block' | 'entity' | 'storage'
+
 type ExecuteConditionBlock = Blockly.BlockSvg & {
   conditionKind_: 'if' | 'unless'
   mode_: ExecuteConditionMode
+  dataKind_: ExecuteConditionDataKind
   updateShape_: () => void
 }
 
@@ -84,18 +87,20 @@ type ExecuteConditionInputConfig =
   }
 
 /**
- * An `execute (if|unless)`'s configuration for message, arguments, and partial code generator.
+ * A config for message, arguments, and partial code generation in execute conditions.
  */
-type ExecuteConditionModeConfig = {
+type ExecuteConditionConfig = {
   message: string
   args: ExecuteConditionInputConfig[]
   partialGenerator: (block: Blockly.Block) => string
+  customAppender?: (block: ExecuteConditionBlock, args: ExecuteConditionInputConfig[]) => void
+  inputsInline?: boolean
 }
 
 /**
  * Partial specs for arguments of `execute (if|unless) <mode> <arguments>`.
  */
-const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteConditionModeConfig> = {
+const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteConditionConfig> = {
   biome: {
     message: 'at %1 is %2',
     args: [
@@ -119,13 +124,17 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       return `${mcfunctionGenerator.valueToCode(block, 'POS', 0)} ${block.getFieldValue('BLOCK')}`
     },
   },
-  blocks: { // TODO clean up display
-    message: 'from %1 to %2 = %3 with equal volume, %4',
+  blocks: {
+    message: '',
+    inputsInline: false,
     args: [
       { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_param'] },
       { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'field_dropdown', name: 'SCAN_MODE', options: [['all', 'all'], ['masked', 'masked']] },
+      { kind: 'field_dropdown', name: 'SCAN_MODE', options: [
+        ['all blocks', 'all'],
+        ['non-air blocks', 'masked'],
+      ] },
     ],
     partialGenerator(block) {
       return [
@@ -135,14 +144,18 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
         block.getFieldValue('SCAN_MODE'),
       ].join(' ')
     },
+    customAppender(block, args) {
+      appendExecuteConditionArg(block, args[0], 'from')
+      appendExecuteConditionArg(block, args[1], 'to')
+      appendExecuteConditionArg(block, args[2], 'compare with')
+      appendExecuteConditionArg(block, args[3], 'using')
+    },
   },
-  data: { // TODO implement `data`
-    message: '%1',
-    args: [
-      { kind: 'field_input', name: 'X', text: '' },
-    ],
-    partialGenerator(block) {
-      return `placeholder ${block.getFieldValue('X')}`
+  data: { // Defined via mutator
+    message: '',
+    args: [],
+    partialGenerator() {
+      return ''
     },
   },
   dimension: {
@@ -154,7 +167,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       return String(block.getFieldValue('DIMENSION'))
     },
   },
-  entity: { // TODO add shadow block
+  entity: {
     message: '%1 exists',
     args: [
       { kind: 'value', name: INPUT_TARGET, check: ['mc_string', 'mc_target_selector'] },
@@ -208,6 +221,39 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   },
 }
 
+const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteConditionConfig> = {
+  block: {
+    message: 'at %1 has %2',
+    args: [
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'field_input', name: 'PATH', text: '' },
+    ],
+    partialGenerator(block) {
+      return `block ${mcfunctionGenerator.valueToCode(block, 'POS', 0)} ${block.getFieldValue('PATH')}`
+    },
+  },
+  entity: {
+    message: '%1 has %2',
+    args: [
+      { kind: 'value', name: INPUT_TARGET, check: ['mc_string', 'mc_target_selector'] },
+      { kind: 'field_input', name: 'PATH', text: '' },
+    ],
+    partialGenerator(block) {
+      return `entity ${mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0)} ${block.getFieldValue('PATH')}`
+    },
+  },
+  storage: {
+    message: '%1 has %2',
+    args: [
+      { kind: 'field_input', name: 'SOURCE', text: '' },
+      { kind: 'field_input', name: 'PATH', text: '' },
+    ],
+    partialGenerator(block) {
+      return `storage ${block.getFieldValue('SOURCE')} ${block.getFieldValue('PATH')}`
+    },
+  },
+}
+
 /**
  * Splits a Blockly-style message string into the text segments around each placeholder.
  */
@@ -217,6 +263,80 @@ function getMessageSegments(message: string, expectedArgs: number): string[] {
     throw new Error(`Execute condition message "${message}" does not match arg count ${expectedArgs}`)
   }
   return segments
+}
+
+/**
+ * Appends inputs and fields for a message/config pair onto the block.
+ */
+function appendExecuteConditionInputs(
+  block: ExecuteConditionBlock,
+  message: string,
+  args: ExecuteConditionInputConfig[],
+  onFirstInput?: (input: Blockly.Input) => void,
+) {
+  const segments = getMessageSegments(message, args.length)
+
+  args.forEach((inputConfig, index) => {
+    let input: Blockly.Input
+
+    if (inputConfig.kind === 'value') {
+      input = block.appendValueInput(inputConfig.name)
+      input.setCheck(inputConfig.check ?? null)
+    } else {
+      input = block.appendDummyInput(inputConfig.name)
+    }
+
+    if (index === 0) {
+      onFirstInput?.(input)
+    }
+
+    const prefix = segments[index].trim()
+    if (prefix !== '') {
+      input.appendField(prefix)
+    }
+
+    if (inputConfig.kind === 'field_input') {
+      input.appendField(new Blockly.FieldTextInput(inputConfig.text), inputConfig.name)
+    } else if (inputConfig.kind === 'field_dropdown') {
+      input.appendField(new Blockly.FieldDropdown(inputConfig.options), inputConfig.name)
+    }
+  })
+
+  const suffix = segments.at(-1)?.trim() ?? ''
+  if (suffix !== '') {
+    const lastInput = block.inputList.at(-1)
+    if (lastInput) {
+      lastInput.appendField(suffix)
+    }
+  }
+}
+
+/**
+ * Appends a single configured execute-condition argument with an optional leading label.
+ */
+function appendExecuteConditionArg(
+  block: ExecuteConditionBlock,
+  inputConfig: ExecuteConditionInputConfig,
+  prefix?: string,
+) {
+  let input: Blockly.Input
+
+  if (inputConfig.kind === 'value') {
+    input = block.appendValueInput(inputConfig.name)
+    input.setCheck(inputConfig.check ?? null)
+  } else {
+    input = block.appendDummyInput(inputConfig.name)
+  }
+
+  if (prefix) {
+    input.appendField(prefix)
+  }
+
+  if (inputConfig.kind === 'field_input') {
+    input.appendField(new Blockly.FieldTextInput(inputConfig.text), inputConfig.name)
+  } else if (inputConfig.kind === 'field_dropdown') {
+    input.appendField(new Blockly.FieldDropdown(inputConfig.options), inputConfig.name)
+  }
 }
 
 export const executeBlockSpecs: BlockSpec[] = [
@@ -264,6 +384,7 @@ export const executeBlockSpecs: BlockSpec[] = [
       const block = this as ExecuteConditionBlock
       block.conditionKind_ = 'if'
       block.mode_ = 'biome'
+      block.dataKind_ = 'block'
       block.setPreviousStatement(true)
       block.setNextStatement(true)
       block.setColour(colours.execute)
@@ -295,40 +416,39 @@ export const executeBlockSpecs: BlockSpec[] = [
         )
 
         const config = executeConditionModeConfigs[this.mode_]
-        const segments = getMessageSegments(config.message, config.args.length)
+        this.setInputsInline(config.inputsInline ?? true)
+        const dataKindField = new Blockly.FieldDropdown(
+          [['block', 'block'], ['entity', 'entity'], ['storage', 'storage']],
+          (newDataKind) => {
+            if (!newDataKind || newDataKind === block.dataKind_) return newDataKind
+            block.dataKind_ = newDataKind as ExecuteConditionDataKind
+            block.updateShape_()
+            return newDataKind
+          }
+        )
 
-        config.args.forEach((inputConfig, index) => {
-          let input: Blockly.Input
-
-          if (inputConfig.kind === 'value') {
-            input = this.appendValueInput(inputConfig.name)
-            input.setCheck(inputConfig.check ?? null)
+        if (this.mode_ === 'data') {
+          const headerInput = this.appendDummyInput('HEADER')
+          headerInput.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
+        } else {
+          if (config.customAppender) {
+            const headerInput = this.appendDummyInput('HEADER')
+            headerInput.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
+            config.customAppender(this, config.args)
           } else {
-            input = this.appendDummyInput(inputConfig.name)
+            appendExecuteConditionInputs(this, config.message, config.args, (input) => {
+              input.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
+            })
           }
+        }
 
-          if (index === 0) {
-            input.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
-          }
+        if (this.mode_ === 'data') {
+          const firstDataInput = this.appendDummyInput('DATA_KIND_ROW')
+          firstDataInput.appendField(dataKindField, 'DATA_KIND')
 
-          const prefix = segments[index].trim()
-          if (prefix !== '') {
-            input.appendField(prefix)
-          }
-
-          if (inputConfig.kind === 'field_input') {
-            input.appendField(new Blockly.FieldTextInput(inputConfig.text), inputConfig.name)
-          } else if (inputConfig.kind === 'field_dropdown') {
-            input.appendField(new Blockly.FieldDropdown(inputConfig.options), inputConfig.name)
-          }
-        })
-
-        const suffix = segments.at(-1)?.trim() ?? ''
-        if (suffix !== '') {
-          const lastInput = this.inputList.at(-1)
-          if (lastInput) {
-            lastInput.appendField(suffix)
-          }
+          const dataConfig = executeConditionDataKindConfigs[this.dataKind_]
+          appendExecuteConditionInputs(this, dataConfig.message, dataConfig.args)
+          dataKindField.setValue(this.dataKind_)
         }
 
         conditionKindField.setValue(this.conditionKind_)
@@ -340,19 +460,29 @@ export const executeBlockSpecs: BlockSpec[] = [
           setShadowState(this, 'START_POS', { type: 'mc_block_pos' })
           setShadowState(this, 'END_POS', { type: 'mc_block_pos' })
           setShadowState(this, 'DEST_POS', { type: 'mc_block_pos' })
+        } else if (this.mode_ === 'entity') {
+          setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+        } else if (this.mode_ === 'data') {
+          if (this.dataKind_ === 'block') {
+            setShadowState(this, 'POS', { type: 'mc_block_pos' })
+          } else if (this.dataKind_ === 'entity') {
+            setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+          }
         }
       }
 
       block.saveExtraState = function(this: ExecuteConditionBlock) {
-        return { conditionKind: this.conditionKind_, mode: this.mode_ }
+        return { conditionKind: this.conditionKind_, mode: this.mode_, dataKind: this.dataKind_ }
       }
 
       block.loadExtraState = function(this: ExecuteConditionBlock, state: {
         conditionKind?: 'if' | 'unless'
         mode?: ExecuteConditionMode
+        dataKind?: ExecuteConditionDataKind
       } | null) {
         this.conditionKind_ = state?.conditionKind ?? 'if'
         this.mode_ = state?.mode ?? 'biome'
+        this.dataKind_ = state?.dataKind ?? 'block'
         this.updateShape_()
       }
 
@@ -361,7 +491,10 @@ export const executeBlockSpecs: BlockSpec[] = [
     generator(block) {
       const conditionKind = block.getFieldValue(FIELD_CONDITION_KIND) as 'if' | 'unless'
       const mode = block.getFieldValue(FIELD_MODE) as ExecuteConditionMode
-      return `${conditionKind} ${mode} ${executeConditionModeConfigs[mode].partialGenerator(block)} `
+      const suffix = mode === 'data'
+        ? executeConditionDataKindConfigs[(block as ExecuteConditionBlock).dataKind_].partialGenerator(block)
+        : executeConditionModeConfigs[mode].partialGenerator(block)
+      return `${conditionKind} ${mode} ${suffix} `
     }
   },
   executeModifierSpec(
