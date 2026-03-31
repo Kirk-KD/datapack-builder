@@ -1,3 +1,9 @@
+:root {
+  --font-family: "Helvetica Neue", Helvetica, sans-serif;
+  --font-size-base: 16px;
+  --font-size-small: 14px;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -6,4 +12,17 @@
 
 html, body {
   overflow: hidden;
+}
+
+span {
+  font-family: var(--font-family), sans-serif !important;
+  font-size: var(--font-size-base) !important;
+}
+
+.blocklyToolboxCategoryIcon {
+  width: 8px !important;
+}
+
+.blocklyToolboxCategoryLabel {
+  font-size: var(--font-size-small) !important;
 }
