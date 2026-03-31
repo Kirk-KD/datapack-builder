@@ -51,7 +51,8 @@ function createFilterSpec(
 }
 
 function getFilterString(block: Blockly.Block): string {
-  const filterStack = mcfunctionGenerator.statementToCode(block, INPUT_FILTER_STACK) || ''
+  const filterStack = block.getInput(INPUT_FILTER_STACK) ?
+    mcfunctionGenerator.statementToCode(block, INPUT_FILTER_STACK) : ''
   const filters = filterStack.trim().split(',').filter((filter: string) => filter.length > 0)
   return filters.length > 0 ? `[${filters.join(',')}]` : ''
 }
