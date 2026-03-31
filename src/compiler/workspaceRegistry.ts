@@ -1,4 +1,5 @@
 import * as Blockly from 'blockly'
+import { WorkspaceSvg} from "blockly";
 
 let variables: Blockly.IVariableModel<Blockly.IVariableState>[] = []
 let procedures: Blockly.Procedures.IProcedureModel[] = []
@@ -7,6 +8,12 @@ export type ProcedureParameterPair = readonly [
   Blockly.Procedures.IProcedureModel,
   Blockly.Procedures.IParameterModel[],
 ]
+
+export function updateWorkspaceRegistry(workspace: WorkspaceSvg) {
+  updateVariables(workspace.getVariableMap().getAllVariables())
+  // Also update procedures when a parameter is renamed (VAR_RENAME fires for param renames)
+  updateProcedures(workspace.getProcedureMap().getProcedures())
+}
 
 export function updateVariables(newVars: Blockly.IVariableModel<Blockly.IVariableState>[]) {
   variables = newVars

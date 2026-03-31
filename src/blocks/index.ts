@@ -5,6 +5,7 @@ import { getBlockJsonByCategory, getBlockTypesByCategory, registerBlockSpecs } f
 import './extensions'
 import './validators'
 import './renderer.ts'
+import getVariablesCategory from "./categories/variables.ts";
 
 type ColourableBlockDefinition = {
   type: string
@@ -57,8 +58,8 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
     {
       kind: 'category',
       name: 'Variables',
-      custom: 'MC_VARIABLES',
-      colour: colours.variable
+      colour: colours.variable,
+      contents: getVariablesCategory()
     },
     {
       kind: "category",

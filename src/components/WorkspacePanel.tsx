@@ -1,113 +1,59 @@
 import { useEffect, useRef } from 'react'
 import * as Blockly from 'blockly'
-import DarkTheme from '@blockly/theme-dark'
-import {blocks as procedureBlocks, unregisterProcedureBlocks} from '@blockly/block-shareable-procedures'
-import {shadowBlockConversionChangeListener} from '@blockly/shadow-block-converter'
+import {registerContinuousToolbox, additionalOptions, setupWorkspace} from '../workspaceSetup.ts'
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
-import getVariablesCategory from '../blocks/categories/variables'
-import { colours } from '../blocks/blockColours'
-import { updateProcedures, updateVariables } from '../compiler/workspaceRegistry'
+import { updateWorkspaceRegistry} from '../compiler/workspaceRegistry'
+
+import type {WorkspaceSvg} from "blockly";
+
+function updateToolbox(workspace: WorkspaceSvg) {
+  updateWorkspaceRegistry(workspace)
+  workspace.updateToolbox({
+    kind: 'categoryToolbox',
+    contents: getToolboxContents(workspace)
+  })
+}
 
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
 
+  // Register outside useEffect to avoid error due to variables category
+  registerContinuousToolbox()
+
   useEffect(() => {
     if (!divRef.current) return
-
-    const customTheme = Blockly.Theme.defineTheme('customDark', {
-      base: DarkTheme,
-      name: 'Custom',
-      blockStyles: {
-        procedure_blocks: {
-          colourPrimary: colours.procedures.toString(),
-          colourSecondary: colours.procedures.toString(),
-          colourTertiary: colours.procedures.toString()
-        }
-      },
-      fontStyle: {
-        family: "Helvetica Neue",
-        weight: "500",
-        size: 9,
-      }
-    })
 
     workspaceRef.current = Blockly.inject(divRef.current, {
       toolbox: {
         kind: 'categoryToolbox',
         contents: getToolboxContents()
       },
-      theme: customTheme,
-      renderer: 'custom_renderer',
-      zoom: {
-        controls: true,
-        wheel: true,
-        startScale: 1.0,
-        maxScale: 2,
-        minScale: 0.4,
-        scaleSpeed: 1.2,
-        pinch: true
-      },
-      grid: {
-        spacing: 20,
-        length: 3,
-        colour: '#555',
-        snap: true
-      }
+      ...additionalOptions
     })
+    setupWorkspace(workspaceRef.current!)
 
-    workspaceRef.current.addChangeListener(shadowBlockConversionChangeListener)
+    // Initial placeholder variable
+    workspaceRef.current.getVariableMap().createVariable('myVar', 'mc_scoreboard_variable')
+    updateToolbox(workspaceRef.current)
 
-    // Custom dynamic category for variables
-    workspaceRef.current.registerToolboxCategoryCallback('MC_VARIABLES', () => {
-      return getVariablesCategory()
-    })
     workspaceRef.current.registerButtonCallback('CREATE_VARIABLE', () => {
       Blockly.Variables.createVariableButtonHandler(workspaceRef.current!, undefined, 'mc_scoreboard_variable')
     })
 
-    // Load built-in procedure blocks
-    unregisterProcedureBlocks()
-    Blockly.common.defineBlocks(procedureBlocks)
-    // Remove unwanted loaded procedure blocks
-    delete Blockly.Blocks['procedures_callreturn']
-    delete Blockly.Blocks['procedures_defreturn']
-    delete Blockly.Blocks['procedures_ifreturn']
-
-    // Populate toolbox
-    workspaceRef.current.updateToolbox({
-      kind: 'categoryToolbox',
-      contents: getToolboxContents(workspaceRef.current!)
-    })
-
     workspaceRef.current.addChangeListener((event) => {
-      // Update toolbox and variable list whenever variables are modified
       if (
+        // Update toolbox and variable list whenever variables are modified
         event.type === Blockly.Events.VAR_CREATE ||
         event.type === Blockly.Events.VAR_DELETE ||
-        event.type === Blockly.Events.VAR_RENAME
-      ) {
-        workspaceRef.current!.updateToolbox({
-          kind: 'categoryToolbox',
-          contents: getToolboxContents(workspaceRef.current!)
-        })
-        updateVariables(workspaceRef.current!.getVariableMap().getAllVariables())
-        // Also update procedures when a parameter is renamed (VAR_RENAME fires for param renames)
-        updateProcedures(workspaceRef.current!.getProcedureMap().getProcedures())
-      }
-
-      // Update procedure list whenever procedures are modified
-      else if (
+        event.type === Blockly.Events.VAR_RENAME ||
+        // Update procedure list whenever procedures are modified
         event.type === Blockly.Events.BLOCK_CREATE ||
         event.type === Blockly.Events.BLOCK_DELETE ||
         event.type === Blockly.Events.BLOCK_CHANGE
       ) {
-        workspaceRef.current!.updateToolbox({
-          kind: 'categoryToolbox',
-          contents: getToolboxContents(workspaceRef.current!)
-        })
-        updateProcedures(workspaceRef.current!.getProcedureMap().getProcedures())
+        updateToolbox(workspaceRef.current!)
       }
     })
 

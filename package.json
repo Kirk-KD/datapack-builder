@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@blockly/block-shareable-procedures": "^6.0.10",
+    "@blockly/continuous-toolbox": "^7.0.8",
     "@blockly/shadow-block-converter": "^7.0.9",
     "@blockly/theme-dark": "^8.0.3",
     "blockly": "^12.5.1",
