@@ -8,7 +8,6 @@ import type { BlockSpec } from './types'
 
 const FIELD_PARAM_NAME = 'PARAM_NAME'
 export const PROC_DEF_NAME = 'procedures_defnoreturn'
-const inlineProcedureArgTypes = new Set(['mc_string', 'mc_int', 'mc_param'])
 
 export const procedureBlockSpecs: BlockSpec[] = [
   {
@@ -70,7 +69,7 @@ export const procedureBlockSpecs: BlockSpec[] = [
           const paramPath = nbtStorageManager.getProcArgPath(procName, param)
           cmd += `execute store result storage ${storageName} ${paramPath} int 1 run scoreboard players get ${varName} ${objectiveName}\n`
           cmdHasStorage = true
-        } else if (inlineProcedureArgTypes.has(argBlock.type)) {
+        } else {
           const [text] = mcfunctionGenerator.blockToCode(argBlock) as [string, number]
           snbt[param] = text
         }
