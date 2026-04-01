@@ -831,7 +831,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_positioned_as',
     'positioned as %1',
-    [targetInput()],
+    [targetInput(selectorLikeChecks)],
     block => `positioned as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
     {},
     function(this: Blockly.Block) {
