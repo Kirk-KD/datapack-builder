@@ -17,8 +17,6 @@ const customTheme = Blockly.Theme.defineTheme('customDark', {
   blockStyles: {
     procedure_blocks: {
       colourPrimary: colours.procedures.toString(),
-      colourSecondary: colours.procedures.toString(),
-      colourTertiary: colours.procedures.toString()
     }
   },
   fontStyle: {
@@ -67,7 +65,13 @@ const additionalOptions = {
 function setupWorkspace(workspace: Blockly.Workspace) {
   // Toolbox behaviors
   Blockly.VerticalFlyout.prototype.getFlyoutScale = () => 0.8
-  Blockly.VerticalFlyout.prototype.getWidth = () => 350
+  // Do not override width of mutator flyouts
+  const originalGetWidth = Blockly.VerticalFlyout.prototype.getWidth
+  Blockly.VerticalFlyout.prototype.getWidth = function() {
+    const workspace = this.getWorkspace()
+    const targetWorkspace = workspace.targetWorkspace
+    return targetWorkspace?.internalIsMutator ? originalGetWidth.call(this) : 350
+  }
 
   // Load built-in procedure blocks
   unregisterProcedureBlocks()
