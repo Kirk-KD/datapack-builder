@@ -3,9 +3,9 @@ import { colours } from '../blockColours'
 import { addFile } from '../../compiler/fileRegistry'
 import { mcfunctionGenerator } from '../../compiler/generator'
 import { nextId } from '../../compiler/idGenerator'
-import { getInternalNamespace } from '../../compiler/projectConfig'
 import type { BlockSpec } from './types'
 import { setShadowState } from '../extensions/shadows.ts'
+import { getInternalNamespace } from "../../compiler/nameManager.ts"
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'

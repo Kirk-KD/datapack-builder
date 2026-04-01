@@ -1,10 +1,13 @@
 import { mcfunctionGenerator } from '../../compiler/generator'
-import { nbtStorageManager } from '../../compiler/nbtStorageManager'
-import { getInternalNamespace } from '../../compiler/projectConfig'
-import { scoreboardManager } from '../../compiler/scoreboardManager'
 import { snbtToString } from '../../compiler/util'
 import { getParameterNameById } from '../../compiler/workspaceRegistry'
 import type { BlockSpec } from './types'
+import {
+  getInternalNamespace,
+  getObjectiveName, getProcArgPath,
+  getProcArgsStorageName,
+  getVarName
+} from "../../compiler/nameManager.ts";
 
 const FIELD_PARAM_NAME = 'PARAM_NAME'
 export const PROC_DEF_NAME = 'procedures_defnoreturn'
@@ -49,7 +52,7 @@ export const procedureBlockSpecs: BlockSpec[] = [
       const procName = block.getFieldValue('NAME')
       const params: string[] = block.getVars() ?? []
       const internalNs = getInternalNamespace()
-      const storageName = nbtStorageManager.getProcArgsStorageName()
+      const storageName = getProcArgsStorageName()
 
       let cmd = ''
       const snbt: Record<string, string> = {}
@@ -64,9 +67,9 @@ export const procedureBlockSpecs: BlockSpec[] = [
         }
 
         if (argBlock.type === 'mc_var_get') {
-          const objectiveName = scoreboardManager.getObjectiveName()
-          const varName = scoreboardManager.getVarName(argBlock.getFieldValue('VAR_NAME'))
-          const paramPath = nbtStorageManager.getProcArgPath(procName, param)
+          const objectiveName = getObjectiveName()
+          const varName = getVarName(argBlock.getFieldValue('VAR_NAME'))
+          const paramPath = getProcArgPath(procName, param)
           cmd += `execute store result storage ${storageName} ${paramPath} int 1 run scoreboard players get ${varName} ${objectiveName}\n`
           cmdHasStorage = true
         } else {

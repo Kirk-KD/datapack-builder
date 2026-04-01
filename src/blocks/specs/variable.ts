@@ -1,8 +1,8 @@
 import { mcfunctionGenerator } from '../../compiler/generator'
-import { scoreboardManager } from '../../compiler/scoreboardManager'
 import { getConditionSetup } from './control'
 import type { BlockSpec } from './types'
 import { setShadowState } from '../extensions/shadows.ts'
+import {getObjectiveName, getTempVarName, getVarName} from "../../compiler/nameManager.ts";
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
@@ -38,8 +38,8 @@ export const variableBlockSpecs: BlockSpec[] = [
       extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
-      const varName = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
-      const obj = scoreboardManager.getObjectiveName()
+      const varName = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const obj = getObjectiveName()
       const valueBlock = block.getInputTargetBlock(INPUT_VALUE)!
 
       if (isConditionBlock(valueBlock.type)) {
@@ -104,8 +104,8 @@ export const variableBlockSpecs: BlockSpec[] = [
       extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
-      const varName = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
-      const obj = scoreboardManager.getObjectiveName()
+      const varName = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const obj = getObjectiveName()
       const opType = block.getFieldValue(FIELD_OP)
       const valueBlock = block.getInputTargetBlock(INPUT_VALUE)!
       const isLiteral = valueBlock.type === 'mc_int'
@@ -120,7 +120,7 @@ export const variableBlockSpecs: BlockSpec[] = [
       }
       if (isLiteral) {
         const opMap: Record<string, string> = { MUL: '*=', DIV: '/=', MOD: '%=' }
-        const tempName = scoreboardManager.getTempVar()
+        const tempName = getTempVarName()
         return `scoreboard players set ${tempName} ${obj} ${num}\n`
           + `scoreboard players operation ${varName} ${obj} ${opMap[opType]} ${tempName} ${obj}\n`
       }
@@ -156,7 +156,7 @@ export const variableBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       const name = block.getField(FIELD_VAR_NAME)!.getText()
-      return [scoreboardManager.getVarName(name), 0]
+      return [getVarName(name), 0]
     },
   },
 ]

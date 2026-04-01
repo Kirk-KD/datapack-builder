@@ -2,10 +2,10 @@ import * as Blockly from 'blockly'
 import './generator'
 import { mcfunctionGenerator } from './generator'
 import { registerBlockSpecGenerators } from '../blocks/specs/registry'
-import { scoreboardManager } from './scoreboardManager'
 import { addFile, resetFiles, getFiles, prependToFile } from './fileRegistry'
-import { getProjectConfig, getInternalNamespace } from './projectConfig'
 import { resetIds } from './idGenerator'
+import { useProjectConfigStore} from "../stores/projectConfig.ts"
+import {getInitializedVarName, getInternalNamespace, getObjectiveName} from "./nameManager.ts";
 
 registerBlockSpecGenerators((type, generator) => {
   mcfunctionGenerator.forBlock[type] = generator
@@ -23,10 +23,11 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
   resetFiles()
   resetIds()
 
-  const { packFormat, description } = getProjectConfig()
+  const {projectConfig} = useProjectConfigStore.getState()
+  const { packFormat, description } = projectConfig
   const internalNs = getInternalNamespace()
-  const obj = scoreboardManager.getObjectiveName()
-  const initializedVar = scoreboardManager.getInitializedVarName()
+  const obj = getObjectiveName()
+  const initializedVar = getInitializedVarName()
 
   const topBlocks = workspace.getTopBlocks(true)
   let hasTick = false

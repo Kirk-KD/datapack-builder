@@ -2,10 +2,9 @@ import * as Blockly from 'blockly'
 import { addFile } from '../../compiler/fileRegistry'
 import { mcfunctionGenerator } from '../../compiler/generator'
 import { nextId } from '../../compiler/idGenerator'
-import { getInternalNamespace } from '../../compiler/projectConfig'
-import { scoreboardManager } from '../../compiler/scoreboardManager'
 import type { BlockSpec } from './types'
 import { setShadowState } from '../extensions/shadows.ts'
+import {getInternalNamespace, getObjectiveName, getTempVarName, getVarName} from "../../compiler/nameManager.ts";
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
@@ -27,8 +26,8 @@ export function getConditionSetup(conditionBlock: Blockly.Block): string {
     const valueBBlock = conditionBlock.getInputTargetBlock(INPUT_VAR_B)
     if (valueBBlock?.type === 'mc_int') {
       const num = valueBBlock.getFieldValue('VALUE')
-      const tempName = scoreboardManager.getTempVar()
-      const obj = scoreboardManager.getObjectiveName()
+      const tempName = getTempVarName()
+      const obj = getObjectiveName()
       return `scoreboard players set ${tempName} ${obj} ${num}\n`
     }
   }
@@ -59,8 +58,8 @@ export const controlBlockSpecs: BlockSpec[] = [
       extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
-      const varName = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
-      const obj = scoreboardManager.getObjectiveName()
+      const varName = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const obj = getObjectiveName()
       const range = mcfunctionGenerator.valueToCode(block, 'RANGE', 0) || ''
       return [`score ${varName} ${obj} matches ${range}`, 0]
     },
@@ -102,18 +101,18 @@ export const controlBlockSpecs: BlockSpec[] = [
       extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
-      const varA = scoreboardManager.getVarName(block.getField(FIELD_VAR_NAME)!.getText())
-      const obj = scoreboardManager.getObjectiveName()
+      const varA = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const obj = getObjectiveName()
       const op = opMap[block.getFieldValue(FIELD_OP)]
       const valueBBlock = block.getInputTargetBlock(INPUT_VAR_B)!
 
       let fragment: string
 
       if (valueBBlock.type === 'mc_int') {
-        const tempName = scoreboardManager.getTempVar()
+        const tempName = getTempVarName()
         fragment = `score ${varA} ${obj} ${op} ${tempName} ${obj}`
       } else {
-        const varB = scoreboardManager.getVarName(valueBBlock.getField(FIELD_VAR_NAME)!.getText())
+        const varB = getVarName(valueBBlock.getField(FIELD_VAR_NAME)!.getText())
         fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
       }
 
