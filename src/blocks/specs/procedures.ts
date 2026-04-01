@@ -7,6 +7,7 @@ import { getParameterNameById } from '../../compiler/workspaceRegistry'
 import type { BlockSpec } from './types'
 
 const FIELD_PARAM_NAME = 'PARAM_NAME'
+export const PROC_DEF_NAME = 'procedures_defnoreturn'
 const inlineProcedureArgTypes = new Set(['mc_string', 'mc_int', 'mc_param'])
 
 export const procedureBlockSpecs: BlockSpec[] = [
@@ -36,7 +37,7 @@ export const procedureBlockSpecs: BlockSpec[] = [
     },
   },
   {
-    type: 'procedures_defnoreturn',
+    type: PROC_DEF_NAME,
     category: 'procedures',
     generator(block) {
       return mcfunctionGenerator.statementToCode(block, 'STACK')
@@ -53,7 +54,6 @@ export const procedureBlockSpecs: BlockSpec[] = [
 
       let cmd = ''
       const snbt: Record<string, string> = {}
-      let cmdHasMacro = false
       let cmdHasStorage = false
 
       params.forEach((param: string, i: number) => {
@@ -73,11 +73,9 @@ export const procedureBlockSpecs: BlockSpec[] = [
         } else if (inlineProcedureArgTypes.has(argBlock.type)) {
           const [text] = mcfunctionGenerator.blockToCode(argBlock) as [string, number]
           snbt[param] = text
-          cmdHasMacro ||= argBlock.type === 'mc_param'
         }
       })
 
-      if (cmdHasMacro) cmd += '$'
       cmd += `function ${internalNs}:proc_${procName}`
       if (Object.keys(snbt).length > 0) cmd += ` ${snbtToString(snbt)}`
       if (cmdHasStorage) cmd += ' with storage ' + storageName

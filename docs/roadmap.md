@@ -103,6 +103,8 @@ Parameters are represented as explicit `mc_param` references inside the procedur
 
 For any block type accepted as an argument of a procedure, all inputs accepting that block type must also accept `mc_param`.
 
+> TODO: fix "$" not prepended reliably on lines needed macros.
+
 ## Subsystem Status
 
 ### Main IDE Workspace `Not started`

@@ -55,7 +55,7 @@ export const variableBlockSpecs: BlockSpec[] = [
         return `scoreboard players operation ${varName} ${obj} = ${srcName} ${obj}\n`
       }
 
-      if (valueBlock.type === 'mc_int') {
+      if (valueBlock.type === 'mc_int' || valueBlock.type === 'mc_param') {
         const valueCode = mcfunctionGenerator.blockToCode(valueBlock)[0]
         return `scoreboard players set ${varName} ${obj} ${valueCode}\n`
       }

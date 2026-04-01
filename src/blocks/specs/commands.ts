@@ -25,8 +25,7 @@ export const commandBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       const message = mcfunctionGenerator.valueToCode(block, 'MESSAGE', 0) || ''
-      const hasMacro = block.getInputTargetBlock('MESSAGE')?.type === 'mc_param'
-      return (hasMacro ? '$' : '') + `say ${message}\n`
+      return `say ${message}\n`
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MESSAGE', {
