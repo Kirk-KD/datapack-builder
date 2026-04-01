@@ -39,7 +39,7 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
       hasTick = true
       addFile(
         `data/${internalNs}/function/tick.mcfunction`,
-        `execute unless score ${initializedVar} ${obj} matches 1 run return\n`
+        `execute unless score ${initializedVar} ${obj} matches 1 run return fail\n`
         + compileChain(block)
       )
     } else if (block.type === 'procedures_defnoreturn') {
