@@ -1,28 +1,17 @@
 :root {
   --font-family: "Helvetica Neue", Helvetica, sans-serif;
-  --font-size-base: 16px;
-  --font-size-small: 14px;
+  --font-size-base: 12pt;
+  --font-size-small: 9pt;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
-
-html, body {
-  overflow: hidden;
-}
-
-span {
   font-family: var(--font-family), sans-serif !important;
   font-size: var(--font-size-base) !important;
 }
 
-.blocklyToolboxCategoryIcon {
-  width: 8px !important;
-}
-
-.blocklyToolboxCategoryLabel {
-  font-size: var(--font-size-small) !important;
+html, body {
+  overflow: hidden;
 }

@@ -4,8 +4,12 @@ import {registerContinuousToolbox, additionalOptions, setupWorkspace} from '../w
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import { updateWorkspaceRegistry} from '../compiler/workspaceRegistry'
+import './WorkspacePanel.css'
 
 import type {WorkspaceSvg} from "blockly";
+
+// Register outside useEffect to avoid error due to variables category
+registerContinuousToolbox()
 
 function updateToolbox(workspace: WorkspaceSvg) {
   updateWorkspaceRegistry(workspace)
@@ -18,9 +22,6 @@ function updateToolbox(workspace: WorkspaceSvg) {
 function WorkspacePanel() {
   const divRef = useRef<HTMLDivElement>(null)
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
-
-  // Register outside useEffect to avoid error due to variables category
-  registerContinuousToolbox()
 
   useEffect(() => {
     if (!divRef.current) return
