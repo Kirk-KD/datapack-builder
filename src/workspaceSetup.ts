@@ -9,6 +9,7 @@ import {
   registerContinuousToolbox
 } from '@blockly/continuous-toolbox'
 import {colours} from "./blocks/blockColours.ts";
+import {MetricsManager} from "blockly";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -27,10 +28,21 @@ const customTheme = Blockly.Theme.defineTheme('customDark', {
   }
 })
 
+class CustomContinuousMetrics extends ContinuousMetrics {
+  override getViewMetrics(getWorkspaceCoordinates?: boolean): MetricsManager.ContainerRegion {
+    const metrics = super.getViewMetrics(getWorkspaceCoordinates);
+    // Decreasing view metrics height by 23 fixes the problem of the toolbox flyout and its contents being cut off at
+    // the bottom, while still letting it fill the screen vertically.
+    // The radius of the corners is 8px, so I'm not sure where this number comes from.
+    metrics.height -= 21
+    return metrics
+  }
+}
+
 const additionalOptions = {
   plugins: {
     flyoutsVerticalToolbox: ContinuousFlyout,
-    metricsManager: ContinuousMetrics,
+    metricsManager: CustomContinuousMetrics,
     toolbox: ContinuousToolbox,
   },
   theme: customTheme,
