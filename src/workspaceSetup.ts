@@ -48,9 +48,9 @@ const additionalOptions = {
   zoom: {
     controls: true,
     wheel: true,
-    startScale: 1.0,
+    startScale: 0.8,
     maxScale: 2,
-    minScale: 0.4,
+    minScale: 0.2,
     scaleSpeed: 1.2,
     pinch: true
   },
