@@ -19,6 +19,21 @@ type AdvancementBlock = Blockly.BlockSvg & {
   updateShape_: (this: AdvancementBlock) => void
 }
 
+const ATTRIBUTE_TARGET_NAME = 'TARGET'
+const ATTRIBUTE_ATTRIBUTE_NAME = 'ATTRIBUTE'
+const ATTRIBUTE_SCALE_NAME = 'SCALE'
+const ATTRIBUTE_ACTION_NAME = 'ACTION'
+const ATTRIBUTE_VALUE_NAME = 'VALUE'
+const ATTRIBUTE_ID_NAME = 'ID'
+const ATTRIBUTE_PROPERTY_NAME = 'PROPERTY'
+type AttributeAction = 'get' | 'base get' | 'base set' | 'base reset' | 'modifier add' | 'modifier remove' | 'modifier value get'
+type AttributeProperty = 'add_value' | 'add_multiplied_base' | 'add_multiplied_total'
+type AttributeBlock = Blockly.BlockSvg & {
+  action_: AttributeAction,
+  property_: AttributeProperty | null,
+  updateShape_: (this: AttributeBlock) => void
+}
+
 export const commandBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_say',
@@ -168,6 +183,110 @@ export const commandBlockSpecs: BlockSpec[] = [
       const criterion = block.getInput(ADVANCEMENT_CRITERION_NAME) ?
         ` ${mcfunctionGenerator.valueToCode(block, ADVANCEMENT_CRITERION_NAME, 0)}` : ''
       return `advancement ${action} ${target} ${specifier}${advancement}${criterion}\n`
+    }
+  },
+  {
+    type: 'mc_attribute',
+    category: 'commands',
+    init(this: Blockly.Block) {
+      const block = this as AttributeBlock
+      block.action_ = 'get'
+      block.property_ = null
+
+      block.setColour(colours.commands)
+      block.setTooltip('')
+      block.setHelpUrl('')
+      block.setInputsInline(true)
+      block.setPreviousStatement(true)
+      block.setNextStatement(true)
+
+      block.updateShape_ = function(this: AttributeBlock) {
+        this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
+
+        this.appendValueInput(ATTRIBUTE_TARGET_NAME)
+          .setCheck(['mc_param', 'mc_string', 'mc_target_selector'])
+          .appendField('attribute')
+        setShadowState(this, ATTRIBUTE_TARGET_NAME, { type: 'mc_target_selector' })
+
+        this.appendValueInput(ATTRIBUTE_ATTRIBUTE_NAME)
+          .setCheck(['mc_param', 'mc_string'])
+        setShadowState(this, ATTRIBUTE_ATTRIBUTE_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:max_health' } })
+
+        const actionDropdown = new Blockly.FieldDropdown([
+          ['get', 'get'],
+          ['base get', 'base get'],
+          ['base set', 'base set'],
+          ['base reset', 'base reset'],
+          ['modifier add', 'modifier add'],
+          ['modifier remove', 'modifier remove'],
+          ['modifier value get', 'modifier value get']
+        ] as [AttributeAction, AttributeAction][], (newAction) => {
+          if (!newAction || newAction === block.action_) return newAction
+          block.action_ = newAction as AttributeAction
+          block.updateShape_()
+          return newAction
+        })
+        this.appendDummyInput('dummy')
+          .appendField(actionDropdown, ATTRIBUTE_ACTION_NAME)
+        actionDropdown.setValue(this.action_)
+
+        const appendScaleInput = () => {
+          this.appendValueInput(ATTRIBUTE_SCALE_NAME)
+            .setCheck(['mc_param', 'number'])
+            .appendField('scaled by')
+          setShadowState(this, ATTRIBUTE_SCALE_NAME, { type: 'number', fields: { VALUE: '1' } })
+        }
+        const appendIdInput = () => {
+          this.appendValueInput(ATTRIBUTE_ID_NAME)
+            .setCheck(['mc_param', 'mc_string'])
+          setShadowState(this, ATTRIBUTE_ID_NAME, { type: 'mc_string', fields: { VALUE: 'custom_id'} })
+        }
+        const appendValueInput = () => {
+          this.appendValueInput(ATTRIBUTE_VALUE_NAME)
+            .setCheck(['mc_param', 'number'])
+          setShadowState(this, ATTRIBUTE_VALUE_NAME, { type: 'number' })
+        }
+        if (this.action_ === 'get' || this.action_ === 'base get') {
+          appendScaleInput()
+        } else if (this.action_ === 'base set') {
+          appendValueInput()
+        } else if (this.action_ === 'modifier add') {
+          appendIdInput()
+          appendValueInput()
+          const propertyDropdown = new Blockly.FieldDropdown([
+            ['add_value', 'add_value'],
+            ['add_multiplied_base', 'add_multiplied_base'],
+            ['add_multiplied_total', 'add_multiplied_total']
+          ] as [AttributeProperty, AttributeProperty][], (newProperty) => {
+            if (!newProperty || newProperty === block.action_) return newProperty
+            block.property_ = newProperty as AttributeProperty
+            return newProperty
+          })
+          propertyDropdown.setValue(this.property_ ?? 'add_value')
+          this.appendDummyInput('dummy1')
+            .appendField(propertyDropdown, ATTRIBUTE_PROPERTY_NAME)
+        } else if (this.action_ === 'modifier remove') {
+          appendIdInput()
+        } else if (this.action_ === 'modifier value get') {
+          appendIdInput()
+          appendScaleInput()
+        }
+      }
+
+      block.updateShape_()
+    },
+    generator(block: Blockly.Block) {
+      const target = mcfunctionGenerator.valueToCode(block, ATTRIBUTE_TARGET_NAME, 0)
+      const attribute = mcfunctionGenerator.valueToCode(block, ATTRIBUTE_ATTRIBUTE_NAME, 0)
+      const action = block.getFieldValue(ATTRIBUTE_ACTION_NAME)
+      const scale = block.getInput(ATTRIBUTE_SCALE_NAME) ?
+        ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_SCALE_NAME, 0)}` : ''
+      const value = block.getInput(ATTRIBUTE_VALUE_NAME) ?
+        ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_VALUE_NAME, 0)}` : ''
+      const id = block.getInput(ATTRIBUTE_ID_NAME) ?
+        ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_ID_NAME, 0)}` : ''
+      const property = ` ${block.getFieldValue(ATTRIBUTE_PROPERTY_NAME) ?? ''}`
+      return `attribute ${target} ${attribute} ${action}${id}${value}${scale}${property}\n`
     }
   }
 ]
