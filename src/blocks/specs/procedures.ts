@@ -6,6 +6,7 @@ import {
   getInternalNamespace,
   getObjectiveName, getProcArgPath,
   getProcArgsStorageName,
+  getProcName,
   getVarName
 } from "../../compiler/nameManager.ts";
 
@@ -53,34 +54,38 @@ export const procedureBlockSpecs: BlockSpec[] = [
       const params: string[] = block.getVars() ?? []
       const internalNs = getInternalNamespace()
       const storageName = getProcArgsStorageName()
+      const objectiveName = getObjectiveName()
 
       let cmd = ''
       const snbt: Record<string, string> = {}
-      let cmdHasStorage = false
+      const cmdNeedsStorage = params.some((_, i) => block.getInputTargetBlock(`ARG${i}`)?.type === 'mc_var_get')
 
       params.forEach((param: string, i: number) => {
         const argBlock = block.getInputTargetBlock(`ARG${i}`)
 
         if (!argBlock) {
-          snbt[param] = ''
+          console.warn('Missing argument for procedure')
+          // TODO proper error handling
           return
         }
 
         if (argBlock.type === 'mc_var_get') {
-          const objectiveName = getObjectiveName()
           const varName = getVarName(argBlock.getFieldValue('VAR_NAME'))
           const paramPath = getProcArgPath(procName, param)
           cmd += `execute store result storage ${storageName} ${paramPath} int 1 run scoreboard players get ${varName} ${objectiveName}\n`
-          cmdHasStorage = true
+        } else if (cmdNeedsStorage) {
+          const [text] = mcfunctionGenerator.blockToCode(argBlock) as [string, number]
+          const paramPath = getProcArgPath(procName, param)
+          cmd += `data modify storage ${storageName} ${paramPath} set value "${text}"\n` // TODO proper quote escape
         } else {
           const [text] = mcfunctionGenerator.blockToCode(argBlock) as [string, number]
           snbt[param] = text
         }
       })
 
-      cmd += `function ${internalNs}:proc_${procName}`
-      if (Object.keys(snbt).length > 0) cmd += ` ${snbtToString(snbt)}`
-      if (cmdHasStorage) cmd += ' with storage ' + storageName
+      cmd += `function ${internalNs}:${getProcName(procName)}`
+      if (cmdNeedsStorage) cmd += ` with storage ${storageName} ${getProcName(procName)}`
+      else if (Object.keys(snbt).length > 0) cmd += ` ${snbtToString(snbt)}`
       cmd += '\n'
 
       return cmd

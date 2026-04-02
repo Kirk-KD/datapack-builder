@@ -5,7 +5,7 @@ import { registerBlockSpecGenerators } from '../blocks/specs/registry'
 import { addFile, resetFiles, getFiles, prependToFile } from './fileRegistry'
 import { resetIds } from './idGenerator'
 import { useProjectConfigStore} from "../stores/projectConfig.ts"
-import {getInitializedVarName, getInternalNamespace, getObjectiveName} from "./nameManager.ts";
+import {getInitializedVarName, getInternalNamespace, getObjectiveName, getProcName} from "./nameManager.ts";
 
 registerBlockSpecGenerators((type, generator) => {
   mcfunctionGenerator.forBlock[type] = generator
@@ -44,7 +44,7 @@ export function compile(workspace: Blockly.WorkspaceSvg): Map<string, string> {
       )
     } else if (block.type === 'procedures_defnoreturn') {
       addFile(
-        `data/${internalNs}/function/proc_${block.getFieldValue('NAME')}.mcfunction`,
+        `data/${internalNs}/function/${getProcName(block.getFieldValue('NAME'))}.mcfunction`,
         compileChain(block)
       )
     }

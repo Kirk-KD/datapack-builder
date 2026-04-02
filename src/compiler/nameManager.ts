@@ -10,8 +10,12 @@ export function getProcArgsStorageName(): string {
   return `${ins}:_proc_args_data`
 }
 
+export function getProcName(procName: string): string {
+  return `proc_${procName}`
+}
+
 export function getProcArgPath(procName: string, paramName: string): string {
-  return `proc_${procName}.${paramName}`
+  return `${getProcName(procName)}.${paramName}`
 }
 
 export function getObjectiveName(): string {
