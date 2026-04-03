@@ -34,6 +34,28 @@ type AttributeBlock = Blockly.BlockSvg & {
   updateShape_: (this: AttributeBlock) => void
 }
 
+const CLONE_FROM_NAME = 'FROM'
+const CLONE_SOURCE_DIMENSION_NAME = 'SOURCE_DIMENSION'
+const CLONE_BEGIN_NAME = 'BEGIN'
+const CLONE_END_NAME = 'END'
+const CLONE_TO_NAME = 'TO'
+const CLONE_TARGET_DIMENSION_NAME = 'TARGET_DIMENSION'
+const CLONE_DESTINATION_NAME = 'DESTINATION'
+const CLONE_STRICT_NAME = 'STRICT'
+const CLONE_MASK_MODE_NAME = 'MASK_MODE'
+const CLONE_FILTER_NAME = 'FILTER'
+const CLONE_CLONE_MODE_NAME = 'CLONE_MODE'
+type CloneMaskMode = '(none)' | 'replace' | 'masked' | 'filtered'
+type CloneCloneMode = '(none)' | 'force' | 'move' | 'normal'
+type CloneBlock = Blockly.BlockSvg & {
+  hasFromDimension_: boolean,
+  hasToDimension_: boolean,
+  isStrict_: boolean,
+  maskMode_: CloneMaskMode,
+  cloneMode_: CloneCloneMode,
+  updateShape_: (this: CloneBlock) => void,
+}
+
 export const commandBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_say',
@@ -151,7 +173,7 @@ export const commandBlockSpecs: BlockSpec[] = [
         }
 
         if (this.specifier_ === 'only') {
-          this.appendValueInput(ADVANCEMENT_CRITERION_NAME).appendField(', criterion').setCheck(['mc_param', 'mc_string']) // TODO validate
+          this.appendValueInput(ADVANCEMENT_CRITERION_NAME).appendField('with criterion').setCheck(['mc_param', 'mc_string']) // TODO validate
           setShadowState(this, ADVANCEMENT_CRITERION_NAME, { type: 'mc_string', fields: { VALUE: '' } })
         }
       }
@@ -273,6 +295,22 @@ export const commandBlockSpecs: BlockSpec[] = [
         }
       }
 
+      block.saveExtraState = function(this) {
+        return {
+          action_: this.action_,
+          property_: this.property_,
+        }
+      }
+
+      block.loadExtraState = function(this: AttributeBlock, state: {
+        action_: AttributeAction,
+        property_: AttributeProperty,
+      }) {
+        this.action_ = state?.action_ ?? 'get'
+        this.property_ = state?.property_ ?? 'add_value'
+        this.updateShape_()
+      }
+
       block.updateShape_()
     },
     generator(block: Blockly.Block) {
@@ -287,6 +325,176 @@ export const commandBlockSpecs: BlockSpec[] = [
         ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_ID_NAME, 0)}` : ''
       const property = ` ${block.getFieldValue(ATTRIBUTE_PROPERTY_NAME) ?? ''}`
       return `attribute ${target} ${attribute} ${action}${id}${value}${scale}${property}\n`
+    }
+  },
+  {
+    type: 'mc_clone',
+    category: 'commands',
+    init(this: Blockly.Block) {
+      const block = this as CloneBlock
+      block.hasFromDimension_ = false
+      block.hasToDimension_ = false
+      block.isStrict_ = false
+      block.maskMode_ = '(none)'
+      block.cloneMode_ = '(none)'
+
+      block.setColour(colours.commands)
+      block.setTooltip('')
+      block.setHelpUrl('')
+      block.setInputsInline(true)
+      block.setPreviousStatement(true)
+      block.setNextStatement(true)
+
+      block.updateShape_ = function(this: CloneBlock) {
+        this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
+
+        this.appendDummyInput('1').appendField('clone')
+
+        this.appendValueInput(CLONE_BEGIN_NAME)
+          .setCheck(['mc_param', 'mc_block_pos'])
+        setShadowState(this, CLONE_BEGIN_NAME, { type: 'mc_block_pos' })
+
+        this.appendValueInput(CLONE_END_NAME)
+          .setCheck(['mc_param', 'mc_block_pos'])
+        setShadowState(this, CLONE_END_NAME, { type: 'mc_block_pos' })
+
+        this.appendDummyInput('2')
+          .appendField('in dimension?')
+          .appendField(new Blockly.FieldCheckbox(block.hasFromDimension_, (newValue) => {
+            block.hasFromDimension_ = newValue === 'TRUE'
+            block.updateShape_()
+            return newValue
+          }), CLONE_FROM_NAME)
+
+        if (this.hasFromDimension_) {
+          this.appendValueInput(CLONE_SOURCE_DIMENSION_NAME)
+            .setCheck(['mc_param', 'mc_string'])
+          setShadowState(this, CLONE_SOURCE_DIMENSION_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:overworld' }})
+        }
+
+        this.appendValueInput(CLONE_DESTINATION_NAME)
+          .setCheck(['mc_param', 'mc_block_pos'])
+          .appendField('to')
+        setShadowState(this, CLONE_DESTINATION_NAME, { type: 'mc_block_pos' })
+
+        this.appendDummyInput('3')
+          .appendField('in dimension?')
+          .appendField(new Blockly.FieldCheckbox(block.hasToDimension_, (newValue) => {
+            block.hasToDimension_ = newValue === 'TRUE'
+            block.updateShape_()
+            return newValue
+          }), CLONE_TO_NAME)
+
+        if (this.hasToDimension_) {
+          this.appendValueInput(CLONE_TARGET_DIMENSION_NAME)
+            .setCheck(['mc_param', 'mc_string'])
+          setShadowState(this, CLONE_TARGET_DIMENSION_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:overworld' } })
+        }
+
+        this.appendDummyInput('4')
+          .appendField('strict?')
+          .appendField(new Blockly.FieldCheckbox(block.isStrict_, (newValue) => {
+            block.isStrict_ = newValue === 'TRUE'
+            return newValue
+          }), CLONE_STRICT_NAME)
+
+        const maskModeDropdown = new Blockly.FieldDropdown([
+          ['(none)', '(none)'],
+          ['replace', 'replace'],
+          ['masked', 'masked'],
+          ['filtered', 'filtered'],
+        ] as [CloneMaskMode, CloneMaskMode][], (newValue) => {
+          if (!newValue || newValue === block.maskMode_) return newValue
+          block.maskMode_ = newValue as CloneMaskMode
+          block.updateShape_()
+          return newValue
+        })
+        maskModeDropdown.setValue(block.maskMode_)
+        this.appendDummyInput('5')
+          .appendField('mask mode:')
+          .appendField(maskModeDropdown, CLONE_MASK_MODE_NAME)
+
+        if (block.maskMode_ === 'filtered') {
+          this.appendValueInput(CLONE_FILTER_NAME)
+            .setCheck(['mc_param', 'mc_string']) // TODO block predicate
+          setShadowState(this, CLONE_FILTER_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:stone' } })
+        }
+
+        const cloneModeDropdown = new Blockly.FieldDropdown([
+          ['(none)', '(none)'],
+          ['force', 'force'],
+          ['move', 'move'],
+          ['normal', 'normal'],
+        ] as [CloneCloneMode, CloneCloneMode][], (newValue) => {
+          if (!newValue || newValue === block.cloneMode_) return newValue
+          block.cloneMode_ = newValue as CloneCloneMode
+          return newValue
+        })
+        cloneModeDropdown.setValue(block.cloneMode_)
+        this.appendDummyInput('5')
+          .appendField('clone mode:')
+          .appendField(cloneModeDropdown, CLONE_CLONE_MODE_NAME)
+      }
+
+      block.saveExtraState = function(this) {
+        return {
+          hasFromDimension_: this.hasFromDimension_,
+          hasToDimension_: this.hasToDimension_,
+          isStrict_: this.isStrict_,
+          maskMode_: this.maskMode_,
+          cloneMode_: this.cloneMode_,
+        }
+      }
+
+      block.loadExtraState = function(this, state: {
+        hasFromDimension_: boolean,
+        hasToDimension_: boolean,
+        isStrict_: boolean,
+        maskMode_: CloneMaskMode,
+        cloneMode_: CloneCloneMode,
+      }) {
+        this.hasFromDimension_ = state.hasFromDimension_
+        this.hasToDimension_ = state.hasToDimension_
+        this.isStrict_ = state.isStrict_
+        this.maskMode_ = state.maskMode_
+        this.cloneMode_ = state.cloneMode_
+      }
+
+      block.updateShape_()
+    },
+    generator(block: Blockly.Block) {
+      const cloneBlock = block as CloneBlock
+
+      let cmd = 'clone'
+
+      if (cloneBlock.hasFromDimension_) {
+        const srcDim = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_SOURCE_DIMENSION_NAME, 0)
+        cmd += ` from ${srcDim}`
+      }
+
+      const begin = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_BEGIN_NAME, 0)
+      const end = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_END_NAME, 0)
+      cmd += ` ${begin} ${end}`
+
+      if (cloneBlock.hasToDimension_) {
+        const tarDim = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_TARGET_DIMENSION_NAME, 0)
+        cmd += ` to ${tarDim}`
+      }
+
+      const destination = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_DESTINATION_NAME, 0)
+      cmd += ` ${destination}`
+
+      if (cloneBlock.isStrict_) cmd += ' strict'
+
+      if (cloneBlock.maskMode_ !== '(none)') cmd += ` ${cloneBlock.maskMode_}`
+      if (cloneBlock.maskMode_ === 'filtered') {
+        const filter = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_FILTER_NAME, 0)
+        cmd += ` ${filter}`
+      }
+
+      if (cloneBlock.cloneMode_ !== '(none)') cmd += ` ${cloneBlock.cloneMode_}`
+
+      return cmd
     }
   }
 ]
