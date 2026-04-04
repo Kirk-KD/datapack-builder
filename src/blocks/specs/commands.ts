@@ -3,6 +3,7 @@ import type { BlockSpec } from './types'
 import {setShadowState} from "../extensions/shadows.ts";
 import * as Blockly from "blockly"
 import {colours} from "../blockColours.ts";
+import { createStateCheckbox, createStateDropdown } from "../utils/dynamicFields.ts";
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 
@@ -137,35 +138,24 @@ export const commandBlockSpecs: BlockSpec[] = [
       block.updateShape_ = function(this: AdvancementBlock) {
         this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
-        const actionDropdown = new Blockly.FieldDropdown([
+        const actionDropdown = createStateDropdown(block, 'action_', [
           ['grant', 'grant'],
           ['revoke', 'revoke'],
-        ], (newAction) => {
-          if (!newAction || newAction === block.action_) return newAction
-          block.action_ = newAction as AdvancementAction
-          return newAction
-        })
+        ] as [string, AdvancementAction][])
         this.appendValueInput(ADVANCEMENT_TARGET_NAME)
           .setCheck(['mc_param', 'mc_string', 'mc_target_selector']) // TODO validate target is player-type
           .appendField('advancement')
           .appendField(actionDropdown, ADVANCEMENT_ACTION_NAME)
-        actionDropdown.setValue(this.action_)
         setShadowState(this, ADVANCEMENT_TARGET_NAME, { type: 'mc_target_selector' })
 
-        const specifierDropdown = new Blockly.FieldDropdown([
+        const specifierDropdown = createStateDropdown(block, 'specifier_', [
           ['everything', 'everything'],
           ['only', 'only'],
           ['from', 'from'],
           ['through', 'through'],
           ['until', 'until'],
-        ], (newSpecifier) => {
-          if (!newSpecifier || newSpecifier === block.specifier_) return newSpecifier
-          block.specifier_ = newSpecifier as AdvancementSpecifier
-          block.updateShape_()
-          return newSpecifier
-        })
+        ] as [string, AdvancementSpecifier][], { rerender: true })
         this.appendDummyInput('HEADER').appendField(specifierDropdown, ADVANCEMENT_SPECIFIER_NAME)
-        specifierDropdown.setValue(this.specifier_)
 
         if (this.specifier_ !== 'everything') {
           this.appendValueInput(ADVANCEMENT_ADVANCEMENT_NAME).setCheck(['mc_param', 'mc_string']) // TODO validate
@@ -234,7 +224,7 @@ export const commandBlockSpecs: BlockSpec[] = [
           .setCheck(['mc_param', 'mc_string'])
         setShadowState(this, ATTRIBUTE_ATTRIBUTE_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:max_health' } })
 
-        const actionDropdown = new Blockly.FieldDropdown([
+        const actionDropdown = createStateDropdown(block, 'action_', [
           ['get', 'get'],
           ['base get', 'base get'],
           ['base set', 'base set'],
@@ -242,15 +232,9 @@ export const commandBlockSpecs: BlockSpec[] = [
           ['modifier add', 'modifier add'],
           ['modifier remove', 'modifier remove'],
           ['modifier value get', 'modifier value get']
-        ] as [AttributeAction, AttributeAction][], (newAction) => {
-          if (!newAction || newAction === block.action_) return newAction
-          block.action_ = newAction as AttributeAction
-          block.updateShape_()
-          return newAction
-        })
+        ] as [string, AttributeAction][], { rerender: true })
         this.appendDummyInput('dummy')
           .appendField(actionDropdown, ATTRIBUTE_ACTION_NAME)
-        actionDropdown.setValue(this.action_)
 
         const appendScaleInput = () => {
           this.appendValueInput(ATTRIBUTE_SCALE_NAME)
@@ -275,16 +259,11 @@ export const commandBlockSpecs: BlockSpec[] = [
         } else if (this.action_ === 'modifier add') {
           appendIdInput()
           appendValueInput()
-          const propertyDropdown = new Blockly.FieldDropdown([
+          const propertyDropdown = createStateDropdown(block, 'property_', [
             ['add_value', 'add_value'],
             ['add_multiplied_base', 'add_multiplied_base'],
             ['add_multiplied_total', 'add_multiplied_total']
-          ] as [AttributeProperty, AttributeProperty][], (newProperty) => {
-            if (!newProperty || newProperty === block.action_) return newProperty
-            block.property_ = newProperty as AttributeProperty
-            return newProperty
-          })
-          propertyDropdown.setValue(this.property_ ?? 'add_value')
+          ] as [string, AttributeProperty][], { fallbackValue: 'add_value' })
           this.appendDummyInput('dummy1')
             .appendField(propertyDropdown, ATTRIBUTE_PROPERTY_NAME)
         } else if (this.action_ === 'modifier remove') {
@@ -360,11 +339,7 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         this.appendDummyInput('2')
           .appendField('in dimension?')
-          .appendField(new Blockly.FieldCheckbox(block.hasFromDimension_, (newValue) => {
-            block.hasFromDimension_ = newValue === 'TRUE'
-            block.updateShape_()
-            return newValue
-          }), CLONE_FROM_NAME)
+          .appendField(createStateCheckbox(block, 'hasFromDimension_', { rerender: true }), CLONE_FROM_NAME)
 
         if (this.hasFromDimension_) {
           this.appendValueInput(CLONE_SOURCE_DIMENSION_NAME)
@@ -379,11 +354,7 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         this.appendDummyInput('3')
           .appendField('in dimension?')
-          .appendField(new Blockly.FieldCheckbox(block.hasToDimension_, (newValue) => {
-            block.hasToDimension_ = newValue === 'TRUE'
-            block.updateShape_()
-            return newValue
-          }), CLONE_TO_NAME)
+          .appendField(createStateCheckbox(block, 'hasToDimension_', { rerender: true }), CLONE_TO_NAME)
 
         if (this.hasToDimension_) {
           this.appendValueInput(CLONE_TARGET_DIMENSION_NAME)
@@ -393,23 +364,14 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         this.appendDummyInput('4')
           .appendField('strict?')
-          .appendField(new Blockly.FieldCheckbox(block.isStrict_, (newValue) => {
-            block.isStrict_ = newValue === 'TRUE'
-            return newValue
-          }), CLONE_STRICT_NAME)
+          .appendField(createStateCheckbox(block, 'isStrict_'), CLONE_STRICT_NAME)
 
-        const maskModeDropdown = new Blockly.FieldDropdown([
+        const maskModeDropdown = createStateDropdown(block, 'maskMode_', [
           ['(none)', '(none)'],
           ['replace', 'replace'],
           ['masked', 'masked'],
           ['filtered', 'filtered'],
-        ] as [CloneMaskMode, CloneMaskMode][], (newValue) => {
-          if (!newValue || newValue === block.maskMode_) return newValue
-          block.maskMode_ = newValue as CloneMaskMode
-          block.updateShape_()
-          return newValue
-        })
-        maskModeDropdown.setValue(block.maskMode_)
+        ] as [string, CloneMaskMode][], { rerender: true })
         this.appendDummyInput('5')
           .appendField('mask mode:')
           .appendField(maskModeDropdown, CLONE_MASK_MODE_NAME)
@@ -420,17 +382,12 @@ export const commandBlockSpecs: BlockSpec[] = [
           setShadowState(this, CLONE_FILTER_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:stone' } })
         }
 
-        const cloneModeDropdown = new Blockly.FieldDropdown([
+        const cloneModeDropdown = createStateDropdown(block, 'cloneMode_', [
           ['(none)', '(none)'],
           ['force', 'force'],
           ['move', 'move'],
           ['normal', 'normal'],
-        ] as [CloneCloneMode, CloneCloneMode][], (newValue) => {
-          if (!newValue || newValue === block.cloneMode_) return newValue
-          block.cloneMode_ = newValue as CloneCloneMode
-          return newValue
-        })
-        cloneModeDropdown.setValue(block.cloneMode_)
+        ] as [string, CloneCloneMode][])
         this.appendDummyInput('5')
           .appendField('clone mode:')
           .appendField(cloneModeDropdown, CLONE_CLONE_MODE_NAME)

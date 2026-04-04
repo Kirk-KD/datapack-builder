@@ -6,6 +6,7 @@ import { nextId } from '../../compiler/idGenerator'
 import type { BlockSpec } from './types'
 import { setShadowState } from '../extensions/shadows.ts'
 import { getInternalNamespace } from "../../compiler/nameManager.ts"
+import { createStateDropdown } from "../utils/dynamicFields.ts";
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'
@@ -545,52 +546,37 @@ export const executeBlockSpecs: BlockSpec[] = [
           .filter(input => input.name !== '')
           .forEach(input => this.removeInput(input.name))
 
-        const modeField = new Blockly.FieldDropdown(
-          Object.keys(executeConditionModeConfigs).map(key => [key, key]),
-          (newMode) => {
-            if (!newMode || newMode === block.mode_) return newMode
-            block.mode_ = newMode as ExecuteConditionMode
-            block.updateShape_()
-            return newMode
-          }
+        const modeField = createStateDropdown(
+          block,
+          'mode_',
+          Object.keys(executeConditionModeConfigs).map(key => [key, key as ExecuteConditionMode]),
+          { rerender: true }
         )
-        const conditionKindField = new Blockly.FieldDropdown(
-          [['if', 'if'], ['unless', 'unless']],
-          (newConditionKind) => {
-            if (!newConditionKind || newConditionKind === block.conditionKind_) return newConditionKind
-            block.conditionKind_ = newConditionKind as 'if' | 'unless'
-            return newConditionKind
-          }
+        const conditionKindField = createStateDropdown(
+          block,
+          'conditionKind_',
+          [['if', 'if'], ['unless', 'unless']] as [string, 'if' | 'unless'][]
         )
 
         const config = executeConditionModeConfigs[this.mode_]
         this.setInputsInline(config.inputsInline ?? true)
-        const dataKindField = new Blockly.FieldDropdown(
-          [['block', 'block'], ['entity', 'entity'], ['storage', 'storage']],
-          (newDataKind) => {
-            if (!newDataKind || newDataKind === block.dataKind_) return newDataKind
-            block.dataKind_ = newDataKind as ExecuteConditionDataKind
-            block.updateShape_()
-            return newDataKind
-          }
+        const dataKindField = createStateDropdown(
+          block,
+          'dataKind_',
+          [['block', 'block'], ['entity', 'entity'], ['storage', 'storage']] as [string, ExecuteConditionDataKind][],
+          { rerender: true }
         )
-        const itemsKindField = new Blockly.FieldDropdown(
-          [['block', 'block'], ['entity', 'entity']],
-          (newItemsKind) => {
-            if (!newItemsKind || newItemsKind === block.itemsKind_) return newItemsKind
-            block.itemsKind_ = newItemsKind as ExecuteConditionItemsKind
-            block.updateShape_()
-            return newItemsKind
-          }
+        const itemsKindField = createStateDropdown(
+          block,
+          'itemsKind_',
+          [['block', 'block'], ['entity', 'entity']] as [string, ExecuteConditionItemsKind][],
+          { rerender: true }
         )
-        const scoreModeField = new Blockly.FieldDropdown(
-          executeScoreModeOptions,
-          (newScoreMode) => {
-            if (!newScoreMode || newScoreMode === block.scoreMode_) return newScoreMode
-            block.scoreMode_ = newScoreMode as ExecuteConditionScoreMode
-            block.updateShape_()
-            return newScoreMode
-          }
+        const scoreModeField = createStateDropdown(
+          block,
+          'scoreMode_',
+          executeScoreModeOptions as [string, ExecuteConditionScoreMode][],
+          { rerender: true }
         )
 
         if (this.mode_ === 'data') {
@@ -618,7 +604,6 @@ export const executeBlockSpecs: BlockSpec[] = [
 
           const dataConfig = executeConditionDataKindConfigs[this.dataKind_]
           appendExecuteConditionInputs(this, dataConfig.message, dataConfig.args)
-          dataKindField.setValue(this.dataKind_)
         } else if (this.mode_ === 'items') {
           const firstItemsInput = this.appendDummyInput('ITEMS_KIND_ROW')
           firstItemsInput.appendField('of')
@@ -627,18 +612,13 @@ export const executeBlockSpecs: BlockSpec[] = [
           const itemsConfig = executeConditionItemsKindConfigs[this.itemsKind_]
           this.setInputsInline(itemsConfig.inputsInline ?? true)
           appendExecuteConditionInputs(this, itemsConfig.message, itemsConfig.args)
-          itemsKindField.setValue(this.itemsKind_)
         } else if (this.mode_ === 'score') {
           const scoreConfig = executeConditionScoreModeConfigs[this.scoreMode_]
           this.setInputsInline(scoreConfig.inputsInline ?? true)
           const headerInput = this.appendDummyInput('HEADER')
           headerInput.appendField(conditionKindField, FIELD_CONDITION_KIND).appendField(modeField, FIELD_MODE)
           appendScoreModeInputs(this, scoreModeField, this.scoreMode_)
-          scoreModeField.setValue(this.scoreMode_)
         }
-
-        conditionKindField.setValue(this.conditionKind_)
-        modeField.setValue(this.mode_)
 
         if (this.mode_ === 'biome' || this.mode_ === 'block' || this.mode_ === 'loaded') {
           setShadowState(this, 'POS', { type: 'mc_block_pos' })
