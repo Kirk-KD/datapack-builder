@@ -4,6 +4,7 @@ import {setShadowState} from "../extensions/shadows.ts";
 import * as Blockly from "blockly"
 import {colours} from "../blockColours.ts";
 import { createStateCheckbox, createStateDropdown } from "../utils/dynamicFields.ts";
+import { bindExtraState } from "../utils/extraState.ts";
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 
@@ -125,8 +126,10 @@ export const commandBlockSpecs: BlockSpec[] = [
     category: 'commands',
     init(this: Blockly.Block) {
       const block = this as AdvancementBlock
-      block.action_ = 'grant'
-      block.specifier_ = 'everything'
+      bindExtraState(block, {
+        action_: 'grant' as AdvancementAction,
+        specifier_: 'everything' as AdvancementSpecifier,
+      })
 
       block.setColour(colours.commands)
       block.setTooltip('')
@@ -168,22 +171,6 @@ export const commandBlockSpecs: BlockSpec[] = [
         }
       }
 
-      block.saveExtraState = function(this: AdvancementBlock) {
-        return {
-          action_: this.action_,
-          specifier_: this.specifier_,
-        }
-      }
-
-      block.loadExtraState = function(this: AdvancementBlock, state: {
-        action_: AdvancementAction,
-        specifier_: AdvancementSpecifier,
-      } | null) {
-        this.action_ = state?.action_ ?? 'grant'
-        this.specifier_ = state?.specifier_ ?? 'everything'
-        this.updateShape_()
-      }
-
       block.updateShape_()
     },
     generator(block: Blockly.Block) {
@@ -202,8 +189,15 @@ export const commandBlockSpecs: BlockSpec[] = [
     category: 'commands',
     init(this: Blockly.Block) {
       const block = this as AttributeBlock
-      block.action_ = 'get'
-      block.property_ = null
+      bindExtraState(block, {
+        action_: 'get' as AttributeAction,
+        property_: null as AttributeProperty | null,
+      }, {
+        loadDefaults: {
+          action_: 'get' as AttributeAction,
+          property_: 'add_value' as AttributeProperty,
+        },
+      })
 
       block.setColour(colours.commands)
       block.setTooltip('')
@@ -274,22 +268,6 @@ export const commandBlockSpecs: BlockSpec[] = [
         }
       }
 
-      block.saveExtraState = function(this) {
-        return {
-          action_: this.action_,
-          property_: this.property_,
-        }
-      }
-
-      block.loadExtraState = function(this: AttributeBlock, state: {
-        action_: AttributeAction,
-        property_: AttributeProperty,
-      }) {
-        this.action_ = state?.action_ ?? 'get'
-        this.property_ = state?.property_ ?? 'add_value'
-        this.updateShape_()
-      }
-
       block.updateShape_()
     },
     generator(block: Blockly.Block) {
@@ -311,11 +289,13 @@ export const commandBlockSpecs: BlockSpec[] = [
     category: 'commands',
     init(this: Blockly.Block) {
       const block = this as CloneBlock
-      block.hasFromDimension_ = false
-      block.hasToDimension_ = false
-      block.isStrict_ = false
-      block.maskMode_ = '(none)'
-      block.cloneMode_ = '(none)'
+      bindExtraState(block, {
+        hasFromDimension_: false,
+        hasToDimension_: false,
+        isStrict_: false,
+        maskMode_: '(none)' as CloneMaskMode,
+        cloneMode_: '(none)' as CloneCloneMode,
+      })
 
       block.setColour(colours.commands)
       block.setTooltip('')
@@ -391,30 +371,6 @@ export const commandBlockSpecs: BlockSpec[] = [
         this.appendDummyInput('5')
           .appendField('clone mode:')
           .appendField(cloneModeDropdown, CLONE_CLONE_MODE_NAME)
-      }
-
-      block.saveExtraState = function(this) {
-        return {
-          hasFromDimension_: this.hasFromDimension_,
-          hasToDimension_: this.hasToDimension_,
-          isStrict_: this.isStrict_,
-          maskMode_: this.maskMode_,
-          cloneMode_: this.cloneMode_,
-        }
-      }
-
-      block.loadExtraState = function(this, state: {
-        hasFromDimension_: boolean,
-        hasToDimension_: boolean,
-        isStrict_: boolean,
-        maskMode_: CloneMaskMode,
-        cloneMode_: CloneCloneMode,
-      }) {
-        this.hasFromDimension_ = state.hasFromDimension_
-        this.hasToDimension_ = state.hasToDimension_
-        this.isStrict_ = state.isStrict_
-        this.maskMode_ = state.maskMode_
-        this.cloneMode_ = state.cloneMode_
       }
 
       block.updateShape_()
