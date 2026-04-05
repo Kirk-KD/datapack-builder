@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { DataComponentScalarSchema } from '../types'
 import { parseNumericInput, validateScalarValue } from '../utils'
 import HelpTooltip from '../HelpTooltip'
@@ -10,7 +11,7 @@ type NumberFieldEditorProps = {
 }
 
 function NumberFieldEditor({ schema, label, value, onChange }: NumberFieldEditorProps) {
-  const text = typeof value === 'number' ? String(value) : ''
+  const [text, setText] = useState(() => (typeof value === 'number' ? String(value) : ''))
   const parsedValue = parseNumericInput(text, schema)
   const validationError = parsedValue === null ? 'Expected a valid number.' : validateScalarValue(schema, parsedValue)
 
@@ -29,6 +30,7 @@ function NumberFieldEditor({ schema, label, value, onChange }: NumberFieldEditor
         value={text}
         onChange={(event) => {
           const nextValue = event.target.value
+          setText(nextValue)
 
           const parsedNextValue = parseNumericInput(nextValue, schema)
           if (parsedNextValue !== null) {
