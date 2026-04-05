@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import type { SchemaValueEditorProps } from './types'
 import type {
   DataComponentListSchema,
@@ -127,12 +126,7 @@ function UnionValueEditor({
   value: unknown
   onChange: (value: unknown) => void
 }) {
-  const [selectedIndex, setSelectedIndex] = useState(() => inferUnionOptionIndex(schema.options, value))
-
-  useEffect(() => {
-    setSelectedIndex(inferUnionOptionIndex(schema.options, value))
-  }, [schema.options, value])
-
+  const selectedIndex = inferUnionOptionIndex(schema.options, value)
   const selectedSchema = schema.options[selectedIndex] ?? schema.options[0]
   if (!selectedSchema) {
     return null
@@ -148,17 +142,15 @@ function UnionValueEditor({
       )}
       <div className="dataComponentGroup">
         <select
-          className="editorModalInput"
-          value={selectedIndex}
-          onChange={(event) => {
-            const nextIndex = Number(event.target.value)
-            setSelectedIndex(nextIndex)
-            const nextSchema = schema.options[nextIndex]
-            if (nextSchema) {
-              onChange(createDefaultValue(nextSchema))
-            }
-          }}
-        >
+        className="editorModalInput"
+        value={selectedIndex}
+        onChange={(event) => {
+          const nextIndex = Number(event.target.value)
+          const nextSchema = schema.options[nextIndex]
+          if (nextSchema) {
+            onChange(createDefaultValue(nextSchema))
+          }
+        }}>
           {schema.options.map((option: DataComponentValueSchema, index: number) => (
             <option key={index} value={index}>
               {getSchemaOptionLabel(option)}

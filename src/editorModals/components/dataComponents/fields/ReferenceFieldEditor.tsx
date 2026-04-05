@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import type { DataComponentReferenceSchema } from '../types'
 import { parseJsonText } from '../utils'
 import HelpTooltip from '../HelpTooltip'
@@ -31,19 +31,8 @@ function supportsTextMode(ref: string) {
 }
 
 function ReferenceFieldEditor({ schema, label, value, onChange }: ReferenceFieldEditorProps) {
-  const [mode, setMode] = useState<'text' | 'json'>(() => {
-    if (supportsTextMode(schema.ref) && typeof value === 'string') {
-      return 'text'
-    }
-    return 'json'
-  })
-  const [text, setText] = useState(() => stringifyReferenceValue(value))
-
-  useEffect(() => {
-    setMode(supportsTextMode(schema.ref) && typeof value === 'string' ? 'text' : 'json')
-    setText(stringifyReferenceValue(value))
-  }, [schema.ref, value])
-
+  const mode = supportsTextMode(schema.ref) && typeof value === 'string' ? 'text' : 'json'
+  const text = stringifyReferenceValue(value)
   const parsedJson = useMemo(() => parseJsonText(text), [text])
   const error = mode === 'json' ? parsedJson.error : null
 
@@ -61,17 +50,11 @@ function ReferenceFieldEditor({ schema, label, value, onChange }: ReferenceField
           value={mode}
           onChange={(event) => {
             const nextMode = event.target.value === 'text' ? 'text' : 'json'
-            setMode(nextMode)
-
             if (nextMode === 'text') {
-              if (typeof value !== 'string') {
-                setText('')
-                onChange('')
-              }
+              onChange('')
               return
             }
 
-            setText('{}')
             onChange({})
           }}
         >
@@ -84,7 +67,6 @@ function ReferenceFieldEditor({ schema, label, value, onChange }: ReferenceField
         value={text}
         onChange={(event) => {
           const nextText = event.target.value
-          setText(nextText)
 
           if (mode === 'text') {
             onChange(nextText)

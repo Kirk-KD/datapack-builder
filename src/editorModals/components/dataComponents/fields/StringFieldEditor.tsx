@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import type { DataComponentScalarSchema } from '../types'
 import { validateScalarValue } from '../utils'
 import HelpTooltip from '../HelpTooltip'
@@ -11,11 +10,7 @@ type StringFieldEditorProps = {
 }
 
 function StringFieldEditor({ schema, label, value, onChange }: StringFieldEditorProps) {
-  const [text, setText] = useState(typeof value === 'string' ? value : '')
-
-  useEffect(() => {
-    setText(typeof value === 'string' ? value : '')
-  }, [value])
+  const text = typeof value === 'string' ? value : ''
 
   const validationError = validateScalarValue(schema, text)
 
@@ -31,11 +26,7 @@ function StringFieldEditor({ schema, label, value, onChange }: StringFieldEditor
         className="editorModalInput"
         type="text"
         value={text}
-        onChange={(event) => {
-          const nextValue = event.target.value
-          setText(nextValue)
-          onChange(nextValue)
-        }}
+        onChange={(event) => onChange(event.target.value)}
       />
       {validationError && <span className="dataComponentFieldError">{validationError}</span>}
     </label>
