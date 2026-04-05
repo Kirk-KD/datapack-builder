@@ -5,7 +5,6 @@ export type OpenEditorFieldOptions = {
   src: string
   width: number
   height: number
-  alt: string
   editorType: string
   title?: string
   triggerData?: unknown
@@ -17,7 +16,7 @@ export class OpenEditorField extends Blockly.FieldImage {
   private readonly triggerData_?: unknown
 
   constructor(options: OpenEditorFieldOptions) {
-    super(options.src, options.width, options.height, options.alt)
+    super(options.src, options.width, options.height)
 
     this.editorType_ = options.editorType
     this.title_ = options.title
@@ -26,7 +25,6 @@ export class OpenEditorField extends Blockly.FieldImage {
     this.setOnClickHandler(() => {
       const sourceBlock = this.getSourceBlock()
       if (!(sourceBlock instanceof Blockly.BlockSvg)) return
-      if (!(sourceBlock.workspace instanceof Blockly.WorkspaceSvg)) return
 
       openEditorModal({
         editorType: this.editorType_,

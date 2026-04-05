@@ -1,4 +1,6 @@
-import { registerEditorModal } from '../registry'
-import ItemStackEditor from './itemStackEditor'
+import { registerLazyEditorModal } from '../registry'
 
-registerEditorModal('item_stack', ItemStackEditor)
+registerLazyEditorModal('item_stack', async () => {
+  const module = await import('./itemStackEditor')
+  return module.default
+})

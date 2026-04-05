@@ -11,7 +11,7 @@
 
 .editorModalCard {
   width: min(720px, 100%);
-  max-height: min(640px, calc(100vh - 48px));
+  height: min(640px, calc(100vh - 48px));
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -35,7 +35,10 @@
 }
 
 .editorModalBody {
-  overflow: auto;
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .editorModalFooter {
@@ -62,6 +65,32 @@
   background: var(--colour-surface-panel-hover-strong);
 }
 
+/* Provides a compact icon-only button for inline editor controls such as clear actions. */
+.editorModalIconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.editorModalIconButton:hover {
+  background: var(--colour-surface-panel-hover);
+}
+
+.editorModalIconButton img {
+  width: 16px;
+  height: 16px;
+  opacity: 0.85;
+}
+
 .editorModalPlaceholder {
   display: flex;
   flex-direction: column;
@@ -69,11 +98,107 @@
   color: var(--colour-text-secondary);
 }
 
+.editorModalSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editorModalSectionFill {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+/* Lays out a compact editor control as a single horizontal row. */
+.editorModalControl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* Provides the shared bordered surface for inline editor controls such as search rows. */
+.editorModalFieldRow {
+  padding: 8px 10px;
+  border: 1px solid var(--colour-border-default);
+  border-radius: 10px;
+  background: var(--colour-surface-app);
+}
+
+.editorModalFieldRow:focus-within {
+  border-color: var(--colour-border-focus);
+  box-shadow: 0 0 0 2px var(--colour-focus-ring);
+}
+
+.editorModalTextMuted {
+  color: var(--colour-text-secondary);
+}
+
+/* Defines the default input look for editor forms inside modals. */
 .editorModalInput {
   width: 100%;
+  min-width: 0;
   padding: 8px 10px;
   border: 1px solid var(--colour-border-default);
   border-radius: 8px;
   background: var(--colour-surface-app);
   color: inherit;
+}
+
+.editorModalInput::placeholder {
+  color: var(--colour-text-placeholder);
+}
+
+/* Removes the default input chrome when an input is rendered inside another shared control surface. */
+.editorModalInputBare {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+}
+
+/* Sizes a standard item or block sprite so it aligns cleanly with editor text. */
+.editorModalSpriteIcon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  image-rendering: pixelated;
+}
+
+/* Increases the shared sprite size slightly for controls that need a more prominent icon. */
+.editorModalSpriteIconLarge {
+  width: 18px;
+  height: 18px;
+  flex-basis: 18px;
+}
+
+/* Reserves sprite space when no actual image exists while keeping alignment stable. */
+.editorModalSpriteIconPlaceholder {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border-radius: 4px;
+  background: var(--colour-surface-panel-hover);
+}
+
+/* Enlarges the placeholder to match the larger shared sprite variant. */
+.editorModalSpriteIconPlaceholderLarge {
+  width: 18px;
+  height: 18px;
+  flex-basis: 18px;
+}
+
+/* Displays loading, empty, or error states in a consistent framed panel within modal editors. */
+.editorModalStatusPanel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 16px;
+  border: 1px dashed var(--colour-border-default);
+  border-radius: 10px;
+  color: var(--colour-text-secondary);
 }

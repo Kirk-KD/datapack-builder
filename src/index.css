@@ -12,13 +12,10 @@
   --colour-border-focus: #8db8ff;
   --colour-text-primary: #f2f5f8;
   --colour-text-secondary: #d4dae2;
+  --colour-text-placeholder: #8f9aab;
   --colour-overlay: rgb(15 18 24 / 72%);
   --colour-shadow-strong: rgb(0 0 0 / 45%);
   --colour-focus-ring: rgb(141 184 255 / 22%);
-
-  /* Note: these two values are arbitrary; they do not correspond to values defined in `workspaceSetup.ts`. */
-  --flyout-width: 420px;
-  --flyout-blur-width: 100px;
 }
 
 * {

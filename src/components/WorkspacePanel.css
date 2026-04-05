@@ -6,6 +6,12 @@
     font-size: var(--font-size-small) !important;
 }
 
+.blocklyToolboxFlyout {
+    /* Note: these two values are arbitrary; they do not correspond to values defined in `workspaceSetup.ts`. */
+    --flyout-width: 420px;
+    --flyout-blur-width: 100px;
+}
+
 .blocklyToolboxFlyout .blocklyBlock {
     -webkit-mask-image: linear-gradient(to right, black 0px, black calc(var(--flyout-width) - var(--flyout-blur-width)), transparent var(--flyout-width));
     mask-image: linear-gradient(to right, black 0px, black calc(var(--flyout-width) - var(--flyout-blur-width)), transparent var(--flyout-width));

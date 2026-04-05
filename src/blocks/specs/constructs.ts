@@ -40,7 +40,6 @@ export const constructBlockSpecs: BlockSpec[] = [
           src: '/edit.svg',
           width: 16,
           height: 16,
-          alt: 'edit item stack',
           editorType: 'item_stack',
           title: 'Item Stack Editor',
         }), 'OPEN_EDITOR')

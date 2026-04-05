@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ItemSelector from '../components/ItemSelector'
 import type { EditorComponentProps } from '../types'
 
 function getInitialValue(context: unknown) {
@@ -23,17 +24,9 @@ function ItemStackEditor({ context, setPendingResult }: EditorComponentProps) {
   }
 
   return (
-    <div className="editorModalPlaceholder">
-      <p>Stub item stack editor.</p>
-      <label htmlFor="item-stack-input">Item stack value</label>
-      <input
-        id="item-stack-input"
-        type="text"
-        value={value}
-        onChange={(event) => updateValue(event.target.value)}
-        className="editorModalInput"
-        placeholder="minecraft:stone"
-      />
+    <div className="editorModalSection editorModalSectionFill">
+      <p className="editorModalTextMuted">Select a Minecraft item or type a custom item name.</p>
+      <ItemSelector value={value} onChange={updateValue} columns={1} layout="fill" />
     </div>
   )
 }

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import * as Blockly from 'blockly'
 import { registerEditorModalController } from './bridge'
-import { getEditorModal } from './registry'
-import type { EditorBlock, EditorComponentProps, EditorModalRequest } from './types'
+import { loadEditorModal } from './registry'
+import type { EditorBlock, EditorComponent, EditorComponentProps, EditorModalRequest } from './types'
 import './editors'
 import './EditorModalHost.css'
 
@@ -25,6 +25,25 @@ function getSourceBlock(request: EditorModalRequest | null): EditorBlock | null 
 function EditorModalHost() {
   const [request, setRequest] = useState<EditorModalRequest | null>(null)
   const [pendingResult, setPendingResult] = useState<unknown>(null)
+  const [loadedEditor, setLoadedEditor] = useState<EditorComponent | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    if (!request) {
+      setLoadedEditor(null)
+      return
+    }
+
+    loadEditorModal(request.editorType).then((component) => {
+      if (cancelled) return
+      setLoadedEditor(() => component)
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [request])
 
   useEffect(() => {
     return registerEditorModalController({
@@ -73,7 +92,7 @@ function EditorModalHost() {
   if (!block) return null
 
   const context = block.getEditorContext?.(activeRequest)
-  const RegisteredEditor = getEditorModal(activeRequest.editorType) ?? FallbackEditorModal
+  const RegisteredEditor = loadedEditor ?? FallbackEditorModal
 
   function close() {
     setPendingResult(null)
@@ -118,13 +137,17 @@ function EditorModalHost() {
           <h2>{activeRequest.title ?? 'Editor'}</h2>
         </div>
         <div className="editorModalBody">
-          <RegisteredEditor
-            request={activeRequest}
-            workspace={activeRequest.workspace}
-            block={block}
-            context={context}
-            setPendingResult={setPendingResult}
-          />
+          {loadedEditor === null ? (
+            <div className="editorModalStatusPanel">Loading editor...</div>
+          ) : (
+            <RegisteredEditor
+              request={activeRequest}
+              workspace={activeRequest.workspace}
+              block={block}
+              context={context}
+              setPendingResult={setPendingResult}
+            />
+          )}
         </div>
         <div className="editorModalFooter">
           <div className="editorModalButtonRow">
