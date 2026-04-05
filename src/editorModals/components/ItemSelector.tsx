@@ -1,6 +1,6 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { loadMinecraftItemCatalog, loadMinecraftSpriteUrl } from '../data/itemCatalog'
-import type { MinecraftItemEntry } from '../data/itemCatalog'
+import { loadMinecraftItemCatalog, loadMinecraftSpriteUrl } from '../../catalog/itemCatalog'
+import type { MinecraftItemEntry } from '../../catalog/itemCatalog'
 import './ItemSelector.css'
 
 type ItemSelectorProps = {
@@ -11,7 +11,7 @@ type ItemSelectorProps = {
   layout?: 'auto' | 'fill'
 }
 
-function getEntryByName(entries: MinecraftItemEntry[], name: string) {
+function getEntryByName(entries: readonly MinecraftItemEntry[], name: string) {
   return entries.find((entry) => entry.name === name) ?? null
 }
 
@@ -50,7 +50,7 @@ function ItemSprite({ spriteFileName, large = false }: { spriteFileName: string;
 }
 
 function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout = 'auto' }: ItemSelectorProps) {
-  const [entries, setEntries] = useState<MinecraftItemEntry[] | null>(null)
+  const [entries, setEntries] = useState<readonly MinecraftItemEntry[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const deferredValue = useDeferredValue(value)
 

@@ -5,7 +5,7 @@ import { OpenEditorTextField } from '../fields/openEditorTextField'
 import { bindExtraState } from '../utils/extraState'
 import type { BlockSpec } from './types'
 import type { EditorBlock } from '../../editorModals/types'
-import { loadMinecraftSpriteUrl } from '../../editorModals/data/itemCatalog'
+import { loadMinecraftSpriteUrl } from '../../catalog/itemCatalog'
 
 const FIELD_ITEM_SPRITE = 'ITEM_SPRITE'
 const FIELD_ITEM_NAME = 'ITEM_NAME'
