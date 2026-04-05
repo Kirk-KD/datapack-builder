@@ -1,9 +1,3 @@
-:root {
-    /* Note: these two values are arbitrary; they do not correspond to values defined in `workspaceSetup.ts`. */
-    --flyout-width: 420px;
-    --flyout-blur-width: 100px;
-}
-
 .blocklyToolboxCategoryContainer {
     margin: 2.5pt;
 }

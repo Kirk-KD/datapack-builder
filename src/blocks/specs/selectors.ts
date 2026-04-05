@@ -33,7 +33,7 @@ function createFilterSpec(
 ): BlockSpec {
   return {
     type,
-    category: 'targetSelectors',
+    category: 'constructs',
     tags: ['selectorFilter'],
     json: {
       type,
@@ -64,7 +64,7 @@ export function compileSelector(block: Blockly.Block): string {
 export const selectorBlockSpecs: BlockSpec[] = [
   {
     type: targetSelectorRootType,
-    category: 'targetSelectors',
+    category: 'constructs',
     init(this: Blockly.Block) {
       const block = this as TargetSelectorBlock
       block.showFilters_ = false

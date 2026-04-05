@@ -23,9 +23,9 @@ applyColour(getBlockJsonByCategory('control'), colours.control)
 applyColour(getBlockJsonByCategory('variable'), colours.variable)
 applyColour(getBlockJsonByCategory('events'), colours.events)
 applyColour(getBlockJsonByCategory('literals'), colours.literals)
+applyColour(getBlockJsonByCategory('constructs'), colours.constructs)
 applyColour(getBlockJsonByCategory('procedures'), colours.procedures)
 applyColour(getBlockJsonByCategory('execute'), colours.execute)
-applyColour(getBlockJsonByCategory('targetSelectors'), colours.targetSelectors)
 
 registerBlockSpecs()
 
@@ -57,6 +57,12 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
     },
     {
       kind: 'category',
+      name: 'Constructs',
+      colour: colours.constructs,
+      contents: getBlockTypesByCategory('constructs').map(type => ({ kind: 'block', type }))
+    },
+    {
+      kind: 'category',
       name: 'Variables',
       colour: colours.variable,
       contents: getVariablesCategory()
@@ -73,11 +79,5 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       colour: colours.execute,
       contents: getBlockTypesByCategory('execute').map(type => ({ kind: 'block', type }))
     },
-    {
-      kind: 'category',
-      name: 'Target Selector',
-      colour: colours.targetSelectors,
-      contents: getBlockTypesByCategory('targetSelectors').map(type => ({ kind: 'block', type }))
-    }
   ]
 }

@@ -5,6 +5,7 @@ import {registerContinuousToolbox, additionalOptions, setupWorkspace} from '../w
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import { updateWorkspaceRegistry} from '../compiler/workspaceRegistry'
+import EditorModalHost from '../editorModals/EditorModalHost.tsx'
 import './WorkspacePanel.css'
 
 import type {WorkspaceSvg} from "blockly";
@@ -107,6 +108,7 @@ function WorkspacePanel() {
 
   return (
     <>
+      <EditorModalHost />
       <div style={{
         display: 'flex',
         flexDirection: 'row',

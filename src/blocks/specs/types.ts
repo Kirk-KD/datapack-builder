@@ -6,9 +6,9 @@ export type BlockSpecCategory =
   | 'variable'
   | 'events'
   | 'literals'
+  | 'constructs'
   | 'procedures'
   | 'execute'
-  | 'targetSelectors'
 
 export type BlockInitFunction = (this: Blockly.Block) => void
 export type BlockGeneratorResult = ReturnType<Blockly.CodeGenerator['blockToCode']>

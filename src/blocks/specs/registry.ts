@@ -1,5 +1,6 @@
 import * as Blockly from 'blockly'
 import { commandBlockSpecs } from './commands'
+import { constructBlockSpecs } from './constructs'
 import { controlBlockSpecs } from './control'
 import { eventBlockSpecs } from './events'
 import { executeBlockSpecs } from './execute'
@@ -16,6 +17,7 @@ const allBlockSpecs = [
   ...variableBlockSpecs,
   ...eventBlockSpecs,
   ...literalBlockSpecs,
+  ...constructBlockSpecs,
   ...procedureBlockSpecs,
   ...executeBlockSpecs,
   ...selectorBlockSpecs,

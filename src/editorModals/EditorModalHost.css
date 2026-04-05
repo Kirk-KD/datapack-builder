@@ -1,0 +1,79 @@
+.editorModalOverlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: var(--colour-overlay);
+  z-index: 1000;
+}
+
+.editorModalCard {
+  width: min(720px, 100%);
+  max-height: min(640px, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--colour-border-muted);
+  border-radius: 12px;
+  background: var(--colour-surface-panel);
+  color: var(--colour-text-primary);
+  box-shadow: 0 18px 60px var(--colour-shadow-strong);
+}
+
+.editorModalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editorModalHeader h2 {
+  font-size: 14pt !important;
+}
+
+.editorModalBody {
+  overflow: auto;
+}
+
+.editorModalFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.editorModalButtonRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editorModalButton {
+  padding: 8px 12px;
+  border: 1px solid var(--colour-border-default);
+  border-radius: 8px;
+  background: var(--colour-surface-panel-hover);
+  color: inherit;
+  cursor: pointer;
+}
+
+.editorModalButton:hover {
+  background: var(--colour-surface-panel-hover-strong);
+}
+
+.editorModalPlaceholder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--colour-text-secondary);
+}
+
+.editorModalInput {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--colour-border-default);
+  border-radius: 8px;
+  background: var(--colour-surface-app);
+  color: inherit;
+}

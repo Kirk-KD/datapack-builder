@@ -2,6 +2,22 @@
   --font-family: "Helvetica Neue", Helvetica, sans-serif;
   --font-size-base: 12pt;
   --font-size-small: 9pt;
+
+  /* TODO apply these colours to Blockly theme */
+  --colour-surface-app: #141a23;
+  --colour-surface-panel: #202733;
+  --colour-surface-panel-hover: #2c3544;
+  --colour-surface-panel-hover-strong: #364154;
+  --colour-border-muted: #3f4858;
+  --colour-border-default: #586173;
+  --colour-text-primary: #f2f5f8;
+  --colour-text-secondary: #d4dae2;
+  --colour-overlay: rgb(15 18 24 / 72%);
+  --colour-shadow-strong: rgb(0 0 0 / 45%);
+
+  /* Note: these two values are arbitrary; they do not correspond to values defined in `workspaceSetup.ts`. */
+  --flyout-width: 420px;
+  --flyout-blur-width: 100px;
 }
 
 * {
