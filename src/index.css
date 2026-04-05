@@ -3,17 +3,18 @@
   --font-size-base: 12pt;
   --font-size-small: 9pt;
 
-  /* TODO apply these colours to Blockly theme */
   --colour-surface-app: #141a23;
   --colour-surface-panel: #202733;
   --colour-surface-panel-hover: #2c3544;
   --colour-surface-panel-hover-strong: #364154;
   --colour-border-muted: #3f4858;
   --colour-border-default: #586173;
+  --colour-border-focus: #8db8ff;
   --colour-text-primary: #f2f5f8;
   --colour-text-secondary: #d4dae2;
   --colour-overlay: rgb(15 18 24 / 72%);
   --colour-shadow-strong: rgb(0 0 0 / 45%);
+  --colour-focus-ring: rgb(141 184 255 / 22%);
 
   /* Note: these two values are arbitrary; they do not correspond to values defined in `workspaceSetup.ts`. */
   --flyout-width: 420px;
@@ -30,4 +31,16 @@
 
 html, body {
   overflow: hidden;
+}
+
+button:focus-visible,
+input:focus,
+input:focus-visible,
+select:focus,
+select:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--colour-border-focus);
+  box-shadow: 0 0 0 2px var(--colour-focus-ring);
 }

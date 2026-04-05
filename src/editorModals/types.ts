@@ -22,8 +22,7 @@ export type EditorComponentProps = {
   workspace: Blockly.WorkspaceSvg
   block: EditorBlock
   context: unknown
-  commit: (result: unknown) => void
-  close: () => void
+  setPendingResult: (result: unknown) => void
 }
 
 export type EditorComponent = ComponentType<EditorComponentProps>

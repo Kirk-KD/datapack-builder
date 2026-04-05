@@ -6,16 +6,11 @@ import type { EditorBlock, EditorComponentProps, EditorModalRequest } from './ty
 import './editors'
 import './EditorModalHost.css'
 
-function FallbackEditorModal({ request, block, close }: EditorComponentProps) {
+function FallbackEditorModal({ request, block }: EditorComponentProps) {
   return (
     <div className="editorModalPlaceholder">
       <p>No editor component is registered for `{request.editorType}`.</p>
       <p>Source block type: `{block.type}`</p>
-      <div className="editorModalFooter">
-        <div className="editorModalButtonRow">
-          <button type="button" className="editorModalButton" onClick={close}>Close</button>
-        </div>
-      </div>
     </div>
   )
 }
@@ -29,11 +24,18 @@ function getSourceBlock(request: EditorModalRequest | null): EditorBlock | null 
 
 function EditorModalHost() {
   const [request, setRequest] = useState<EditorModalRequest | null>(null)
+  const [pendingResult, setPendingResult] = useState<unknown>(null)
 
   useEffect(() => {
     return registerEditorModalController({
-      open: setRequest,
-      close: () => setRequest(null),
+      open: (nextRequest) => {
+        setPendingResult(null)
+        setRequest(nextRequest)
+      },
+      close: () => {
+        setPendingResult(null)
+        setRequest(null)
+      },
     })
   }, [])
 
@@ -42,6 +44,7 @@ function EditorModalHost() {
 
     const listener = () => {
       if (!request.workspace.getBlockById(request.blockId)) {
+        setPendingResult(null)
         setRequest(null)
       }
     }
@@ -53,6 +56,7 @@ function EditorModalHost() {
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
+        setPendingResult(null)
         setRequest(null)
       }
     }
@@ -72,19 +76,21 @@ function EditorModalHost() {
   const RegisteredEditor = getEditorModal(activeRequest.editorType) ?? FallbackEditorModal
 
   function close() {
+    setPendingResult(null)
     setRequest(null)
   }
 
-  function commit(result: unknown) {
+  function save() {
     const sourceBlock = getSourceBlock(activeRequest)
     if (!sourceBlock) {
+      setPendingResult(null)
       setRequest(null)
       return
     }
 
     Blockly.Events.setGroup(true)
     try {
-      sourceBlock.applyEditorResult?.(result, activeRequest)
+      sourceBlock.applyEditorResult?.(pendingResult, activeRequest)
       if (sourceBlock.rendered) {
         sourceBlock.render()
       }
@@ -92,6 +98,7 @@ function EditorModalHost() {
       Blockly.Events.setGroup(false)
     }
 
+    setPendingResult(null)
     setRequest(null)
   }
 
@@ -109,9 +116,6 @@ function EditorModalHost() {
       >
         <div className="editorModalHeader">
           <h2>{activeRequest.title ?? 'Editor'}</h2>
-          <div className="editorModalButtonRow">
-            <button type="button" className="editorModalButton" onClick={close}>Close</button>
-          </div>
         </div>
         <div className="editorModalBody">
           <RegisteredEditor
@@ -119,9 +123,14 @@ function EditorModalHost() {
             workspace={activeRequest.workspace}
             block={block}
             context={context}
-            commit={commit}
-            close={close}
+            setPendingResult={setPendingResult}
           />
+        </div>
+        <div className="editorModalFooter">
+          <div className="editorModalButtonRow">
+            <button type="button" className="editorModalButton" onClick={close}>Cancel</button>
+            <button type="button" className="editorModalButton" onClick={save}>Save</button>
+          </div>
         </div>
       </div>
     </div>

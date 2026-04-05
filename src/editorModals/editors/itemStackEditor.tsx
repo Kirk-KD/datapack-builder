@@ -14,8 +14,13 @@ function getInitialValue(context: unknown) {
   return ''
 }
 
-function ItemStackEditor({ context, commit, close }: EditorComponentProps) {
+function ItemStackEditor({ context, setPendingResult }: EditorComponentProps) {
   const [value, setValue] = useState(() => getInitialValue(context))
+
+  function updateValue(nextValue: string) {
+    setValue(nextValue)
+    setPendingResult(nextValue)
+  }
 
   return (
     <div className="editorModalPlaceholder">
@@ -25,16 +30,10 @@ function ItemStackEditor({ context, commit, close }: EditorComponentProps) {
         id="item-stack-input"
         type="text"
         value={value}
-        onChange={(event) => setValue(event.target.value)}
+        onChange={(event) => updateValue(event.target.value)}
         className="editorModalInput"
         placeholder="minecraft:stone"
       />
-      <div className="editorModalFooter">
-        <div className="editorModalButtonRow">
-          <button type="button" className="editorModalButton" onClick={close}>Cancel</button>
-          <button type="button" className="editorModalButton" onClick={() => commit(value)}>Save</button>
-        </div>
-      </div>
     </div>
   )
 }

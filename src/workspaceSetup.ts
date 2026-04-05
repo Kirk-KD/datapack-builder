@@ -11,6 +11,17 @@ import {
 import {colours} from "./blocks/blockColours.ts";
 import {MetricsManager} from "blockly";
 
+// from index.css
+const themeColours = {
+  surfaceApp: '#141a23',
+  surfacePanel: '#202733',
+  surfacePanelHover: '#2c3544',
+  borderDefault: '#586173',
+  textPrimary: '#f2f5f8',
+  textSecondary: '#d4dae2',
+  focus: '#8db8ff',
+}
+
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
   name: 'Custom',
@@ -18,6 +29,19 @@ const customTheme = Blockly.Theme.defineTheme('customDark', {
     procedure_blocks: {
       colourPrimary: colours.procedures.toString(),
     }
+  },
+  componentStyles: {
+    workspaceBackgroundColour: themeColours.surfaceApp,
+    toolboxBackgroundColour: themeColours.surfacePanelHover,
+    toolboxForegroundColour: themeColours.textPrimary,
+    flyoutBackgroundColour: themeColours.surfacePanel,
+    flyoutForegroundColour: themeColours.textSecondary,
+    flyoutOpacity: 0.85,
+    scrollbarColour: themeColours.borderDefault,
+    scrollbarOpacity: 0.5,
+    insertionMarkerColour: themeColours.focus,
+    insertionMarkerOpacity: 0.35,
+    cursorColour: themeColours.textPrimary,
   },
   fontStyle: {
     family: "Helvetica Neue",
@@ -57,7 +81,7 @@ const additionalOptions = {
   grid: {
     spacing: 20,
     length: 3,
-    colour: '#555',
+    colour: themeColours.borderDefault,
     snap: true
   }
 }
