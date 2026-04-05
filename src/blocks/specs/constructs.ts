@@ -6,6 +6,7 @@ import { bindExtraState } from '../utils/extraState'
 import type { BlockSpec } from './types'
 import type { EditorBlock } from '../../editorModals/types'
 import { loadMinecraftSpriteUrl } from '../../catalog/itemCatalog'
+import {type SNBT, snbtToString} from "../../compiler/util.ts";
 
 const FIELD_ITEM_SPRITE = 'ITEM_SPRITE'
 const FIELD_ITEM_NAME = 'ITEM_NAME'
@@ -19,8 +20,14 @@ type ItemStackBlock = EditorBlock & {
   updatePreview_: () => void
 }
 
-function getPreviewText(value: string) {
-  return value || DEFAULT_TEXT
+function getPreviewText(value: string, components: Record<string, unknown>) {
+  if (!value) {
+    return DEFAULT_TEXT
+  }
+
+  return Object.keys(components).length > 0
+    ? `${value}[...]`
+    : value
 }
 
 export const constructBlockSpecs: BlockSpec[] = [
@@ -52,7 +59,7 @@ export const constructBlockSpecs: BlockSpec[] = [
       block.updatePreview_ = function(this: ItemStackBlock) {
         const previewField = this.getField(FIELD_ITEM_NAME)
         if (previewField instanceof Blockly.FieldLabelSerializable) {
-          previewField.setValue(getPreviewText(this.itemStackValue_))
+          previewField.setValue(getPreviewText(this.itemStackValue_, this.itemStackComponents_))
         }
 
         const spriteField = this.getField(FIELD_ITEM_SPRITE)
@@ -117,7 +124,11 @@ export const constructBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       const itemStackBlock = block as ItemStackBlock
-      return [itemStackBlock.itemStackValue_ || 'minecraft:stone', 0]
+      const itemStackComponents = Object.entries(itemStackBlock.itemStackComponents_)
+        .map(([componentName, componentValue]) => `${componentName}=${snbtToString(componentValue as SNBT)}`)
+        .join(',')
+      const code = `${itemStackBlock.itemStackValue_}[${itemStackComponents}]`
+      return [code, 0]
     },
   },
 ]

@@ -407,7 +407,46 @@ export const commandBlockSpecs: BlockSpec[] = [
 
       if (cloneBlock.cloneMode_ !== '(none)') cmd += ` ${cloneBlock.cloneMode_}`
 
-      return cmd
+      return cmd + '\n'
+    }
+  },
+  {
+    type: 'mc_give',
+    category: 'commands',
+    json: {
+      type: 'mc_give',
+      message0: 'give %1 %2 count: %3',
+      args0: [
+        {
+          type: 'input_value',
+          name: 'TARGET',
+          check: ['mc_param', 'mc_string', 'mc_target_selector'],
+        },
+        {
+          type: 'input_value',
+          name: 'ITEM',
+          check: ['mc_param', 'mc_item_stack']
+        },
+        {
+          type: 'input_value',
+          name: 'COUNT',
+          check: ['mc_param', 'number'],
+        }
+      ],
+      previousStatement: null,
+      nextStatement: null,
+      inputsInline: true,
+    },
+    generator(block) {
+      const target = mcfunctionGenerator.valueToCode(block, 'TARGET', 0)
+      const item = mcfunctionGenerator.valueToCode(block, 'ITEM', 0)
+      const count = mcfunctionGenerator.valueToCode(block, 'COUNT', 0)
+      return `give ${target} ${item} ${count}\n`
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
+      setShadowState(this, 'ITEM', { type: 'mc_item_stack' })
+      setShadowState(this, 'COUNT', { type: 'number', fields: { VALUE: '1' } })
     }
   }
 ]
