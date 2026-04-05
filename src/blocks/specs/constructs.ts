@@ -15,6 +15,7 @@ const DEFAULT_TEXT = 'Create item stack...'
 type ItemStackBlock = EditorBlock & {
   itemStackValue_: string
   itemStackSpriteFile_: string
+  itemStackComponents_: Record<string, unknown>
   updatePreview_: () => void
 }
 
@@ -32,6 +33,7 @@ export const constructBlockSpecs: BlockSpec[] = [
       bindExtraState(block, {
         itemStackValue_: '',
         itemStackSpriteFile_: '',
+        itemStackComponents_: {},
       })
 
       block.setOutput(true, 'mc_item_stack')
@@ -73,6 +75,7 @@ export const constructBlockSpecs: BlockSpec[] = [
         return {
           value: this.itemStackValue_,
           spriteFileName: this.itemStackSpriteFile_,
+          components: this.itemStackComponents_,
         }
       }
 
@@ -94,11 +97,19 @@ export const constructBlockSpecs: BlockSpec[] = [
           'spriteFileName' in result && typeof result.spriteFileName === 'string'
             ? result.spriteFileName
             : ''
+        const nextComponents =
+          'components' in result
+          && result.components
+          && typeof result.components === 'object'
+          && !Array.isArray(result.components)
+            ? { ...(result.components as Record<string, unknown>) }
+            : {}
 
         if (nextValue === null) return
 
         this.itemStackValue_ = nextValue
         this.itemStackSpriteFile_ = nextSpriteFile
+        this.itemStackComponents_ = nextComponents
         this.updatePreview_()
       }
 

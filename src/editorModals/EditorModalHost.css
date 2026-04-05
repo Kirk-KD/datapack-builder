@@ -23,6 +23,11 @@
   box-shadow: 0 18px 60px var(--colour-shadow-strong);
 }
 
+.editorModalCard.is-maximized {
+  width: calc(100vw - 48px);
+  height: calc(100vh - 48px);
+}
+
 .editorModalHeader {
   display: flex;
   align-items: center;
@@ -38,7 +43,7 @@
   flex: 1;
   display: flex;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .editorModalFooter {
@@ -91,6 +96,19 @@
   opacity: 0.85;
 }
 
+.editorModalHeaderIconButton {
+  width: 28px;
+  height: 28px;
+  flex-basis: 28px;
+  border: 1px solid var(--colour-border-default);
+  border-radius: 8px;
+  background: var(--colour-surface-panel-hover);
+}
+
+.editorModalHeaderIconButton:hover {
+  background: var(--colour-surface-panel-hover-strong);
+}
+
 .editorModalPlaceholder {
   display: flex;
   flex-direction: column;
@@ -107,7 +125,6 @@
 .editorModalSectionFill {
   flex: 1;
   min-height: 0;
-  height: 100%;
 }
 
 /* Lays out a compact editor control as a single horizontal row. */

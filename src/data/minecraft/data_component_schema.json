@@ -1,0 +1,2563 @@
+{
+  "schema_version": 1,
+  "source": {
+    "page": "https://minecraft.wiki/w/Data_component_format",
+    "html_file": "scripts/data_component_format_wiki.html"
+  },
+  "components": [
+    {
+      "id": "minecraft:attack_range",
+      "label": "attack_range",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "min_reach",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The minimum distance in blocks from the attacker to the target to be considered valid. Defaults to 0.0, valid from 0.0 to 64.0.",
+              "default": 0.0,
+              "min": 0.0,
+              "max": 64
+            }
+          },
+          {
+            "key": "max_reach",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The maximum distance in blocks from the attacker to the target to be considered valid. Defaults to 3.0, valid from 0.0 to 64.0.",
+              "default": 3.0,
+              "min": 0.0,
+              "max": 64
+            }
+          },
+          {
+            "key": "min_creative_reach",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The minimum distance in blocks from the attacker to the target to be considered valid in Creative mode. Defaults to 0.0, valid from 0.0 to 64.0.",
+              "default": 0.0,
+              "min": 0.0,
+              "max": 64
+            }
+          },
+          {
+            "key": "max_creative_reach",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The maximum distance in blocks from the attacker to the target to be considered valid in Creative mode. Defaults to 5.0, valid from 0.0 to 64.0.",
+              "default": 5.0,
+              "min": 0.0,
+              "max": 64
+            }
+          },
+          {
+            "key": "hitbox_margin",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The margin applied to the target bounding box when checking for valid hitbox collision. Defaults to 0.3, valid from 0.0 to 1.0.",
+              "default": 0.3,
+              "min": 0.0,
+              "max": 1
+            }
+          },
+          {
+            "key": "mob_factor",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The multiplier applied to min_range and max_range when checking for valid distance if item is used by a mob. Defaults to 1.0, valid from 0.0 to 2.0.",
+              "default": 1.0,
+              "min": 0.0,
+              "max": 2
+            }
+          }
+        ],
+        "description": "Determines the attack range and hitbox margin of a weapon."
+      }
+    },
+    {
+      "id": "minecraft:attribute_modifiers",
+      "label": "attribute_modifiers",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "object",
+          "fields": [
+            {
+              "key": "id",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "semantic_type": "resource_location",
+                "description": "A namespaced ID to identify this modifier. It must be unique from other modifiers of the same attribute."
+              }
+            },
+            {
+              "key": "type",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "semantic_type": "resource_location",
+                "description": "The namespaced ID of the attribute this modifier is to act upon."
+              }
+            },
+            {
+              "key": "slot",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "description": "The equipment slot/slots the item must be in for the modifier to take effect. Can be any , hand , armor , mainhand , offhand , head , chest , legs , feet , body , or saddle . Defaults to any . Note: any refers to any equipment slot, not any inventory slot.",
+                "default": "any",
+                "choices": [
+                  "any",
+                  "hand",
+                  "armor",
+                  "mainhand",
+                  "offhand",
+                  "head",
+                  "chest",
+                  "legs",
+                  "feet",
+                  "body",
+                  "saddle"
+                ]
+              }
+            },
+            {
+              "key": "operation",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "description": "Modifier operation. Can be add_value , add_multiplied_base , or add_multiplied_total . See Attribute Modifiers for info.",
+                "choices": [
+                  "add_value",
+                  "add_multiplied_base",
+                  "add_multiplied_total"
+                ]
+              }
+            },
+            {
+              "key": "amount",
+              "schema": {
+                "kind": "scalar",
+                "type": "double",
+                "description": "The value used in the modifier's operation."
+              }
+            },
+            {
+              "key": "display",
+              "schema": {
+                "kind": "object",
+                "fields": [
+                  {
+                    "key": "type",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "string",
+                      "description": "Display type. Can be default , hidden or override .",
+                      "choices": [
+                        "default",
+                        "hidden",
+                        "override"
+                      ]
+                    }
+                  },
+                  {
+                    "key": "value",
+                    "schema": {
+                      "kind": "union",
+                      "options": [
+                        {
+                          "kind": "scalar",
+                          "type": "string"
+                        },
+                        {
+                          "kind": "reference",
+                          "ref": "text_component",
+                          "semantic_type": "text_component"
+                        }
+                      ],
+                      "description": "(only present if is override ): A text component to show for this attribute modifier entry."
+                    }
+                  }
+                ],
+                "description": "How the modifier is displayed in an item's tooltip. Optional."
+              }
+            }
+          ],
+          "description": "A single attribute modifier and its tooltip display type."
+        },
+        "description": "A list of attribute modifiers which, if present on an item, may be applied to a player or mob that has equipped the item. If the item is not in the correct equipment slot, it has no effect. The modifiers are removed from the entity once the item is moved out of that slot or is deleted. Any attribute modifiers specified are listed in the item's tooltip (unless hidden)."
+      }
+    },
+    {
+      "id": "minecraft:banner_patterns",
+      "label": "banner_patterns",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "object",
+          "fields": [
+            {
+              "key": "color",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "description": "Dye color of the section."
+              }
+            },
+            {
+              "key": "pattern",
+              "schema": {
+                "kind": "union",
+                "options": [
+                  {
+                    "kind": "scalar",
+                    "type": "string"
+                  },
+                  {
+                    "kind": "reference",
+                    "ref": "banner_pattern"
+                  }
+                ],
+                "description": "One banner pattern (an ID , or a new banner pattern definition)."
+              }
+            }
+          ],
+          "description": "A single pattern."
+        },
+        "description": "List of all patterns applied to the banner or the shield. If used on a shield and the minecraft:base_color component is not specified, then white is used as the base banner color."
+      }
+    },
+    {
+      "id": "minecraft:base_color",
+      "label": "base_color",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "description": "The base dye color of the banner applied on a shield. If neither this nor minecraft:banner_patterns is specified, then the shield model will show its normal wooden texture. If the minecraft:banner_patterns component is specified but this component is not, then white is used as the base banner color. If present on a shield item, the item name is overridden as \"<color> Shield\" (e.g. if set to green , the name will be \"Green Shield\")."
+      }
+    },
+    {
+      "id": "minecraft:bees",
+      "label": "bees",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "object",
+          "fields": [
+            {
+              "key": "entity_data",
+              "schema": {
+                "kind": "object",
+                "fields": [],
+                "description": "Must include id tag. If the id is not minecraft:bee then the entity will never leave the hive. The Passengers , Pos , Rotation , and UUID tags are ignored when the bee spawns (the bee will always spawn in front of the hive with a random UUID, facing south, and without any passengers)."
+              }
+            },
+            {
+              "key": "min_ticks_in_hive",
+              "schema": {
+                "kind": "scalar",
+                "type": "int",
+                "description": "The minimum amount of time in ticks for this entity to stay in the hive."
+              }
+            },
+            {
+              "key": "ticks_in_hive",
+              "schema": {
+                "kind": "scalar",
+                "type": "int",
+                "description": "The amount of ticks the entity has stayed in the hive."
+              }
+            }
+          ],
+          "description": "A single entity."
+        },
+        "description": "A list of the entities currently in the beehive or bee nest. If present on an item, text is added to the item's tooltip that says how many entries are in the list (e.g. if there are two entries, the tooltip will say \"Bees: 2 / 3\") and each item is considered a full stack for the minecraft:bundle_contents components. Despite the tooltip suggesting there is a maximum of 3 entries, there is no limit to the size of this component."
+      }
+    },
+    {
+      "id": "minecraft:block_entity_data",
+      "label": "block_entity_data",
+      "value_schema": {
+        "kind": "object",
+        "fields": [],
+        "description": "Block entity NBT applied when this block is placed. Depending on the block type that this item places, and the block entity ID specified in this component, this component may add a red message to the item's tooltip (for operator players only) warning the player that placing it may result in command execution."
+      }
+    },
+    {
+      "id": "minecraft:block_state",
+      "label": "block_state",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "<block state>",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "A key-value pair, where the key is a block state key and the value is a block state value to force place for this block, for example facing: \"east\" ."
+            }
+          }
+        ],
+        "description": "The block state properties to apply when placing this block. When present on an item, regardless of the item type, if the honey_level property is specified then a gray \"Honey: <honey_level> / 5\" text is added to the tooltip."
+      }
+    },
+    {
+      "id": "minecraft:blocks_attacks",
+      "label": "blocks_attacks",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "block_delay_seconds",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The amount of time (in seconds) that must be held before successfully blocking attacks. Defaults to 0 .",
+              "default": 0
+            }
+          },
+          {
+            "key": "disable_cooldown_scale",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "float"
+                },
+                {
+                  "kind": "scalar",
+                  "type": "float"
+                }
+              ],
+              "description": "The multiplier applied to the cooldown time for the item when attacked by a disabling attack (the multiplier for on the minecraft:weapon component). If set to 0 , this item can never be disabled by attacks. Defaults to 1 .",
+              "default": 1
+            }
+          },
+          {
+            "key": "damage_reductions",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "object",
+                "fields": [
+                  {
+                    "key": "type",
+                    "schema": {
+                      "kind": "union",
+                      "options": [
+                        {
+                          "kind": "scalar",
+                          "type": "string"
+                        },
+                        {
+                          "kind": "list",
+                          "item": {
+                            "kind": "scalar",
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "kind": "scalar",
+                          "type": "string"
+                        },
+                        {
+                          "kind": "scalar",
+                          "type": "string"
+                        },
+                        {
+                          "kind": "list",
+                          "item": {
+                            "kind": "scalar",
+                            "type": "string"
+                          }
+                        },
+                        {
+                          "kind": "scalar",
+                          "type": "string"
+                        }
+                      ],
+                      "description": "Any number of damage type (s) (an ID , or a tag with # , or an array containing IDs) to block. Defaults to all damage types."
+                    }
+                  },
+                  {
+                    "key": "base",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "float",
+                      "description": "The constant amount of damage to be blocked. This is a required field."
+                    }
+                  },
+                  {
+                    "key": "factor",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "float",
+                      "description": "The fraction of the dealt damage to be blocked. This is a required field."
+                    }
+                  },
+                  {
+                    "key": "horizontal_blocking_angle",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "float",
+                      "description": "strictly positive float \u2014 The maximum angle between the users facing direction and the direction of the incoming attack to be blocked. Defaults to 90 .",
+                      "default": 90
+                    }
+                  }
+                ],
+                "description": "A damage reduction field"
+              },
+              "description": "A set of rules for how much and what kinds damage should be blocked in a given attack. Defaults to [{base:0,factor:1,horizontal_blocking_angle:90}] which blocks all damage within a 90 degree angle.",
+              "default": "[{base:0,factor:1,horizontal_blocking_angle:90}]"
+            }
+          },
+          {
+            "key": "item_damage",
+            "schema": {
+              "kind": "object",
+              "fields": [
+                {
+                  "key": "threshold",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "float",
+                    "description": "The minimum amount of damage dealt by the attack before item damage is applied to the item. Defaults to 0 .",
+                    "default": 0
+                  }
+                },
+                {
+                  "key": "base",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "float",
+                    "description": "The constant amount of damage applied to the item, if threshold is passed. Defaults to 0 .",
+                    "default": 0
+                  }
+                },
+                {
+                  "key": "factor",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "float",
+                    "description": "The fraction of the dealt damage that should be applied to the item, if threshold is passed. Defaults to 1.5 .",
+                    "default": 1.5
+                  }
+                }
+              ],
+              "description": "Controls how much damage should be applied to the item from a given attack."
+            }
+          },
+          {
+            "key": "block_sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "One sound event (an ID , or a new sound event definition) to play when an attack is successfully blocked. Defaults to none."
+            }
+          },
+          {
+            "key": "disabled_sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "One sound event (an ID , or a new sound event definition) to play when the item goes on its disabled cooldown due to an attack. Defaults to none."
+            }
+          },
+          {
+            "key": "bypassed_by",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "a damage type tag with # of damage types that bypass the blocking. Defaults to none."
+            }
+          }
+        ],
+        "description": "When present, this item can be used like a shield to block attacks to the holding player."
+      }
+    },
+    {
+      "id": "minecraft:break_sound",
+      "label": "break_sound",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "reference",
+            "ref": "sound_event",
+            "semantic_type": "sound_event"
+          }
+        ],
+        "description": "One sound event (an ID , or a new sound event definition) to play when the item runs out of durability and breaks."
+      }
+    },
+    {
+      "id": "minecraft:bucket_entity_data",
+      "label": "bucket_entity_data",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "NoAI",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Turns into NoAI entity tag for all bucketable entities."
+            }
+          },
+          {
+            "key": "Silent",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Turns into Silent entity tag for all bucketable entities."
+            }
+          },
+          {
+            "key": "NoGravity",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Turns into NoGravity entity tag for all bucketable entities."
+            }
+          },
+          {
+            "key": "Glowing",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Turns into Glowing entity tag for all bucketable entities."
+            }
+          },
+          {
+            "key": "Invulnerable",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Turns into Invulnerable entity tag for all bucketable entities."
+            }
+          },
+          {
+            "key": "AgeLocked",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Turns into AgeLocked entity tag for axolotls and tadpoles ."
+            }
+          },
+          {
+            "key": "Health",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "Turns into Health entity tag for all bucketable entities."
+            }
+          },
+          {
+            "key": "Age",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "Turns into Age entity tag for axolotls and tadpoles ."
+            }
+          },
+          {
+            "key": "HuntingCooldown",
+            "schema": {
+              "kind": "scalar",
+              "type": "long",
+              "description": "Turns into the expiry time of the memory module has_hunting_cooldown for axolotls ."
+            }
+          }
+        ],
+        "description": "NBT applied to an entity when placed from this bucket. Only tags below are applied."
+      }
+    },
+    {
+      "id": "minecraft:bundle_contents",
+      "label": "bundle_contents",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "reference",
+          "ref": "item_stack",
+          "description": "A single item stack."
+        },
+        "description": "The items stored inside this bundle . Adding this component to any item other than a bundle does nothing. If this component is removed from a bundle , it cannot be used by the player and the usual instruction and fullness bar does not appear in the tooltip."
+      }
+    },
+    {
+      "id": "minecraft:can_break",
+      "label": "can_break",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "object",
+            "fields": []
+          },
+          {
+            "kind": "list",
+            "item": {
+              "kind": "scalar",
+              "type": "string"
+            }
+          },
+          {
+            "kind": "object",
+            "fields": []
+          }
+        ],
+        "description": "The only blocks this item may break when used by a player in Adventure mode. If defined as a compound, corresponds to A single block predicate. Items are listed in the tooltip in the order specified."
+      }
+    },
+    {
+      "id": "minecraft:can_place_on",
+      "label": "can_place_on",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "object",
+            "fields": []
+          },
+          {
+            "kind": "list",
+            "item": {
+              "kind": "scalar",
+              "type": "string"
+            }
+          },
+          {
+            "kind": "object",
+            "fields": []
+          }
+        ],
+        "description": "Determines which blocks that blocks with this component can be placed against in Adventure mode. If defined as a compound, corresponds to A single block predicate. Items are listed in the tooltip in the order specified."
+      }
+    },
+    {
+      "id": "minecraft:charged_projectiles",
+      "label": "charged_projectiles",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "reference",
+          "ref": "item_stack",
+          "description": "A single projectile item stack."
+        },
+        "description": "The items loaded as projectiles into this crossbow. If there are item stacks in this component, the item name for item stack is listed in the tooltip of the item as \"Projectile: [ <name> ]\", and any duplicate item stack entries are grouped together as \"Projectile: N x [ <name> ]\". If not present, this crossbow is not charged."
+      }
+    },
+    {
+      "id": "minecraft:consumable",
+      "label": "consumable",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "consume_seconds",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The amount of seconds it takes for a player to consume the item. Defaults to 1.6.",
+              "default": 1.6
+            }
+          },
+          {
+            "key": "animation",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The animation used during consumption of the item. Must be one of none , eat , drink , block , bow , spear , crossbow , spyglass , toot_horn , brush , bundle , or trident . Defaults to eat .",
+              "default": "eat"
+            }
+          },
+          {
+            "key": "sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "One sound event (an ID , or a new sound event definition) used during and on completion of the item's consumption. Defaults to entity.generic.eat .",
+              "default": "entity.generic.eat"
+            }
+          },
+          {
+            "key": "has_consume_particles",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether consumption particles are emitted while consuming this item. Defaults to true .",
+              "default": true
+            }
+          },
+          {
+            "key": "on_consume_effects",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "reference",
+                "ref": "consume_effect",
+                "description": "A single consume effect."
+              },
+              "description": "A list of effects which take place as a result of consuming this item. Optional."
+            }
+          }
+        ],
+        "description": "If present, this item can be consumed on use."
+      }
+    },
+    {
+      "id": "minecraft:container",
+      "label": "container",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "object",
+          "fields": [
+            {
+              "key": "item",
+              "schema": {
+                "kind": "reference",
+                "ref": "item_stack",
+                "description": "The item stack in this slot."
+              }
+            },
+            {
+              "key": "slot",
+              "schema": {
+                "kind": "scalar",
+                "type": "int",
+                "description": "A slot in this container. Can be from 0 to 255 (inclusive)."
+              }
+            }
+          ],
+          "description": "A single item."
+        },
+        "description": "The items contained in this container 's slots. If present on an item, the first 5 item slots in the container are listed in the tooltip, and the number of any extra slots are listed as \" and <N> more... \" underneath (only seen on shulker boxes in normal gameplay or ctrl-middle-clicked containers in creative mode). This component supports up to 256 item slots but, when present on some block entities, the number of slots may be artificially limited based on the number of slots the block needs (e.g. 1 for decorated pots, and 27 for chests)."
+      }
+    },
+    {
+      "id": "minecraft:container_loot",
+      "label": "container_loot",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "loot_table",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The ID of a loot table ."
+            }
+          },
+          {
+            "key": "seed",
+            "schema": {
+              "kind": "scalar",
+              "type": "long",
+              "description": "The pseudorandom seed to resolve the loot table with. If not specified or 0, a seed is randomly chosen by the game."
+            }
+          }
+        ],
+        "description": "The unresolved loot table and seed of this container item."
+      }
+    },
+    {
+      "id": "minecraft:custom_data",
+      "label": "custom_data",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "object",
+            "fields": []
+          }
+        ],
+        "description": "Contains key-value pairs of any custom data not used by the game, either as an object or a SNBT string."
+      }
+    },
+    {
+      "id": "minecraft:custom_model_data",
+      "label": "custom_model_data",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "floats",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "list",
+                  "item": {
+                    "kind": "scalar",
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "scalar",
+                  "type": "float"
+                }
+              ],
+              "description": "A list of for the range_dispatch model type. Missing values return the fallback model."
+            }
+          },
+          {
+            "key": "flags",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "byte_array"
+                },
+                {
+                  "kind": "scalar",
+                  "type": "boolean"
+                }
+              ],
+              "description": "A list of for the condition model type. Missing value returns the is_false model."
+            }
+          },
+          {
+            "key": "strings",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "list",
+                  "item": {
+                    "kind": "scalar",
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                }
+              ],
+              "description": "A list of for the select model type. Missing value returns the fallback model."
+            }
+          },
+          {
+            "key": "colors",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "list",
+                  "item": {
+                    "kind": "scalar",
+                    "type": "string"
+                  }
+                },
+                {
+                  "kind": "scalar",
+                  "type": "int_array"
+                }
+              ],
+              "description": "A list of RGB values for the model model type's tints . Missing values return the default value provided by the item model definition. Each entry can either be a list of floats or an integer. Any provided lists automatically convert to an integer, so the component is saved as an int array."
+            }
+          }
+        ],
+        "description": "A list of values used by items model definitions for model selection and coloring."
+      }
+    },
+    {
+      "id": "minecraft:damage",
+      "label": "damage",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The number of uses consumed (not remaining) of the item's durability . Must be a non-negative integer, defaults to 0. If not present, the item cannot take damage.",
+        "min": 0
+      }
+    },
+    {
+      "id": "minecraft:damage_resistant",
+      "label": "damage_resistant",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "types",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "A damage type tag prefixed with # ."
+            }
+          }
+        ],
+        "description": "If specified, this item is invulnerable to the specified damage types when in entity form or equipped."
+      }
+    },
+    {
+      "id": "minecraft:damage_type",
+      "label": "damage_type",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "description": "Specifies the damage type this item deals"
+      }
+    },
+    {
+      "id": "minecraft:death_protection",
+      "label": "death_protection",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "death_effects",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "reference",
+                "ref": "consume_effect",
+                "description": "A single consume effect."
+              },
+              "description": "A list of consume effects that are applied when the item protects the holder. Optional."
+            }
+          }
+        ],
+        "description": "If present, this item protects the holder from dying by restoring a single health point."
+      }
+    },
+    {
+      "id": "minecraft:debug_stick_state",
+      "label": "debug_stick_state",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "<block ID>",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "A key-value pair, where the key is a block ID and the value is a block state key to edit on the block, for example \"minecraft:oak_fence\": \"east\" ."
+            }
+          }
+        ],
+        "description": "The selected block state properties used by this debug stick ."
+      }
+    },
+    {
+      "id": "minecraft:dye",
+      "label": "dye",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "description": "When present on an item, stores the color of dye that this item can be used as for the purpose of crafting recipes and mob or block interactions. Can be one of white , orange , magenta , light_blue , yellow , lime , pink , gray , light_gray , cyan , purple , blue , brown , green , red , or black .",
+        "choices": [
+          "one of white",
+          "orange",
+          "magenta",
+          "light_blue",
+          "yellow",
+          "lime",
+          "pink",
+          "gray",
+          "light_gray",
+          "cyan",
+          "purple",
+          "blue",
+          "brown",
+          "green",
+          "red",
+          "black"
+        ]
+      }
+    },
+    {
+      "id": "minecraft:dyed_color",
+      "label": "dyed_color",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The color applied of this leather armor or wolf armor item. More generally, it is used as the minecraft:dye color provider in item model definitions . If present on an item, a gray and italic \"Dyed\" text is added to the tooltip (If you have \"Advanced tooltips\" on, you will see it an non-italic \"Color: #<hex color code> \" instead). Color codes are the hex code of the color converted to a decimal number, or can be calculated from the red, green and blue components using this formula: ( Red << 16) + ( Green << 8) + Blue [ note 1 ] An interactive widget is being loaded. If this does not work for you, please reload the page or check if JavaScript is working or enabled."
+      }
+    },
+    {
+      "id": "minecraft:enchantable",
+      "label": "enchantable",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "value",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "Positive integer representing the item's enchantability . A higher value allows enchantments with a higher cost to be picked."
+            }
+          }
+        ],
+        "description": "If this and minecraft:enchantments are present on an item, and applicable enchantments are available, the item can be enchanted in an enchanting table."
+      }
+    },
+    {
+      "id": "minecraft:enchantment_glint_override",
+      "label": "enchantment_glint_override",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "boolean",
+        "description": "Overrides the enchantment glint effect on this item. When true , this item displays a glint, even without enchantments. When false , this item does not display a glint, even with enchantments."
+      }
+    },
+    {
+      "id": "minecraft:enchantments",
+      "label": "enchantments",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "<enchantment ID>",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "semantic_type": "resource_location",
+              "description": "A single key-value pair, where the key is the resource location of an enchantment, and the value is the level."
+            }
+          }
+        ],
+        "description": "Contains a map of each of this item's enchantments to its enchantment level. This and minecraft:enchantable must exist on an item for it to be able to be enchanted in an enchanting table. If present on an item, the color of the item name is aqua if its rarity is common or uncommon , and light purple if its rarity is rare or epic . If present on an item, the enchantments are listed in the item's tooltip. The order of the enchantments in the tooltip is defined by the #minecraft:tooltip_order enchantment tag."
+      }
+    },
+    {
+      "id": "minecraft:entity_data",
+      "label": "entity_data",
+      "value_schema": {
+        "kind": "object",
+        "fields": [],
+        "description": "NBT applied to an entity when created from an item. Depending on the entity type that this item spawns, and the entity ID specified in this component, this component may add a red message to the item's tooltip (for operator players only) warning the player that using it may result in command execution."
+      }
+    },
+    {
+      "id": "minecraft:equippable",
+      "label": "equippable",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "slot",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The slot to put the item on. Can be one of head , chest , legs , feet , body , mainhand , offhand , or saddle"
+            }
+          },
+          {
+            "key": "equip_sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "One sound event (an ID , or a new sound event definition) to play when the item is equipped. Defaults to item.armor.equip_generic .",
+              "default": "item.armor.equip_generic"
+            }
+          },
+          {
+            "key": "asset_id",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "semantic_type": "resource_location",
+              "description": "The resource location of the equipment model to use when equipped. The directory this refers to is assets/<namespace>/equipment/<id>.json . If not specified, falls back to rendering as the item itself when in the head slot (if not applicable, the item does not render)."
+            }
+          },
+          {
+            "key": "allowed_entities",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "list",
+                  "item": {
+                    "kind": "scalar",
+                    "type": "string"
+                  }
+                }
+              ],
+              "description": "Entity ID, Entity Tag, or list of Entity IDs to limit which entities can equip this item. Defaults to all entities."
+            }
+          },
+          {
+            "key": "dispensable",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether the item can be dispensed by using a dispenser . [ note 2 ] Defaults to true .",
+              "default": true
+            }
+          },
+          {
+            "key": "swappable",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether the item can be equipped into the relevant slot by right-clicking. Defaults to true .",
+              "default": true
+            }
+          },
+          {
+            "key": "damage_on_hurt",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether this item is damaged when the wearing entity is damaged. Defaults to true .",
+              "default": true
+            }
+          },
+          {
+            "key": "equip_on_interact",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether this item can be equipped onto a target mob by pressing on it (as long as this item can be equipped on the target at all). Defaults to false .",
+              "default": false
+            }
+          },
+          {
+            "key": "camera_overlay",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "semantic_type": "resource_location",
+              "description": "The resource location of the overlay texture to use when equipped. The directory this refers to is assets/<namespace>/textures/<id> . Assets which do not exist will use the missing texture , rather than falling back to a default such as the pumpkin overlay."
+            }
+          },
+          {
+            "key": "can_be_sheared",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether this item can be unequipped from a target mob by right-clicking with Shears. Defaults to false .",
+              "default": false
+            }
+          },
+          {
+            "key": "shearing_sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "One sound event (an ID , or a new sound event definition) to play when the item is sheared. Defaults to item.shears.snip .",
+              "default": "item.shears.snip"
+            }
+          }
+        ],
+        "description": "If present, this item can be equipped in the specified slot."
+      }
+    },
+    {
+      "id": "minecraft:firework_explosion",
+      "label": "firework_explosion",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "shape",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The shape of the explosion. Can be small_ball , large_ball , star , creeper , or burst .",
+              "choices": [
+                "small_ball",
+                "large_ball",
+                "star",
+                "creeper",
+                "burst"
+              ]
+            }
+          },
+          {
+            "key": "colors",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "scalar",
+                "type": "int",
+                "semantic_type": "color",
+                "description": "A color as a packed integer"
+              },
+              "description": "The colors of the initial particles of the explosion, randomly selected from."
+            }
+          },
+          {
+            "key": "fade_colors",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "scalar",
+                "type": "int",
+                "semantic_type": "color",
+                "description": "A color as a packed integer"
+              },
+              "description": "The colors of the fading particles of the explosion, randomly selected from."
+            }
+          },
+          {
+            "key": "has_trail",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether or not the explosion has a trail effect (diamond)."
+            }
+          },
+          {
+            "key": "has_twinkle",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether or not the explosion has a twinkle effect (glowstone dust)."
+            }
+          }
+        ],
+        "description": "The explosion effect stored by this firework star ."
+      }
+    },
+    {
+      "id": "minecraft:fireworks",
+      "label": "fireworks",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "flight_duration",
+            "schema": {
+              "kind": "scalar",
+              "type": "byte",
+              "description": "The flight duration of this firework rocket (and the number of gunpowders used to craft it). Must be an integer between -128 and 127. Defaults to 1. If specified, gray \"Flight Duration: <flight_duration> \" text is added to the item's tooltip.",
+              "default": 1,
+              "min": -128,
+              "max": 127
+            }
+          },
+          {
+            "key": "explosions",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "object",
+                "fields": [
+                  {
+                    "key": "shape",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "string",
+                      "description": "The shape of the explosion. Can be small_ball , large_ball , star , creeper , or burst .",
+                      "choices": [
+                        "small_ball",
+                        "large_ball",
+                        "star",
+                        "creeper",
+                        "burst"
+                      ]
+                    }
+                  },
+                  {
+                    "key": "colors",
+                    "schema": {
+                      "kind": "list",
+                      "item": {
+                        "kind": "union",
+                        "options": [
+                          {
+                            "kind": "scalar",
+                            "type": "int"
+                          },
+                          {
+                            "kind": "list",
+                            "item": {
+                              "kind": "scalar",
+                              "type": "string"
+                            }
+                          }
+                        ],
+                        "description": "A color as a packed integer or list of three floats."
+                      },
+                      "description": "The colors of the initial particles of the explosion, randomly selected from."
+                    }
+                  },
+                  {
+                    "key": "fade_colors",
+                    "schema": {
+                      "kind": "list",
+                      "item": {
+                        "kind": "union",
+                        "options": [
+                          {
+                            "kind": "scalar",
+                            "type": "int"
+                          },
+                          {
+                            "kind": "list",
+                            "item": {
+                              "kind": "scalar",
+                              "type": "string"
+                            }
+                          }
+                        ],
+                        "description": "A color as a packed integer or list of three floats."
+                      },
+                      "description": "The colors of the fading particles of the explosion, randomly selected from."
+                    }
+                  },
+                  {
+                    "key": "has_trail",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "boolean",
+                      "description": "Whether or not the explosion has a trail effect (diamond)."
+                    }
+                  },
+                  {
+                    "key": "has_twinkle",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "boolean",
+                      "description": "Whether or not the explosion has a twinkle effect (glowstone dust)."
+                    }
+                  }
+                ],
+                "description": "A single explosion effect."
+              },
+              "description": "List of the explosion effects caused by this firework rocket . Has a maximum of 256 explosions. Each explosion is listed in the item's tooltip as its shape on the first line, then additional information such as color indented on further lines.",
+              "max": 256
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "minecraft:food",
+      "label": "food",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "nutrition",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "The number of food points restored by this item when the player eats. The number of health points restored by this item when used to feed cats. Wolfs, nautilus and zombie nautilus restored the twice the value. Must be a non-negative integer.",
+              "min": 0
+            }
+          },
+          {
+            "key": "saturation",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The amount of saturation restored by this item when eaten."
+            }
+          },
+          {
+            "key": "can_always_eat",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "If true , this item can be eaten even if the player is not hungry. Defaults to false .",
+              "default": false
+            }
+          }
+        ],
+        "description": "The food stats applied to the mob or player upon consuming this item."
+      }
+    },
+    {
+      "id": "minecraft:glider",
+      "label": "glider",
+      "value_schema": {
+        "kind": "object",
+        "fields": [],
+        "description": "If present, this item allows players to glide (as with elytra ) when equipped."
+      }
+    },
+    {
+      "id": "minecraft:instrument",
+      "label": "instrument",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "object",
+            "fields": []
+          },
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "object",
+            "fields": []
+          }
+        ],
+        "description": "One instrument (an ID , or a new instrument definition). If present on an item, the description of the instrument is shown in the item's tooltip as gray text. There are actually two unique states of this component that both register in usage as the minecraft:ponder_goat_horn instrument ID, but they do not stack with each other, only one of them matches a component comparison for that ID, and only one of them gets serialised while the other does not."
+      }
+    },
+    {
+      "id": "minecraft:intangible_projectile",
+      "label": "intangible_projectile",
+      "value_schema": {
+        "kind": "object",
+        "fields": [],
+        "description": "If present on an item that can be used as a projectile without breaking upon impact (such as arrows and tridents), the projectile cannot be picked up by a player once fired, unless they are in creative mode . When present on any item, a line of gray text that says \"Intangible\" is added to the item's tooltip."
+      }
+    },
+    {
+      "id": "minecraft:item_model",
+      "label": "item_model",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "semantic_type": "resource_location",
+        "description": "The resource location of the item, which references the item model definition /assets/<namespace>/items/<id> without the .json suffix. Referencing nonexistent models will cause the missing model to be used, rather than falling back to the item ID's default model."
+      }
+    },
+    {
+      "id": "minecraft:item_name",
+      "label": "item_name",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "reference",
+            "ref": "text_component",
+            "semantic_type": "text_component"
+          }
+        ],
+        "description": "The default name of this item, as a text component. See Text component format . Unlike the minecraft:custom_name component, this name cannot be erased using an anvil, is not italicized, and does not appear in some labels, such as banner markers and item frames."
+      }
+    },
+    {
+      "id": "minecraft:jukebox_playable",
+      "label": "jukebox_playable",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "scalar",
+            "type": "string"
+          }
+        ],
+        "description": "One jukebox song (an ID ) to play when inserted into a jukebox. If present on an item, the item can be inserted into a jukebox to play the specified song. If present on an item, the artist and the title of the song are added to the item's tooltip as gray text."
+      }
+    },
+    {
+      "id": "minecraft:kinetic_weapon",
+      "label": "kinetic_weapon",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "delay_ticks",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "The time in ticks required before weapon is effective. Defaults to 0.",
+              "default": 0
+            }
+          },
+          {
+            "key": "damage_conditions",
+            "schema": {
+              "kind": "reference",
+              "ref": "kinetic_weapon_conditions",
+              "description": "The condition under which the charge attack deals damage."
+            }
+          },
+          {
+            "key": "dismount_conditions",
+            "schema": {
+              "kind": "reference",
+              "ref": "kinetic_weapon_conditions",
+              "description": "The condition under which the charge attack dismounts the target."
+            }
+          },
+          {
+            "key": "knockback_conditions",
+            "schema": {
+              "kind": "reference",
+              "ref": "kinetic_weapon_conditions",
+              "description": "The condition under which the charge attack deals knockback."
+            }
+          },
+          {
+            "key": "forward_movement",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The distance the item moves out of the wielder's hand during its animation. Defaults to 0.0.",
+              "default": 0.0
+            }
+          },
+          {
+            "key": "damage_multiplier",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The multiplier for the final damage from the relative speed. [ note 3 ] Defaults to 1.0.",
+              "default": 1.0
+            }
+          },
+          {
+            "key": "sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "Optional sound event to play when the weapon is engaged."
+            }
+          },
+          {
+            "key": "hit_sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "Optional sound event to play when the weapon hits an entity."
+            }
+          }
+        ],
+        "description": "Enables a charge-type attack when using the item where, while being used, the damage is dealt along a ray every tick based on the relative speed of the entities"
+      }
+    },
+    {
+      "id": "minecraft:lock",
+      "label": "lock",
+      "value_schema": {
+        "kind": "reference",
+        "ref": "item_predicate",
+        "semantic_type": "item_predicate",
+        "description": "An item predicate representing the \"key\" to open this container. If present on a block, players must have an item that passes this predicate in their main hand in order to open the container. If they do not, interacting with the container will play a sound and display a message in the actionbar."
+      }
+    },
+    {
+      "id": "minecraft:lodestone_tracker",
+      "label": "lodestone_tracker",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "target",
+            "schema": {
+              "kind": "object",
+              "fields": [
+                {
+                  "key": "pos",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "int_array",
+                    "description": "The integer coordinates of the lodestone."
+                  }
+                },
+                {
+                  "key": "dimension",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "string",
+                    "description": "The ID of the dimension of the lodestone."
+                  }
+                }
+              ],
+              "description": "Information about the lodestone. Optional. If not set, this compass spins randomly."
+            }
+          },
+          {
+            "key": "tracked",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "If true , the component is removed when the lodestone is broken. If false , the component is kept. Defaults to true .",
+              "default": true
+            }
+          }
+        ],
+        "description": "Stores information about the lodestone this compass should point toward. If present on a compass item, the base item name will be overridden as \"Lodestone Compass\". While tracked in a player's inventory, a compass with this component will do active polling to see if the position of its lodestone is loaded, and if it is and the lodestone has been destroyed then this component is removed."
+      }
+    },
+    {
+      "id": "minecraft:lore",
+      "label": "lore",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "union",
+          "options": [
+            {
+              "kind": "scalar",
+              "type": "string"
+            },
+            {
+              "kind": "reference",
+              "ref": "text_component",
+              "semantic_type": "text_component"
+            }
+          ],
+          "description": "Text component representing a line of text. See Text component format ."
+        },
+        "description": "List of additional lines to display in this item's tooltip. Has a maximum of 256 lines.",
+        "max": 256
+      }
+    },
+    {
+      "id": "minecraft:map_color",
+      "label": "map_color",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The color code for the minecraft:map_color color provider in item model definitions . Normally used by the minecraft:filled_map item model."
+      }
+    },
+    {
+      "id": "minecraft:map_decorations",
+      "label": "map_decorations",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "<key>",
+            "schema": {
+              "kind": "object",
+              "fields": [
+                {
+                  "key": "type",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "string",
+                    "description": "The type of the icon. Can be player , frame , red_marker , blue_marker , target_x , target_point , player_off_map , player_off_limits , mansion , monument , banner_white , banner_orange , banner_magenta , banner_light_blue , banner_yellow , banner_lime , banner_pink , banner_gray , banner_light_gray , banner_cyan , banner_purple , banner_blue , banner_brown , banner_green , banner_red , banner_black , red_x , village_desert , village_plains , village_savanna , village_snowy , village_taiga , jungle_temple , or swamp_hut .",
+                    "choices": [
+                      "player",
+                      "frame",
+                      "red_marker",
+                      "blue_marker",
+                      "target_x",
+                      "target_point",
+                      "player_off_map",
+                      "player_off_limits",
+                      "mansion",
+                      "monument",
+                      "banner_white",
+                      "banner_orange",
+                      "banner_magenta",
+                      "banner_light_blue",
+                      "banner_yellow",
+                      "banner_lime",
+                      "banner_pink",
+                      "banner_gray",
+                      "banner_light_gray",
+                      "banner_cyan",
+                      "banner_purple",
+                      "banner_blue",
+                      "banner_brown",
+                      "banner_green",
+                      "banner_red",
+                      "banner_black",
+                      "red_x",
+                      "village_desert",
+                      "village_plains",
+                      "village_savanna",
+                      "village_snowy",
+                      "village_taiga",
+                      "jungle_temple",
+                      "swamp_hut"
+                    ]
+                  }
+                },
+                {
+                  "key": "x",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "double",
+                    "description": "The X world coordinate of the decoration."
+                  }
+                },
+                {
+                  "key": "z",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "double",
+                    "description": "The Z world coordinate of the decoration."
+                  }
+                },
+                {
+                  "key": "rotation",
+                  "schema": {
+                    "kind": "scalar",
+                    "type": "float",
+                    "description": "The rotation of the icon, ranging from 0.0 to 360.0, rotated clockwise from north in degrees."
+                  }
+                }
+              ],
+              "description": "The key-value pair of a single icon, where the key is an arbitrary unique string identifying the decoration."
+            }
+          }
+        ],
+        "description": "Contains key-value pairs of the icons to display on this filled map ."
+      }
+    },
+    {
+      "id": "minecraft:map_id",
+      "label": "map_id",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The number of this filled map , representing the shared state holding map contents and markers."
+      }
+    },
+    {
+      "id": "minecraft:max_damage",
+      "label": "max_damage",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The maximum amount of damage that this item can take. If not set, this item cannot take damage. Must be a non-zero positive integer. Cannot be combined with minecraft:max_stack_size if it has a value greater than 1 (if the item can be stacked). For the durability bar to appear, the damage component must have a value. Example damage=0 ."
+      }
+    },
+    {
+      "id": "minecraft:max_stack_size",
+      "label": "max_stack_size",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The maximum number of items that can fit in a stack. Must be a positive integer between 1 and 99 (inclusive). If it has a value greater than 1 (if the item can be stacked), cannot be combined with minecraft:max_damage . If this component is removed, it will behave as though it was set to 1.",
+        "min": 1,
+        "max": "99 (inclusive)"
+      }
+    },
+    {
+      "id": "minecraft:minimum_attack_charge",
+      "label": "minimum_attack_charge",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "float",
+        "description": "Sets the minimum attack charge on the attack indicator required to attack with this item. Must be a non-negative float between 0.0 and 1.0",
+        "min": 0.0,
+        "max": 1
+      }
+    },
+    {
+      "id": "minecraft:note_block_sound",
+      "label": "note_block_sound",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "semantic_type": "sound_event",
+        "description": "The ID of the sound event played by a note block when this player head is placed above."
+      }
+    },
+    {
+      "id": "minecraft:ominous_bottle_amplifier",
+      "label": "ominous_bottle_amplifier",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The amplifier of the Bad Omen effect given to the player or mob upon consuming this item (normally an ominous bottle ). Must be a non-negative integer from 0 to 4 (inclusive). The duration of the effect is always 120000 ticks (1 hour and 40 minutes at the normal tick rate) and minecraft:potion_duration_scale is ignored. If present on an item, information about the mob effect is added to the tooltip, in the same format as the minecraft:potion_contents component.",
+        "min": 0
+      }
+    },
+    {
+      "id": "minecraft:piercing_weapon",
+      "label": "piercing_weapon",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "deals_knockback",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether the attack deals knockback. Defaults to true.",
+              "default": true
+            }
+          },
+          {
+            "key": "dismounts",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether the attack dismounts the target. Defaults to false.",
+              "default": false
+            }
+          },
+          {
+            "key": "sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "Optional sound event to play when a player attacks with the weapon."
+            }
+          },
+          {
+            "key": "hit_sound",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "reference",
+                  "ref": "sound_event",
+                  "semantic_type": "sound_event"
+                }
+              ],
+              "description": "Optional sound event to play when the weapon hits an entity."
+            }
+          }
+        ],
+        "description": "Melee attacks using this item damage multiple entities along a ray, instead of only a single entity. Also prevents this item from being used to mine blocks."
+      }
+    },
+    {
+      "id": "minecraft:pot_decorations",
+      "label": "pot_decorations",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "The ID of an item. Can be either brick or a sherd .",
+          "choices": [
+            "either brick",
+            "a sherd"
+          ]
+        },
+        "description": "A list of the items (typically pottery sherds or bricks) applied on each face of this decorated pot . If the list is specified with less than 4 entries, the remaining ones default to \"minecraft:brick\" . The first entry is the front face of the pot, and subsequent entries are the faces going clockwise around the pot. If this component is present on an item, the item's tooltip will list the translated names of each of the items in the same order."
+      }
+    },
+    {
+      "id": "minecraft:potion_contents",
+      "label": "potion_contents",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "reference",
+            "ref": "potion_contents"
+          }
+        ],
+        "description": "The base potion, custom list of mob effects , and custom color contained in this potion , splash potion , lingering potion , tipped arrow , or area effect cloud . When present on an item, the mob effects are listed in the item's tooltip. If this and a minecraft:consumable component are present on an item, consuming the item will apply all of the effects from this component to the player or mob that consumed it. If defined as a string, corresponds to ."
+      }
+    },
+    {
+      "id": "minecraft:potion_duration_scale",
+      "label": "potion_duration_scale",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "float",
+        "description": "When present on an item or area effect cloud that has the minecraft:potion_contents component, the duration of the applied effects is scaled by this factor."
+      }
+    },
+    {
+      "id": "minecraft:profile",
+      "label": "profile",
+      "value_schema": {
+        "kind": "union",
+        "options": [
+          {
+            "kind": "scalar",
+            "type": "string"
+          },
+          {
+            "kind": "object",
+            "fields": []
+          }
+        ],
+        "description": "Provides the textures needed for rendering player models ( player head blocks, player head item models, and mannequins ) and player face sprites . Each texture can be provided either as the namespaced path to a texture in a resource pack, or from a player profile. A player profile can be specified either as player information whose profile properties must be requested on the fly, or a list of already-resolved profile properties."
+      }
+    },
+    {
+      "id": "minecraft:provides_banner_patterns",
+      "label": "provides_banner_patterns",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "description": "When present, this item can be placed in the pattern slot of a loom and provides the specified banner pattern tag. Must be a tag prefixed with # ."
+      }
+    },
+    {
+      "id": "minecraft:provides_trim_material",
+      "label": "provides_trim_material",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "description": "When present, this item provides the specified trim material when used in a trimming recipe. [ note 4 ]"
+      }
+    },
+    {
+      "id": "minecraft:rarity",
+      "label": "rarity",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "description": "Sets the rarity of this item, which affects the default color of its name. Can be common , uncommon , rare , or epic . If this component does not exist on the item, then common is used.",
+        "choices": [
+          "common",
+          "uncommon",
+          "rare",
+          "epic"
+        ]
+      }
+    },
+    {
+      "id": "minecraft:recipes",
+      "label": "recipes",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "The ID of a recipe ."
+        },
+        "description": "The recipes that a player unlocks when this knowledge book is used."
+      }
+    },
+    {
+      "id": "minecraft:repair_cost",
+      "label": "repair_cost",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "int",
+        "description": "The number of experience levels to add to the base level cost when repairing, combining, or renaming this item with an anvil . Must be a non-negative integer, defaults to 0.",
+        "min": 0
+      }
+    },
+    {
+      "id": "minecraft:repairable",
+      "label": "repairable",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "items",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "list",
+                  "item": {
+                    "kind": "scalar",
+                    "type": "string"
+                  }
+                }
+              ],
+              "description": "Item, list of Items, or hash-prefixed Item Tag matching what can be used to repair this item."
+            }
+          }
+        ],
+        "description": "Allows the item to be repaired, if damageable, in an anvil using the specified ingredient. Also repairs equipped items in the body slot of a tamed wolf."
+      }
+    },
+    {
+      "id": "minecraft:stored_enchantments",
+      "label": "stored_enchantments",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "<enchantment ID>",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "semantic_type": "resource_location",
+              "description": "A single key-value pair, where the key is the resource location of an enchantment, and the value is the level."
+            }
+          }
+        ],
+        "description": "Contains a map of inactive enchantments and their levels. Adding this component to any item other than an enchanted book does nothing except add text to the item's tooltip. If this component is removed from an enchanted book, the item can no longer be combined with other enchanted books. If present on an item, the enchantments are listed in the item's tooltip. The order of the enchantments in the tooltip is defined by the #minecraft:tooltip_order enchantment tag."
+      }
+    },
+    {
+      "id": "minecraft:suspicious_stew_effects",
+      "label": "suspicious_stew_effects",
+      "value_schema": {
+        "kind": "list",
+        "item": {
+          "kind": "object",
+          "fields": [
+            {
+              "key": "id",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "description": "The ID of the effect."
+              }
+            },
+            {
+              "key": "duration",
+              "schema": {
+                "kind": "scalar",
+                "type": "int",
+                "description": "The duration of the effect in ticks . Defaults to 160.",
+                "default": 160
+              }
+            }
+          ],
+          "description": "A single custom effect."
+        },
+        "description": "A list of unamplified mob effects given to the player or mob upon consuming this item (normally a suspicious stew ). minecraft:potion_duration_scale is ignored. When present on an item, text is added to the item's tooltip only when it is inside of the item selection screen ."
+      }
+    },
+    {
+      "id": "minecraft:swing_animation",
+      "label": "swing_animation",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "type",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The type of swinging animation. Can be none , whack , stab . Defaults to whack .",
+              "default": "whack",
+              "choices": [
+                "none",
+                "whack",
+                "stab"
+              ]
+            }
+          },
+          {
+            "key": "duration",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "A positive integer that determines the animation's duration in ticks . Defaults to 6 .",
+              "default": 6
+            }
+          }
+        ],
+        "description": "Allows modification of the swinging animation."
+      }
+    },
+    {
+      "id": "minecraft:tool",
+      "label": "tool",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "default_mining_speed",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The default mining speed of this tool, used if no rules override it. Defaults to 1.0.",
+              "default": 1.0
+            }
+          },
+          {
+            "key": "damage_per_block",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "The amount of durability to remove each time a block is broken with this tool. Must be a non-negative integer. Defaults to 1.",
+              "default": 1,
+              "min": 0
+            }
+          },
+          {
+            "key": "can_destroy_blocks_in_creative",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether players can break blocks while holding this tool in Creative mode. Defaults to true .",
+              "default": true
+            }
+          },
+          {
+            "key": "rules",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "object",
+                "fields": [
+                  {
+                    "key": "blocks",
+                    "schema": {
+                      "kind": "union",
+                      "options": [
+                        {
+                          "kind": "scalar",
+                          "type": "string"
+                        },
+                        {
+                          "kind": "list",
+                          "item": {
+                            "kind": "scalar",
+                            "type": "string"
+                          }
+                        }
+                      ],
+                      "description": "The blocks to match with. Can be a block ID or a block tag with a # , or a list of block IDs.",
+                      "choices": [
+                        "a block ID",
+                        "a block tag with a #",
+                        "a list of block IDs"
+                      ]
+                    }
+                  },
+                  {
+                    "key": "speed",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "float",
+                      "description": "If the blocks match, overrides the default mining speed. Optional."
+                    }
+                  },
+                  {
+                    "key": "correct_for_drops",
+                    "schema": {
+                      "kind": "scalar",
+                      "type": "boolean",
+                      "description": "If the blocks match, overrides whether or not this tool is considered correct to mine at its most efficient speed, and to drop items if the block's loot table requires it. If not set by any rules, defaults to false . Optional."
+                    }
+                  }
+                ],
+                "description": "A single rule."
+              },
+              "description": "A list of rules for the blocks that this tool has a special behavior with. If a field is overridden by multiple matched rules, the one that comes first in the list is chosen."
+            }
+          }
+        ],
+        "description": "If set, this item is considered as a tool ."
+      }
+    },
+    {
+      "id": "minecraft:tooltip_display",
+      "label": "tooltip_display",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "hide_tooltip",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "If true, the item has no tooltip when hovered."
+            }
+          },
+          {
+            "key": "hidden_components",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "scalar",
+                "type": "string",
+                "semantic_type": "resource_location",
+                "description": "The resource location of a component"
+              },
+              "description": "The tooltips provided by any component in this list are hidden. If that component provides no tooltip, it has no effect."
+            }
+          }
+        ],
+        "description": "Allows the tooltips provided specifically by any given item component to be suppressed."
+      }
+    },
+    {
+      "id": "minecraft:tooltip_style",
+      "label": "tooltip_style",
+      "value_schema": {
+        "kind": "scalar",
+        "type": "string",
+        "semantic_type": "resource_location",
+        "description": "The resource location of the custom sprites for the tooltip background and frame which references textures /assets/<namespace>/textures/gui/sprites/tooltip/<id>_background and /assets/<namespace>/textures/gui/sprites/tooltip/<id>_frame . Instead of falling back to the default value, invalid specifications will use the missing texture ."
+      }
+    },
+    {
+      "id": "minecraft:trim",
+      "label": "trim",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "pattern",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The ID of the trim pattern."
+            }
+          },
+          {
+            "key": "material",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The ID of the trim material, which applies a color to the trim."
+            }
+          }
+        ],
+        "description": "Contains the trim applied to this armor piece. If present on an item, information about the armor trim is added to the item's tooltip."
+      }
+    },
+    {
+      "id": "minecraft:unbreakable",
+      "label": "unbreakable",
+      "value_schema": {
+        "kind": "object",
+        "fields": [],
+        "description": "If set, this item cannot lose durability, and blue \"Unbreakable\" text will appear in the item's tooltip."
+      }
+    },
+    {
+      "id": "minecraft:use_cooldown",
+      "label": "use_cooldown",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "seconds",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The use cooldown duration in seconds."
+            }
+          },
+          {
+            "key": "cooldown_group",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "semantic_type": "resource_location",
+              "description": "The unique resource location to identify this cooldown group. If present, the item is included in a use cooldown group and no longer shares cooldowns with its base item type, but instead with any other items that are part of the same use cooldown group. Optional."
+            }
+          }
+        ],
+        "description": "If present, this item applies a use cooldown to all items of the same type when it has been used."
+      }
+    },
+    {
+      "id": "minecraft:use_effects",
+      "label": "use_effects",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "can_sprint",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "If the player can sprint during use. Defaults to false .",
+              "default": false
+            }
+          },
+          {
+            "key": "speed_multiplier",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "A ranged float (0.0-1.0 inclusive) speed multiplier inflicted during use. Defaults to 0.2 .",
+              "default": 0.2
+            }
+          },
+          {
+            "key": "interact_vibrations",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "description": "Whether using this item emits the minecraft:item_interact_start and minecraft:item_interact_finish game events . Defaults to true .",
+              "default": true
+            }
+          }
+        ],
+        "description": "Defines the vibrations and player movement penalties when an item with a continuous use action is being used."
+      }
+    },
+    {
+      "id": "minecraft:use_remainder",
+      "label": "use_remainder",
+      "value_schema": {
+        "kind": "reference",
+        "ref": "item_stack",
+        "description": "If present, replaces the item with a remainder item if its stack count has decreased after use."
+      }
+    },
+    {
+      "id": "minecraft:weapon",
+      "label": "weapon",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "item_damage_per_attack",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "The amount to damage the item for each attack performed. Defaults to 1 .",
+              "default": 1
+            }
+          },
+          {
+            "key": "disable_blocking_for_seconds",
+            "schema": {
+              "kind": "scalar",
+              "type": "float",
+              "description": "The amount of seconds that this item can disable a blocking shield on successful attack. If set to 0, this item cannot disable a blocking shield. Defaults to 0 .",
+              "default": 0
+            }
+          }
+        ],
+        "description": "When present, the specified amount of damage can be done to the item with each attack. Additionally, the 'Item Used' statistic is incremented for each attack with the item."
+      }
+    },
+    {
+      "id": "minecraft:writable_book_content",
+      "label": "writable_book_content",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "pages",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "union",
+                "options": [
+                  {
+                    "kind": "scalar",
+                    "type": "string"
+                  },
+                  {
+                    "kind": "object",
+                    "fields": []
+                  },
+                  {
+                    "kind": "scalar",
+                    "type": "string"
+                  }
+                ],
+                "description": "The title of this written book. If set to a string, it corresponds to ."
+              },
+              "description": "A list of the pages in the book."
+            }
+          }
+        ],
+        "description": "The contents of this book and quill . Adding this component to any item other than a writable_book does nothing. If this component is removed from a writable_book item, attempting to use the item will still swing the arm and increment its used statistic, but no UI will appear."
+      }
+    },
+    {
+      "id": "minecraft:written_book_content",
+      "label": "written_book_content",
+      "value_schema": {
+        "kind": "object",
+        "fields": [
+          {
+            "key": "pages",
+            "schema": {
+              "kind": "list",
+              "item": {
+                "kind": "union",
+                "options": [
+                  {
+                    "kind": "object",
+                    "fields": []
+                  },
+                  {
+                    "kind": "scalar",
+                    "type": "string"
+                  },
+                  {
+                    "kind": "list",
+                    "item": {
+                      "kind": "scalar",
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "kind": "object",
+                    "fields": []
+                  },
+                  {
+                    "kind": "scalar",
+                    "type": "string"
+                  },
+                  {
+                    "kind": "list",
+                    "item": {
+                      "kind": "scalar",
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "kind": "object",
+                    "fields": []
+                  }
+                ],
+                "description": "or : A single page. If set to a string, list, or compound with no raw or filtered tags in it, it corresponds to ."
+              },
+              "description": "A list of the pages in the book."
+            }
+          },
+          {
+            "key": "title",
+            "schema": {
+              "kind": "union",
+              "options": [
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                },
+                {
+                  "kind": "object",
+                  "fields": []
+                },
+                {
+                  "kind": "scalar",
+                  "type": "string"
+                }
+              ],
+              "description": "The title of this written book. Overrides the base item name. If set to an empty string, it is ignored and does not override the base item name. If set to a string, it corresponds to ."
+            }
+          },
+          {
+            "key": "author",
+            "schema": {
+              "kind": "scalar",
+              "type": "string",
+              "description": "The author of this written book. This is shown in the item tooltip."
+            }
+          },
+          {
+            "key": "generation",
+            "schema": {
+              "kind": "scalar",
+              "type": "int",
+              "description": "The number of times this written book has been copied. 0 = original, 1 = copy of original, 2 = copy of copy, 3 = tattered. Defaults to 0. If the value is greater than 1, the book cannot be copied. If specified, this is shown in the item tooltip.",
+              "default": 0
+            }
+          },
+          {
+            "key": "resolved",
+            "schema": {
+              "kind": "scalar",
+              "type": "boolean",
+              "semantic_type": "text_component",
+              "description": "If true , the text components have already been resolved by the server. If false , they are resolved either when the book is opened by an operator, when the book is placed into a lectern by an operator, or when the item stack is written to a lectern's Book tag by a command. Defaults to false .",
+              "default": false
+            }
+          }
+        ],
+        "description": "The contents and metadata of this written book . Adding this component to any item other than a written_book does nothing except add text to the item tooltip. If this component is removed from a written_book item, attempting to use the item will still swing the arm and increment its used statistic, but no UI will appear."
+      }
+    }
+  ]
+}
