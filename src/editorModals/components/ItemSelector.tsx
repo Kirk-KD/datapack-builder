@@ -6,6 +6,7 @@ import './ItemSelector.css'
 type ItemSelectorProps = {
   value: string
   onChange: (value: string) => void
+  onResolvedChange?: (value: { value: string; spriteFileName: string }) => void
   columns?: number
   layout?: 'auto' | 'fill'
 }
@@ -48,7 +49,7 @@ function ItemSprite({ spriteFileName, large = false }: { spriteFileName: string;
   )
 }
 
-function ItemSelector({ value, onChange, columns = 2, layout = 'auto' }: ItemSelectorProps) {
+function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout = 'auto' }: ItemSelectorProps) {
   const [entries, setEntries] = useState<MinecraftItemEntry[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const deferredValue = useDeferredValue(value)
@@ -90,6 +91,18 @@ function ItemSelector({ value, onChange, columns = 2, layout = 'auto' }: ItemSel
   const exactMatch = entries ? getEntryByName(entries, value.trim()) : null
   const selectedEntry = exactMatch ?? placeholderEntry
 
+  function emitValueChange(nextValue: string) {
+    onChange(nextValue)
+
+    if (!onResolvedChange) return
+
+    const nextMatch = entries ? getEntryByName(entries, nextValue.trim()) : null
+    onResolvedChange({
+      value: nextValue,
+      spriteFileName: nextMatch?.spriteFileName ?? '',
+    })
+  }
+
   return (
     <div className={`itemSelector${layout === 'fill' ? ' itemSelectorFill' : ''}`}>
       <div className="editorModalControl editorModalFieldRow">
@@ -103,7 +116,7 @@ function ItemSelector({ value, onChange, columns = 2, layout = 'auto' }: ItemSel
         <input
           type="text"
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => emitValueChange(event.target.value)}
           className="editorModalInput editorModalInputBare"
           placeholder={placeholderEntry?.name ?? 'minecraft item'}
           spellCheck={false}
@@ -113,7 +126,7 @@ function ItemSelector({ value, onChange, columns = 2, layout = 'auto' }: ItemSel
           <button
             type="button"
             className="editorModalIconButton"
-            onClick={() => onChange('')}
+            onClick={() => emitValueChange('')}
             aria-label="Clear search"
           >
             <img src="/clear.svg" alt="" aria-hidden="true" />
@@ -140,7 +153,7 @@ function ItemSelector({ value, onChange, columns = 2, layout = 'auto' }: ItemSel
                 key={entry.name}
                 type="button"
                 className={`itemSelectorEntry${isActive ? ' is-active' : ''}`}
-                onClick={() => onChange(entry.name)}
+                onClick={() => emitValueChange(entry.name)}
               >
                 {entry.spriteFileName ? (
                   <ItemSprite spriteFileName={entry.spriteFileName} />
