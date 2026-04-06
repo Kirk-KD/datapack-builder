@@ -160,7 +160,7 @@
                     "schema": {
                       "kind": "scalar",
                       "type": "string",
-                      "description": "Display type. Can be default , hidden or override .",
+                      "description": "Display type. Can be default, hidden, or override.",
                       "choices": [
                         "default",
                         "hidden",
@@ -213,7 +213,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "string",
-        "description": "The base dye color of the banner applied on a shield. If neither this nor minecraft:banner_patterns is specified, then the shield model will show its normal wooden texture. If the minecraft:banner_patterns component is specified but this component is not, then white is used as the base banner color. If present on a shield item, the item name is overridden as \"<color> Shield\" (e.g. if set to green , the name will be \"Green Shield\").",
+        "description": "The base dye color of the banner applied on a shield. If neither this nor minecraft:banner_patterns is specified, then the shield model will show its normal wooden texture. If the minecraft:banner_patterns component is specified but this component is not, then white is used as the base banner color. If present on a shield item, the item name is overridden as \"<color> Shield\" (e.g. if set to green, the name will be \"Green Shield\").",
         "choices": ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"],
         "default": "white"
       }
@@ -324,7 +324,7 @@
                         "kind": "scalar",
                         "type": "string"
                       },
-                      "description": "Any number of damage type (s) (an ID, or a tag with #, or an array containing IDs) to block. Defaults to all damage types."
+                      "description": "Any number of damage type(s) (an ID, or a tag with #, or an array containing IDs) to block. Defaults to all damage types."
                     }
                   },
                   {
@@ -348,7 +348,7 @@
                     "schema": {
                       "kind": "scalar",
                       "type": "float",
-                      "description": "Positive float number. The maximum angle between the users facing direction and the direction of the incoming attack to be blocked. Defaults to 90 .",
+                      "description": "Positive float number. The maximum angle between the user's facing direction and the direction of the incoming attack to be blocked. Defaults to 90.",
                       "default": 90
                     }
                   }
@@ -368,7 +368,7 @@
                   "schema": {
                     "kind": "scalar",
                     "type": "float",
-                    "description": "The minimum amount of damage dealt by the attack before item damage is applied to the item. Defaults to 0 .",
+                    "description": "The minimum amount of damage dealt by the attack before item damage is applied to the item. Defaults to 0.",
                     "default": 0
                   }
                 },
@@ -377,7 +377,7 @@
                   "schema": {
                     "kind": "scalar",
                     "type": "float",
-                    "description": "The constant amount of damage applied to the item, if threshold is passed. Defaults to 0 .",
+                    "description": "The constant amount of damage applied to the item, if threshold is passed. Defaults to 0.",
                     "default": 0
                   }
                 },
@@ -386,7 +386,7 @@
                   "schema": {
                     "kind": "scalar",
                     "type": "float",
-                    "description": "The fraction of the dealt damage that should be applied to the item, if threshold is passed. Defaults to 1.5 .",
+                    "description": "The fraction of the dealt damage that should be applied to the item, if threshold is passed. Defaults to 1.5.",
                     "default": 1.5
                   }
                 }
@@ -418,7 +418,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "a damage type tag with # of damage types that bypass the blocking. Defaults to none."
+              "description": "A damage type tag with # of damage types that bypass the blocking. Defaults to none."
             }
           }
         ],
@@ -485,7 +485,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Turns into AgeLocked entity tag for axolotls and tadpoles ."
+              "description": "Turns into AgeLocked entity tag for axolotls and tadpoles."
             }
           },
           {
@@ -527,7 +527,7 @@
           "ref": "item_stack",
           "description": "A single item stack."
         },
-        "description": "The items stored inside this bundle. Adding this component to any item other than a bundle does nothing. If this component is removed from a bundle , it cannot be used by the player and the usual instruction and fullness bar does not appear in the tooltip."
+        "description": "The items stored inside this bundle. Adding this component to any item other than a bundle does nothing. If this component is removed from a bundle, it cannot be used by the player and the usual instruction and fullness bar does not appear in the tooltip."
       }
     },
     {
@@ -567,7 +567,7 @@
           "ref": "item_stack",
           "description": "A single projectile item stack."
         },
-        "description": "The items loaded as projectiles into this crossbow. If there are item stacks in this component, the item name for item stack is listed in the tooltip of the item as \"Projectile: [<name>]\", and any duplicate item stack entries are grouped together as \"Projectile: N x [ <name> ]\". If not present, this crossbow is not charged."
+        "description": "The items loaded as projectiles into this crossbow. If there are item stacks in this component, the item name for item stack is listed in the tooltip of the item as \"Projectile: [<name>]\", and any duplicate item stack entries are grouped together as \"Projectile: N x [<name>]\". If not present, this crossbow is not charged."
       }
     },
     {
@@ -590,7 +590,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "The animation used during consumption of the item. Must be one of none , eat , drink , block , bow , spear , crossbow , spyglass , toot_horn , brush , bundle , or trident . Defaults to eat .",
+              "description": "The animation used during consumption of the item. Must be one of none, eat, drink, block, bow, spear, crossbow, spyglass, toot_horn, brush, bundle, or trident. Defaults to eat.",
               "default": "eat"
             }
           },
@@ -609,7 +609,7 @@
                   "semantic_type": "sound_event"
                 }
               ],
-              "description": "One sound event (an ID , or a new sound event definition) used during and on completion of the item's consumption. Defaults to entity.generic.eat .",
+              "description": "One sound event (an ID, or a new sound event definition) used during and on completion of the item's consumption. Defaults to entity.generic.eat.",
               "default": "entity.generic.eat"
             }
           },
@@ -618,7 +618,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether consumption particles are emitted while consuming this item. Defaults to true .",
+              "description": "Whether consumption particles are emitted while consuming this item. Defaults to true.",
               "default": true
             }
           },
@@ -665,7 +665,7 @@
           ],
           "description": "A single item."
         },
-        "description": "The items contained in this container 's slots. If present on an item, the first 5 item slots in the container are listed in the tooltip, and the number of any extra slots are listed as \" and <N> more... \" underneath (only seen on shulker boxes in normal gameplay or ctrl-middle-clicked containers in creative mode). This component supports up to 256 item slots but, when present on some block entities, the number of slots may be artificially limited based on the number of slots the block needs (e.g. 1 for decorated pots, and 27 for chests)."
+        "description": "The items contained in this container's slots. If present on an item, the first 5 item slots in the container are listed in the tooltip, and the number of any extra slots are listed as \" and <N> more... \" underneath (only seen on shulker boxes in normal gameplay or ctrl-middle-clicked containers in creative mode). This component supports up to 256 item slots but, when present on some block entities, the number of slots may be artificially limited based on the number of slots the block needs (e.g. 1 for decorated pots, and 27 for chests)."
       }
     },
     {
@@ -679,7 +679,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "The ID of a loot table ."
+              "description": "The ID of a loot table."
             }
           },
           {
@@ -820,7 +820,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "A damage type tag prefixed with # ."
+              "description": "A damage type tag prefixed with #."
             }
           }
         ],
@@ -833,7 +833,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "string",
-        "description": "Specifies the damage type this item deals"
+        "description": "Specifies the damage type this item deals."
       }
     },
     {
@@ -872,9 +872,9 @@
         "value": {
           "kind": "scalar",
           "type": "string",
-          "description": "A key-value pair, where the key is a block ID and the value is a block state key to edit on the block, for example \"minecraft:oak_fence\": \"east\" ."
+          "description": "A key-value pair, where the key is a block ID and the value is a block state key to edit on the block, for example \"minecraft:oak_fence\": \"east\"."
         },
-        "description": "The selected block state properties used by this debug stick ."
+        "description": "The selected block state properties used by this debug stick."
       }
     },
     {
@@ -883,7 +883,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "string",
-        "description": "When present on an item, stores the color of dye that this item can be used as for the purpose of crafting recipes and mob or block interactions. Can be one of white , orange , magenta , light_blue , yellow , lime , pink , gray , light_gray , cyan , purple , blue , brown , green , red , or black .",
+        "description": "When present on an item, stores the color of dye that this item can be used as for the purpose of crafting recipes and mob or block interactions. Can be one of white, orange, magenta, light_blue, yellow, lime, pink, gray, light_gray, cyan, purple, blue, brown, green, red, or black.",
         "choices": [
           "one of white",
           "orange",
@@ -924,7 +924,7 @@
             "schema": {
               "kind": "scalar",
               "type": "int",
-              "description": "Positive integer representing the item's enchantability . A higher value allows enchantments with a higher cost to be picked."
+              "description": "Positive integer representing the item's enchantability. A higher value allows enchantments with a higher cost to be picked."
             }
           }
         ],
@@ -937,7 +937,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "boolean",
-        "description": "Overrides the enchantment glint effect on this item. When true , this item displays a glint, even without enchantments. When false , this item does not display a glint, even with enchantments."
+        "description": "Overrides the enchantment glint effect on this item. When true, this item displays a glint, even without enchantments. When false, this item does not display a glint, even with enchantments."
       }
     },
     {
@@ -979,7 +979,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "The slot to put the item on. Can be one of head , chest , legs , feet , body , mainhand , offhand , or saddle"
+              "description": "The slot to put the item on. Can be one of head, chest, legs, feet, body, mainhand, offhand, or saddle"
             }
           },
           {
@@ -997,7 +997,7 @@
                   "semantic_type": "sound_event"
                 }
               ],
-              "description": "One sound event (an ID , or a new sound event definition) to play when the item is equipped. Defaults to item.armor.equip_generic .",
+              "description": "One sound event (an ID, or a new sound event definition) to play when the item is equipped. Defaults to item.armor.equip_generic.",
               "default": "item.armor.equip_generic"
             }
           },
@@ -1007,7 +1007,7 @@
               "kind": "scalar",
               "type": "string",
               "semantic_type": "resource_location",
-              "description": "The resource location of the equipment model to use when equipped. The directory this refers to is assets/<namespace>/equipment/<id>.json . If not specified, falls back to rendering as the item itself when in the head slot (if not applicable, the item does not render)."
+              "description": "The resource location of the equipment model to use when equipped. The directory this refers to is assets/<namespace>/equipment/<id>.json. If not specified, falls back to rendering as the item itself when in the head slot (if not applicable, the item does not render)."
             }
           },
           {
@@ -1035,7 +1035,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether the item can be dispensed by using a dispenser . [ note 2 ] Defaults to true .",
+              "description": "Whether the item can be dispensed by using a dispenser. [note 2] Defaults to true.",
               "default": true
             }
           },
@@ -1044,7 +1044,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether the item can be equipped into the relevant slot by right-clicking. Defaults to true .",
+              "description": "Whether the item can be equipped into the relevant slot by right-clicking. Defaults to true.",
               "default": true
             }
           },
@@ -1053,7 +1053,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether this item is damaged when the wearing entity is damaged. Defaults to true .",
+              "description": "Whether this item is damaged when the wearing entity is damaged. Defaults to true.",
               "default": true
             }
           },
@@ -1062,7 +1062,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether this item can be equipped onto a target mob by pressing on it (as long as this item can be equipped on the target at all). Defaults to false .",
+              "description": "Whether this item can be equipped onto a target mob by pressing on it (as long as this item can be equipped on the target at all). Defaults to false.",
               "default": false
             }
           },
@@ -1072,7 +1072,7 @@
               "kind": "scalar",
               "type": "string",
               "semantic_type": "resource_location",
-              "description": "The resource location of the overlay texture to use when equipped. The directory this refers to is assets/<namespace>/textures/<id> . Assets which do not exist will use the missing texture , rather than falling back to a default such as the pumpkin overlay."
+              "description": "The resource location of the overlay texture to use when equipped. The directory this refers to is assets/<namespace>/textures/<id>. Assets which do not exist will use the missing texture, rather than falling back to a default such as the pumpkin overlay."
             }
           },
           {
@@ -1080,7 +1080,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether this item can be unequipped from a target mob by right-clicking with Shears. Defaults to false .",
+              "description": "Whether this item can be unequipped from a target mob by right-clicking with Shears. Defaults to false.",
               "default": false
             }
           },
@@ -1099,7 +1099,7 @@
                   "semantic_type": "sound_event"
                 }
               ],
-              "description": "One sound event (an ID , or a new sound event definition) to play when the item is sheared. Defaults to item.shears.snip .",
+              "description": "One sound event (an ID, or a new sound event definition) to play when the item is sheared. Defaults to item.shears.snip.",
               "default": "item.shears.snip"
             }
           }
@@ -1118,7 +1118,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "The shape of the explosion. Can be small_ball , large_ball , star , creeper , or burst .",
+              "description": "The shape of the explosion. Can be small_ball, large_ball, star, creeper, or burst.",
               "choices": [
                 "small_ball",
                 "large_ball",
@@ -1171,7 +1171,7 @@
             }
           }
         ],
-        "description": "The explosion effect stored by this firework star ."
+        "description": "The explosion effect stored by this firework star."
       }
     },
     {
@@ -1185,7 +1185,7 @@
             "schema": {
               "kind": "scalar",
               "type": "byte",
-              "description": "The flight duration of this firework rocket (and the number of gunpowders used to craft it). Must be an integer between -128 and 127. Defaults to 1. If specified, gray \"Flight Duration: <flight_duration> \" text is added to the item's tooltip.",
+              "description": "The flight duration of this firework rocket (and the number of gunpowders used to craft it). Must be an integer between -128 and 127. Defaults to 1. If specified, gray \"Flight Duration: <flight_duration>\" text is added to the item's tooltip.",
               "default": 1,
               "min": -128,
               "max": 127
@@ -1203,7 +1203,7 @@
                     "schema": {
                       "kind": "scalar",
                       "type": "string",
-                      "description": "The shape of the explosion. Can be small_ball , large_ball , star , creeper , or burst .",
+                      "description": "The shape of the explosion. Can be small_ball, large_ball, star, creeper, or burst.",
                       "choices": [
                         "small_ball",
                         "large_ball",
@@ -1280,7 +1280,7 @@
                 ],
                 "description": "A single explosion effect."
               },
-              "description": "List of the explosion effects caused by this firework rocket . Has a maximum of 256 explosions. Each explosion is listed in the item's tooltip as its shape on the first line, then additional information such as color indented on further lines.",
+              "description": "List of the explosion effects caused by this firework rocket. Has a maximum of 256 explosions. Each explosion is listed in the item's tooltip as its shape on the first line, then additional information such as color indented on further lines.",
               "max": 256
             }
           }
@@ -1298,7 +1298,7 @@
             "schema": {
               "kind": "scalar",
               "type": "int",
-              "description": "The number of food points restored by this item when the player eats. The number of health points restored by this item when used to feed cats. Wolfs, nautilus and zombie nautilus restored the twice the value. Must be a non-negative integer.",
+              "description": "The number of food points restored by this item when the player eats. The number of health points restored by this item when used to feed cats. Wolves, nautilus and zombie nautilus restore twice the value. Must be a non-negative integer.",
               "min": 0
             }
           },
@@ -1315,7 +1315,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "If true , this item can be eaten even if the player is not hungry. Defaults to false .",
+              "description": "If true, this item can be eaten even if the player is not hungry. Defaults to false.",
               "default": false
             }
           }
@@ -1329,7 +1329,7 @@
       "value_schema": {
         "kind": "object",
         "fields": [],
-        "description": "If present, this item allows players to glide (as with elytra ) when equipped."
+        "description": "If present, this item allows players to glide (as with elytra) when equipped."
       }
     },
     {
@@ -1355,7 +1355,7 @@
             "fields": []
           }
         ],
-        "description": "One instrument (an ID , or a new instrument definition). If present on an item, the description of the instrument is shown in the item's tooltip as gray text. There are actually two unique states of this component that both register in usage as the minecraft:ponder_goat_horn instrument ID, but they do not stack with each other, only one of them matches a component comparison for that ID, and only one of them gets serialised while the other does not."
+        "description": "One instrument (an ID, or a new instrument definition). If present on an item, the description of the instrument is shown in the item's tooltip as gray text. There are actually two unique states of this component that both register in usage as the minecraft:ponder_goat_horn instrument ID, but they do not stack with each other, only one of them matches a component comparison for that ID, and only one of them gets serialised while the other does not."
       }
     },
     {
@@ -1467,7 +1467,7 @@
             "schema": {
               "kind": "scalar",
               "type": "float",
-              "description": "The multiplier for the final damage from the relative speed. [ note 3 ] Defaults to 1.0.",
+              "description": "The multiplier for the final damage from the relative speed. [note 3] Defaults to 1.0.",
               "default": 1.0
             }
           },
@@ -1557,7 +1557,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "If true , the component is removed when the lodestone is broken. If false , the component is kept. Defaults to true .",
+              "description": "If true, the component is removed when the lodestone is broken. If false, the component is kept. Defaults to true.",
               "default": true
             }
           }
@@ -1583,7 +1583,7 @@
               "semantic_type": "text_component"
             }
           ],
-          "description": "Text component representing a line of text. See Text component format ."
+          "description": "Text component representing a line of text. See Text component format."
         },
         "description": "List of additional lines to display in this item's tooltip. Has a maximum of 256 lines.",
         "max": 256
@@ -1691,7 +1691,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "int",
-        "description": "The number of this filled map , representing the shared state holding map contents and markers."
+        "description": "The number of this filled map, representing the shared state holding map contents and markers."
       }
     },
     {
@@ -1700,7 +1700,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "int",
-        "description": "The maximum amount of damage that this item can take. If not set, this item cannot take damage. Must be a non-zero positive integer. Cannot be combined with minecraft:max_stack_size if it has a value greater than 1 (if the item can be stacked). For the durability bar to appear, the damage component must have a value. Example damage=0 ."
+        "description": "The maximum amount of damage that this item can take. If not set, this item cannot take damage. Must be a non-zero positive integer. Cannot be combined with minecraft:max_stack_size if it has a value greater than 1 (if the item can be stacked). For the durability bar to appear, the damage component must have a value. Example damage=0."
       }
     },
     {
@@ -1741,7 +1741,7 @@
       "value_schema": {
         "kind": "scalar",
         "type": "int",
-        "description": "The amplifier of the Bad Omen effect given to the player or mob upon consuming this item (normally an ominous bottle ). Must be a non-negative integer from 0 to 4 (inclusive). The duration of the effect is always 120000 ticks (1 hour and 40 minutes at the normal tick rate) and minecraft:potion_duration_scale is ignored. If present on an item, information about the mob effect is added to the tooltip, in the same format as the minecraft:potion_contents component.",
+        "description": "The amplifier of the Bad Omen effect given to the player or mob upon consuming this item (normally an ominous bottle). Must be a non-negative integer from 0 to 4 (inclusive). The duration of the effect is always 120000 ticks (1 hour and 40 minutes at the normal tick rate) and minecraft:potion_duration_scale is ignored. If present on an item, information about the mob effect is added to the tooltip, in the same format as the minecraft:potion_contents component.",
         "min": 0
       }
     },
@@ -2018,7 +2018,7 @@
             "schema": {
               "kind": "scalar",
               "type": "string",
-              "description": "The type of swinging animation. Can be none , whack , stab . Defaults to whack .",
+              "description": "The type of swinging animation. Can be none, whack, or stab. Defaults to whack.",
               "default": "whack",
               "choices": [
                 "none",
@@ -2032,7 +2032,7 @@
             "schema": {
               "kind": "scalar",
               "type": "int",
-              "description": "A positive integer that determines the animation's duration in ticks . Defaults to 6 .",
+              "description": "A positive integer that determines the animation's duration in ticks. Defaults to 6.",
               "default": 6
             }
           }
@@ -2070,7 +2070,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether players can break blocks while holding this tool in Creative mode. Defaults to true .",
+              "description": "Whether players can break blocks while holding this tool in Creative mode. Defaults to true.",
               "default": true
             }
           },
@@ -2246,7 +2246,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "If the player can sprint during use. Defaults to false .",
+              "description": "If the player can sprint during use. Defaults to false.",
               "default": false
             }
           },
@@ -2255,7 +2255,7 @@
             "schema": {
               "kind": "scalar",
               "type": "float",
-              "description": "A ranged float (0.0-1.0 inclusive) speed multiplier inflicted during use. Defaults to 0.2 .",
+              "description": "A ranged float (0.0-1.0 inclusive) speed multiplier inflicted during use. Defaults to 0.2.",
               "default": 0.2
             }
           },
@@ -2264,7 +2264,7 @@
             "schema": {
               "kind": "scalar",
               "type": "boolean",
-              "description": "Whether using this item emits the minecraft:item_interact_start and minecraft:item_interact_finish game events . Defaults to true .",
+              "description": "Whether using this item emits the minecraft:item_interact_start and minecraft:item_interact_finish game events. Defaults to true.",
               "default": true
             }
           }
@@ -2292,7 +2292,7 @@
             "schema": {
               "kind": "scalar",
               "type": "int",
-              "description": "The amount to damage the item for each attack performed. Defaults to 1 .",
+              "description": "The amount to damage the item for each attack performed. Defaults to 1.",
               "default": 1
             }
           },
@@ -2301,7 +2301,7 @@
             "schema": {
               "kind": "scalar",
               "type": "float",
-              "description": "The amount of seconds that this item can disable a blocking shield on successful attack. If set to 0, this item cannot disable a blocking shield. Defaults to 0 .",
+              "description": "The amount of seconds that this item can disable a blocking shield on successful attack. If set to 0, this item cannot disable a blocking shield. Defaults to 0.",
               "default": 0
             }
           }
