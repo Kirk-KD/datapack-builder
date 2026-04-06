@@ -45,6 +45,75 @@ Deferred for now.
 - Native blocks expose Minecraft semantics, but with strong validation and UX support.
 - The editor should prevent invalid structures where possible.
 
+## Editor Modal System
+The editor modal system exists to support block fields whose value is too complex or too awkward to edit inline.
+It should stay small and block-driven rather than becoming a separate application state layer.
+
+Each block that wants a modal editor exposes two functions:
+- `getEditorContext`, which returns the current structured value for the editor
+- `applyEditorResult`, which accepts the editor output and stores it back on the block
+
+The modal host only manages generic concerns:
+- open/close lifecycle
+- lazy loading of editor components by `editorType`
+- passing block context into the editor
+- collecting a pending result and committing it on save
+
+This keeps the ownership boundaries clear.
+The modal host does not know what an item stack, selector, or NBT value means.
+The block remains the owner of its own state shape and compilation behaviour.
+The editor component is only responsible for editing a structured value and emitting the next structured value.
+
+This design is intentionally simple:
+- one shared host
+- one registry for editor components
+- one bridge for opening a modal from a Blockly field
+- no global editor store
+- no editor-specific persistence outside block extra state
+
+The result is that modal editors are reusable UI helpers for complex native-layer values, not an independent document model.
+
+## Item Component Editor System
+The item component editor is designed as a schema-driven React component used inside the item stack editor, not as its own top-level modal.
+This is important because item components are part of a larger `mc_item_stack` value alongside the selected item id and sprite preview.
+
+The system is split into a few narrow responsibilities:
+- a data component schema catalog in `src/catalog/`, which lazy-loads the generated component schema JSON
+- a `DataComponentEditor`, which loads schemas and renders the component editing UI
+- a `ComponentListEditor`, which manages the list of chosen components for one item
+- a recursive `SchemaValueEditor`, which renders a value editor from schema nodes
+- a small set of field editors for scalar and reference-like schema types
+
+The main design choice is that editors are created per schema node kind, not per Minecraft component.
+There should not be a handwritten React editor for every item component.
+Instead, each component schema describes its value shape, and the UI walks that schema recursively.
+
+Supported schema node kinds are intentionally minimal:
+- `scalar`
+- `object`
+- `list`
+- `union`
+- `reference`
+- `opaque` as a fallback for imperfect schema entries
+
+This keeps the system practical while the schema is still being refined.
+If a component is parsed imperfectly, the editor should still render something editable instead of blocking the entire feature.
+
+Validation is also intentionally minimal.
+The editor should enforce only what the schema directly declares:
+- primitive type shape
+- `choices`
+- `min`
+- `max`
+- `default`
+- `description`
+
+Descriptions are available through help tooltips rather than always-visible text, so the editor stays dense enough for real use.
+
+For now, reference types are edited using generic text or JSON inputs where a fully specialized UI does not yet exist.
+That keeps the system immediately usable without requiring a large up-front library of special-purpose editors.
+More specific editors can be added later only where they materially improve usability.
+
 ## Data Types
 Data types are key to Minecraft commands.
 Blocks responsible for the definition and validation of these types are considered to be in the Native layer.
