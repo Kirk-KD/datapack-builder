@@ -56,7 +56,6 @@ function ItemStackEditor({ context, setPendingResult }: EditorComponentProps) {
           value={resolvedValue.value}
           onChange={(nextValue) => updateValue({ ...resolvedValue, value: nextValue, spriteFileName: '' })}
           onResolvedChange={(nextValue) => updateValue({ ...resolvedValue, ...nextValue })}
-          columns={3}
           layout="auto"
         />
       </div>

@@ -49,7 +49,7 @@ function ItemSprite({ spriteFileName, large = false }: { spriteFileName: string;
   )
 }
 
-function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout = 'auto' }: ItemSelectorProps) {
+function ItemSelector({ value, onChange, onResolvedChange, layout = 'auto' }: ItemSelectorProps) {
   const [entries, setEntries] = useState<readonly MinecraftItemEntry[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
@@ -145,10 +145,7 @@ function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout =
         ) : filteredEntries.length === 0 ? (
           <div className="editorModalStatusPanel">No item matches. Save to keep a custom item name.</div>
         ) : (
-          <div
-            className={`itemSelectorList${layout === 'fill' ? ' itemSelectorListFill' : ''}`}
-            style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-          >
+          <div className={`itemSelectorList${layout === 'fill' ? ' itemSelectorListFill' : ''}`}>
             {filteredEntries.map((entry) => {
               const isActive = entry.name === value.trim()
 

@@ -10,8 +10,8 @@
 }
 
 .editorModalCard {
-  width: min(720px, 100%);
-  height: min(640px, calc(100vh - 48px));
+  width: min(1220px, 100%);
+  height: min(740px, calc(100vh - 24px));
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -24,8 +24,8 @@
 }
 
 .editorModalCard.is-maximized {
-  width: calc(100vw - 48px);
-  height: calc(100vh - 48px);
+  width: calc(100vw - 24px);
+  height: calc(100vh - 24px);
 }
 
 .editorModalHeader {
