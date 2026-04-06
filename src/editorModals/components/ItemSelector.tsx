@@ -1,6 +1,6 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 'react'
-import { loadMinecraftItemCatalog, loadMinecraftSpriteUrl } from '../data/itemCatalog'
-import type { MinecraftItemEntry } from '../data/itemCatalog'
+import { loadMinecraftItemCatalog, loadMinecraftSpriteUrl } from '../../catalog/itemCatalog'
+import type { MinecraftItemEntry } from '../../catalog/itemCatalog'
 import './ItemSelector.css'
 
 type ItemSelectorProps = {
@@ -11,7 +11,7 @@ type ItemSelectorProps = {
   layout?: 'auto' | 'fill'
 }
 
-function getEntryByName(entries: MinecraftItemEntry[], name: string) {
+function getEntryByName(entries: readonly MinecraftItemEntry[], name: string) {
   return entries.find((entry) => entry.name === name) ?? null
 }
 
@@ -49,9 +49,10 @@ function ItemSprite({ spriteFileName, large = false }: { spriteFileName: string;
   )
 }
 
-function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout = 'auto' }: ItemSelectorProps) {
-  const [entries, setEntries] = useState<MinecraftItemEntry[] | null>(null)
+function ItemSelector({ value, onChange, onResolvedChange, layout = 'auto' }: ItemSelectorProps) {
+  const [entries, setEntries] = useState<readonly MinecraftItemEntry[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
   const deferredValue = useDeferredValue(value)
 
   useEffect(() => {
@@ -117,6 +118,8 @@ function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout =
           type="text"
           value={value}
           onChange={(event) => emitValueChange(event.target.value)}
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
           className="editorModalInput editorModalInputBare"
           placeholder={placeholderEntry?.name ?? 'minecraft item'}
           spellCheck={false}
@@ -134,37 +137,37 @@ function ItemSelector({ value, onChange, onResolvedChange, columns = 2, layout =
         )}
       </div>
 
-      {loadError ? (
-        <div className="editorModalStatusPanel">{loadError}</div>
-      ) : !entries ? (
-        <div className="editorModalStatusPanel">Loading items...</div>
-      ) : filteredEntries.length === 0 ? (
-        <div className="editorModalStatusPanel">No item matches. Save to keep a custom item name.</div>
-      ) : (
-        <div
-          className={`itemSelectorList${layout === 'fill' ? ' itemSelectorListFill' : ''}`}
-          style={{ gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))` }}
-        >
-          {filteredEntries.map((entry) => {
-            const isActive = entry.name === value.trim()
+      {isSearchFocused && (
+        loadError ? (
+          <div className="editorModalStatusPanel">{loadError}</div>
+        ) : !entries ? (
+          <div className="editorModalStatusPanel">Loading items...</div>
+        ) : filteredEntries.length === 0 ? (
+          <div className="editorModalStatusPanel">No item matches. Save to keep a custom item name.</div>
+        ) : (
+          <div className={`itemSelectorList${layout === 'fill' ? ' itemSelectorListFill' : ''}`}>
+            {filteredEntries.map((entry) => {
+              const isActive = entry.name === value.trim()
 
-            return (
-              <button
-                key={entry.name}
-                type="button"
-                className={`itemSelectorEntry${isActive ? ' is-active' : ''}`}
-                onClick={() => emitValueChange(entry.name)}
-              >
-                {entry.spriteFileName ? (
-                  <ItemSprite spriteFileName={entry.spriteFileName} />
-                ) : (
-                  <div className="editorModalSpriteIconPlaceholder" />
-                )}
-                <span className="itemSelectorEntryName">{entry.name}</span>
-              </button>
-            )
-          })}
-        </div>
+              return (
+                <button
+                  key={entry.name}
+                  type="button"
+                  className={`itemSelectorEntry${isActive ? ' is-active' : ''}`}
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => emitValueChange(entry.name)}
+                >
+                  {entry.spriteFileName ? (
+                    <ItemSprite spriteFileName={entry.spriteFileName} />
+                  ) : (
+                    <div className="editorModalSpriteIconPlaceholder" />
+                  )}
+                  <span className="itemSelectorEntryName">{entry.name}</span>
+                </button>
+              )
+            })}
+          </div>
+        )
       )}
     </div>
   )

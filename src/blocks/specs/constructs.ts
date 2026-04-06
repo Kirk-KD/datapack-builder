@@ -5,7 +5,8 @@ import { OpenEditorTextField } from '../fields/openEditorTextField'
 import { bindExtraState } from '../utils/extraState'
 import type { BlockSpec } from './types'
 import type { EditorBlock } from '../../editorModals/types'
-import { loadMinecraftSpriteUrl } from '../../editorModals/data/itemCatalog'
+import { loadMinecraftSpriteUrl } from '../../catalog/itemCatalog'
+import {type SNBT, snbtToString} from "../../compiler/util.ts";
 
 const FIELD_ITEM_SPRITE = 'ITEM_SPRITE'
 const FIELD_ITEM_NAME = 'ITEM_NAME'
@@ -15,11 +16,18 @@ const DEFAULT_TEXT = 'Create item stack...'
 type ItemStackBlock = EditorBlock & {
   itemStackValue_: string
   itemStackSpriteFile_: string
+  itemStackComponents_: Record<string, unknown>
   updatePreview_: () => void
 }
 
-function getPreviewText(value: string) {
-  return value || DEFAULT_TEXT
+function getPreviewText(value: string, components: Record<string, unknown>) {
+  if (!value) {
+    return DEFAULT_TEXT
+  }
+
+  return Object.keys(components).length > 0
+    ? `${value}[...]`
+    : value
 }
 
 export const constructBlockSpecs: BlockSpec[] = [
@@ -32,6 +40,7 @@ export const constructBlockSpecs: BlockSpec[] = [
       bindExtraState(block, {
         itemStackValue_: '',
         itemStackSpriteFile_: '',
+        itemStackComponents_: {},
       })
 
       block.setOutput(true, 'mc_item_stack')
@@ -50,7 +59,7 @@ export const constructBlockSpecs: BlockSpec[] = [
       block.updatePreview_ = function(this: ItemStackBlock) {
         const previewField = this.getField(FIELD_ITEM_NAME)
         if (previewField instanceof Blockly.FieldLabelSerializable) {
-          previewField.setValue(getPreviewText(this.itemStackValue_))
+          previewField.setValue(getPreviewText(this.itemStackValue_, this.itemStackComponents_))
         }
 
         const spriteField = this.getField(FIELD_ITEM_SPRITE)
@@ -73,6 +82,7 @@ export const constructBlockSpecs: BlockSpec[] = [
         return {
           value: this.itemStackValue_,
           spriteFileName: this.itemStackSpriteFile_,
+          components: this.itemStackComponents_,
         }
       }
 
@@ -94,11 +104,19 @@ export const constructBlockSpecs: BlockSpec[] = [
           'spriteFileName' in result && typeof result.spriteFileName === 'string'
             ? result.spriteFileName
             : ''
+        const nextComponents =
+          'components' in result
+          && result.components
+          && typeof result.components === 'object'
+          && !Array.isArray(result.components)
+            ? { ...(result.components as Record<string, unknown>) }
+            : {}
 
         if (nextValue === null) return
 
         this.itemStackValue_ = nextValue
         this.itemStackSpriteFile_ = nextSpriteFile
+        this.itemStackComponents_ = nextComponents
         this.updatePreview_()
       }
 
@@ -106,7 +124,11 @@ export const constructBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       const itemStackBlock = block as ItemStackBlock
-      return [itemStackBlock.itemStackValue_ || 'minecraft:stone', 0]
+      const itemStackComponents = Object.entries(itemStackBlock.itemStackComponents_)
+        .map(([componentName, componentValue]) => `${componentName}=${snbtToString(componentValue as SNBT)}`)
+        .join(',')
+      const code = `${itemStackBlock.itemStackValue_}[${itemStackComponents}]`
+      return [code, 0]
     },
   },
 ]

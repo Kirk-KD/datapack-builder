@@ -85,7 +85,7 @@ export const procedureBlockSpecs: BlockSpec[] = [
 
       cmd += `function ${internalNs}:${getProcName(procName)}`
       if (cmdNeedsStorage) cmd += ` with storage ${storageName} ${getProcName(procName)}`
-      else if (Object.keys(snbt).length > 0) cmd += ` ${snbtToString(snbt)}`
+      else if (Object.keys(snbt).length > 0) cmd += ` ${snbtToString(snbt, { shallow: true })}`
       cmd += '\n'
 
       return cmd

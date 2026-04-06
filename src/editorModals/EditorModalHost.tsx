@@ -26,12 +26,14 @@ function EditorModalHost() {
   const [request, setRequest] = useState<EditorModalRequest | null>(null)
   const [pendingResult, setPendingResult] = useState<unknown>(null)
   const [loadedEditor, setLoadedEditor] = useState<EditorComponent | null>(null)
+  const [isMaximized, setIsMaximized] = useState(false)
 
   useEffect(() => {
     let cancelled = false
 
     if (!request) {
       setLoadedEditor(null)
+      setIsMaximized(false)
       return
     }
 
@@ -49,10 +51,12 @@ function EditorModalHost() {
     return registerEditorModalController({
       open: (nextRequest) => {
         setPendingResult(null)
+        setIsMaximized(false)
         setRequest(nextRequest)
       },
       close: () => {
         setPendingResult(null)
+        setIsMaximized(false)
         setRequest(null)
       },
     })
@@ -96,6 +100,7 @@ function EditorModalHost() {
 
   function close() {
     setPendingResult(null)
+    setIsMaximized(false)
     setRequest(null)
   }
 
@@ -118,6 +123,7 @@ function EditorModalHost() {
     }
 
     setPendingResult(null)
+    setIsMaximized(false)
     setRequest(null)
   }
 
@@ -128,13 +134,21 @@ function EditorModalHost() {
       }
     }}>
       <div
-        className="editorModalCard"
+        className={`editorModalCard${isMaximized ? ' is-maximized' : ''}`}
         role="dialog"
         aria-modal="true"
         aria-label={activeRequest.title ?? 'Editor modal'}
       >
         <div className="editorModalHeader">
           <h2>{activeRequest.title ?? 'Editor'}</h2>
+          <button
+            type="button"
+            className="editorModalIconButton editorModalHeaderIconButton"
+            onClick={() => setIsMaximized((current) => !current)}
+            aria-label={isMaximized ? 'Restore modal size' : 'Maximize modal'}
+          >
+            <img src={isMaximized ? '/minimize.svg' : '/maximize.svg'} alt="" aria-hidden="true" />
+          </button>
         </div>
         <div className="editorModalBody">
           {loadedEditor === null ? (

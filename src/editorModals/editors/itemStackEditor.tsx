@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import ItemSelector from '../components/ItemSelector'
+import DataComponentEditor from '../components/dataComponents/DataComponentEditor'
 import type { EditorComponentProps } from '../types'
+import type { DataComponentMapValue } from '../components/dataComponents/types'
 
 type ItemStackEditorValue = {
   value: string
   spriteFileName: string
+  components: DataComponentMapValue
 }
 
 function getInitialValue(context: unknown): ItemStackEditorValue {
@@ -20,12 +23,20 @@ function getInitialValue(context: unknown): ItemStackEditorValue {
         'spriteFileName' in context && typeof context.spriteFileName === 'string'
           ? context.spriteFileName
           : '',
+      components:
+        'components' in context
+        && context.components
+        && typeof context.components === 'object'
+        && !Array.isArray(context.components)
+          ? { ...(context.components as Record<string, unknown>) }
+          : {},
     }
   }
 
   return {
     value: '',
     spriteFileName: '',
+    components: {},
   }
 }
 
@@ -39,14 +50,21 @@ function ItemStackEditor({ context, setPendingResult }: EditorComponentProps) {
 
   return (
     <div className="editorModalSection editorModalSectionFill">
-      <p className="editorModalTextMuted">Select a Minecraft item or type a custom item name.</p>
-      <ItemSelector
-        value={resolvedValue.value}
-        onChange={(nextValue) => updateValue({ value: nextValue, spriteFileName: '' })}
-        onResolvedChange={updateValue}
-        columns={1}
-        layout="fill"
-      />
+      <div className="editorModalSection">
+        <p className="editorModalTextMuted">Select a Minecraft item or type a custom item name.</p>
+        <ItemSelector
+          value={resolvedValue.value}
+          onChange={(nextValue) => updateValue({ ...resolvedValue, value: nextValue, spriteFileName: '' })}
+          onResolvedChange={(nextValue) => updateValue({ ...resolvedValue, ...nextValue })}
+          layout="auto"
+        />
+      </div>
+      <div className="editorModalSection">
+        <DataComponentEditor
+          value={resolvedValue.components}
+          onChange={(components) => updateValue({ ...resolvedValue, components })}
+        />
+      </div>
     </div>
   )
 }
