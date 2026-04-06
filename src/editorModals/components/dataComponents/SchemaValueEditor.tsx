@@ -1,6 +1,7 @@
 import type { SchemaValueEditorProps } from './types'
 import type {
   DataComponentListSchema,
+  DataComponentMapSchema,
   DataComponentObjectSchema,
   DataComponentUnionSchema,
   DataComponentValueSchema,
@@ -13,6 +14,116 @@ import IntArrayFieldEditor from './fields/IntArrayFieldEditor'
 import ReferenceFieldEditor from './fields/ReferenceFieldEditor'
 import HelpTooltip from './HelpTooltip'
 import './dataComponents.css'
+
+function createMapEntryKey(mapValue: Record<string, unknown>) {
+  const defaultKey = 'key'
+
+  if (!(defaultKey in mapValue)) {
+    return defaultKey
+  }
+
+  let index = 2
+  while (`${defaultKey}_${index}` in mapValue) {
+    index += 1
+  }
+  return `${defaultKey}_${index}`
+}
+
+function renameMapEntryKey(
+  mapValue: Record<string, unknown>,
+  currentKey: string,
+  nextKey: string,
+) {
+  if (currentKey === nextKey) {
+    return mapValue
+  }
+
+  const nextValue: Record<string, unknown> = {}
+  for (const [entryKey, entryValue] of Object.entries(mapValue)) {
+    nextValue[entryKey === currentKey ? nextKey : entryKey] = entryValue
+  }
+  return nextValue
+}
+
+function MapValueEditor({
+  schema,
+  label,
+  value,
+  onChange,
+}: {
+  schema: DataComponentMapSchema
+  label?: string
+  value: unknown
+  onChange: (value: unknown) => void
+}) {
+  const mapValue = typeof value === 'object' && value !== null && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {}
+  const entrySchema = schema.value
+  const keyPlaceholder = schema.key.semantic_type?.replaceAll('_', ' ') ?? 'key'
+
+  return (
+    <div className="dataComponentGroupBlock">
+      {label && (
+        <div className="dataComponentGroupHeader">
+          <div className="dataComponentGroupLabel">{label}</div>
+          {schema.description && <HelpTooltip text={schema.description} />}
+        </div>
+      )}
+      <div className="dataComponentGroup">
+        <div className="dataComponentMapList">
+          {Object.entries(mapValue).map(([entryKey, entryValue]) => (
+            <div key={entryKey} className="dataComponentMapEntry">
+              <input
+                className="editorModalInput dataComponentMapKeyInput"
+                type="text"
+                value={entryKey}
+                placeholder={keyPlaceholder}
+                onChange={(event) => onChange(renameMapEntryKey(mapValue, entryKey, event.target.value))}
+              />
+              <div className="dataComponentMapValue">
+                <SchemaValueEditor
+                  schema={entrySchema}
+                  value={entryValue}
+                  onChange={(nextEntryValue) => {
+                    onChange({
+                      ...mapValue,
+                      [entryKey]: nextEntryValue,
+                    })
+                  }}
+                />
+              </div>
+              <button
+                type="button"
+                className="editorModalButton dataComponentMapRemoveButton"
+                onClick={() => {
+                  const nextValue = { ...mapValue }
+                  delete nextValue[entryKey]
+                  onChange(nextValue)
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="editorModalButton"
+            onClick={() => {
+              const nextKey = createMapEntryKey(mapValue)
+              onChange({
+                ...mapValue,
+                [nextKey]: createDefaultValue(entrySchema),
+              })
+            }}
+          >
+            Add entry
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function ObjectValueEditor({
   schema,
@@ -180,6 +291,8 @@ function getSchemaOptionLabel(schema: DataComponentValueSchema) {
       return schema.semantic_type ?? schema.type
     case 'object':
       return 'object'
+    case 'map':
+      return 'map'
     case 'list':
       return 'list'
     case 'reference':
@@ -206,6 +319,8 @@ function SchemaValueEditor({ schema, label, value, onChange }: SchemaValueEditor
       return <StringFieldEditor schema={schema} label={label} value={value} onChange={onChange} />
     case 'object':
       return <ObjectValueEditor schema={schema} label={label} value={value} onChange={onChange} />
+    case 'map':
+      return <MapValueEditor schema={schema} label={label} value={value} onChange={onChange} />
     case 'list':
       return <ListValueEditor schema={schema} label={label} value={value} onChange={onChange} />
     case 'union':

@@ -90,15 +90,6 @@
           "kind": "object",
           "fields": [
             {
-              "key": "id",
-              "schema": {
-                "kind": "scalar",
-                "type": "string",
-                "semantic_type": "resource_location",
-                "description": "A namespaced ID to identify this modifier. It must be unique from other modifiers of the same attribute."
-              }
-            },
-            {
               "key": "type",
               "schema": {
                 "kind": "scalar",
@@ -108,11 +99,20 @@
               }
             },
             {
+              "key": "id",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "semantic_type": "resource_location",
+                "description": "A namespaced ID to identify this modifier. It must be unique from other modifiers of the same attribute."
+              }
+            },
+            {
               "key": "slot",
               "schema": {
                 "kind": "scalar",
                 "type": "string",
-                "description": "The equipment slot/slots the item must be in for the modifier to take effect. Can be any , hand , armor , mainhand , offhand , head , chest , legs , feet , body , or saddle . Defaults to any . Note: any refers to any equipment slot, not any inventory slot.",
+                "description": "The equipment slot/slots the item must be in for the modifier to take effect. Note: 'any' refers to any equipment slot, not any inventory slot.",
                 "default": "any",
                 "choices": [
                   "any",
@@ -134,7 +134,7 @@
               "schema": {
                 "kind": "scalar",
                 "type": "string",
-                "description": "Modifier operation. Can be add_value , add_multiplied_base , or add_multiplied_total . See Attribute Modifiers for info.",
+                "description": "Modifier operation.",
                 "choices": [
                   "add_value",
                   "add_multiplied_base",
@@ -169,6 +169,7 @@
                     }
                   },
                   {
+                    "_TODO": "TEXT COMPONENT EDITOR",
                     "key": "value",
                     "schema": {
                       "kind": "union",
@@ -183,7 +184,7 @@
                           "semantic_type": "text_component"
                         }
                       ],
-                      "description": "(only present if is override ): A text component to show for this attribute modifier entry."
+                      "description": "A text component to show for this attribute modifier entry."
                     }
                   }
                 ],
@@ -197,42 +198,13 @@
       }
     },
     {
+      "_TODO": "PARSE GENERATED COMMAND",
       "id": "minecraft:banner_patterns",
       "label": "banner_patterns",
       "value_schema": {
-        "kind": "list",
-        "item": {
-          "kind": "object",
-          "fields": [
-            {
-              "key": "color",
-              "schema": {
-                "kind": "scalar",
-                "type": "string",
-                "description": "Dye color of the section."
-              }
-            },
-            {
-              "key": "pattern",
-              "schema": {
-                "kind": "union",
-                "options": [
-                  {
-                    "kind": "scalar",
-                    "type": "string"
-                  },
-                  {
-                    "kind": "reference",
-                    "ref": "banner_pattern"
-                  }
-                ],
-                "description": "One banner pattern (an ID , or a new banner pattern definition)."
-              }
-            }
-          ],
-          "description": "A single pattern."
-        },
-        "description": "List of all patterns applied to the banner or the shield. If used on a shield and the minecraft:base_color component is not specified, then white is used as the base banner color."
+        "kind": "scalar",
+        "type": "string",
+        "description": "Paste here the /give command generated at https://needcoolershoes.com/banner"
       }
     },
     {
@@ -241,7 +213,9 @@
       "value_schema": {
         "kind": "scalar",
         "type": "string",
-        "description": "The base dye color of the banner applied on a shield. If neither this nor minecraft:banner_patterns is specified, then the shield model will show its normal wooden texture. If the minecraft:banner_patterns component is specified but this component is not, then white is used as the base banner color. If present on a shield item, the item name is overridden as \"<color> Shield\" (e.g. if set to green , the name will be \"Green Shield\")."
+        "description": "The base dye color of the banner applied on a shield. If neither this nor minecraft:banner_patterns is specified, then the shield model will show its normal wooden texture. If the minecraft:banner_patterns component is specified but this component is not, then white is used as the base banner color. If present on a shield item, the item name is overridden as \"<color> Shield\" (e.g. if set to green , the name will be \"Green Shield\").",
+        "choices": ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"],
+        "default": "white"
       }
     },
     {
@@ -255,9 +229,10 @@
             {
               "key": "entity_data",
               "schema": {
+                "_TODO": "ENTITY EDITOR",
                 "kind": "object",
                 "fields": [],
-                "description": "Must include id tag. If the id is not minecraft:bee then the entity will never leave the hive. The Passengers , Pos , Rotation , and UUID tags are ignored when the bee spawns (the bee will always spawn in front of the hive with a random UUID, facing south, and without any passengers)."
+                "description": "Must include id tag. If the id is not minecraft:bee then the entity will never leave the hive. The passengers, position, rotation, and UUID tags are ignored when the bee spawns (the bee will always spawn in front of the hive with a random UUID, facing south, and without any passengers)."
               }
             },
             {
@@ -283,6 +258,7 @@
       }
     },
     {
+      "_TODO": "BLOCK ENTITY EDITOR; AN ID FOR EACH KIND, DIFFERENT FIELDS FOR EACH ITEM. https://minecraft.wiki/w/Block_entity_format",
       "id": "minecraft:block_entity_data",
       "label": "block_entity_data",
       "value_schema": {
@@ -292,21 +268,20 @@
       }
     },
     {
+      "_TODO": "BLOCK STATE EDITOR; DIFFERENT FIELDS FOR EACH BLOCK. https://minecraft.fandom.com/wiki/Block_states",
       "id": "minecraft:block_state",
       "label": "block_state",
       "value_schema": {
-        "kind": "object",
-        "fields": [
-          {
-            "key": "<block state>",
-            "schema": {
-              "kind": "scalar",
-              "type": "string",
-              "description": "A key-value pair, where the key is a block state key and the value is a block state value to force place for this block, for example facing: \"east\" ."
-            }
-          }
-        ],
-        "description": "The block state properties to apply when placing this block. When present on an item, regardless of the item type, if the honey_level property is specified then a gray \"Honey: <honey_level> / 5\" text is added to the tooltip."
+        "kind": "map",
+        "key": {
+          "kind": "scalar",
+          "type": "string"
+        },
+        "value": {
+          "kind": "scalar",
+          "type": "string"
+        },
+        "description": "The block state properties to apply when placing this block."
       }
     },
     {
@@ -320,25 +295,16 @@
             "schema": {
               "kind": "scalar",
               "type": "float",
-              "description": "The amount of time (in seconds) that must be held before successfully blocking attacks. Defaults to 0 .",
+              "description": "The amount of time (in seconds) that must be held before successfully blocking attacks. Defaults to 0.",
               "default": 0
             }
           },
           {
             "key": "disable_cooldown_scale",
             "schema": {
-              "kind": "union",
-              "options": [
-                {
-                  "kind": "scalar",
-                  "type": "float"
-                },
-                {
-                  "kind": "scalar",
-                  "type": "float"
-                }
-              ],
-              "description": "The multiplier applied to the cooldown time for the item when attacked by a disabling attack (the multiplier for on the minecraft:weapon component). If set to 0 , this item can never be disabled by attacks. Defaults to 1 .",
+              "kind": "scalar",
+              "type": "float",
+              "description": "The multiplier applied to the cooldown time for the item when attacked by a disabling attack (the multiplier for on the minecraft:weapon component). If set to 0, this item can never be disabled by attacks. Defaults to 1.",
               "default": 1
             }
           },
@@ -352,40 +318,13 @@
                   {
                     "key": "type",
                     "schema": {
-                      "kind": "union",
-                      "options": [
-                        {
-                          "kind": "scalar",
-                          "type": "string"
-                        },
-                        {
-                          "kind": "list",
-                          "item": {
-                            "kind": "scalar",
-                            "type": "string"
-                          }
-                        },
-                        {
-                          "kind": "scalar",
-                          "type": "string"
-                        },
-                        {
-                          "kind": "scalar",
-                          "type": "string"
-                        },
-                        {
-                          "kind": "list",
-                          "item": {
-                            "kind": "scalar",
-                            "type": "string"
-                          }
-                        },
-                        {
-                          "kind": "scalar",
-                          "type": "string"
-                        }
-                      ],
-                      "description": "Any number of damage type (s) (an ID , or a tag with # , or an array containing IDs) to block. Defaults to all damage types."
+                      "kind": "list",
+                      "item": {
+                        "_TODO": "DAMAGE ID SELECTION",
+                        "kind": "scalar",
+                        "type": "string"
+                      },
+                      "description": "Any number of damage type (s) (an ID, or a tag with #, or an array containing IDs) to block. Defaults to all damage types."
                     }
                   },
                   {
@@ -409,15 +348,14 @@
                     "schema": {
                       "kind": "scalar",
                       "type": "float",
-                      "description": "strictly positive float \u2014 The maximum angle between the users facing direction and the direction of the incoming attack to be blocked. Defaults to 90 .",
+                      "description": "Positive float number. The maximum angle between the users facing direction and the direction of the incoming attack to be blocked. Defaults to 90 .",
                       "default": 90
                     }
                   }
                 ],
                 "description": "A damage reduction field"
               },
-              "description": "A set of rules for how much and what kinds damage should be blocked in a given attack. Defaults to [{base:0,factor:1,horizontal_blocking_angle:90}] which blocks all damage within a 90 degree angle.",
-              "default": "[{base:0,factor:1,horizontal_blocking_angle:90}]"
+              "description": "A set of rules for how much and what kinds damage should be blocked in a given attack. Defaults to blocking all damage within a 90 degree angle."
             }
           },
           {
@@ -457,42 +395,25 @@
             }
           },
           {
+            "_TODO": "SOUND EVENT EDITOR",
             "key": "block_sound",
             "schema": {
-              "kind": "union",
-              "options": [
-                {
-                  "kind": "scalar",
-                  "type": "string"
-                },
-                {
-                  "kind": "reference",
-                  "ref": "sound_event",
-                  "semantic_type": "sound_event"
-                }
-              ],
-              "description": "One sound event (an ID , or a new sound event definition) to play when an attack is successfully blocked. Defaults to none."
+              "kind": "scalar",
+              "type": "string",
+              "description": "One sound event (an ID, or a new sound event definition) to play when an attack is successfully blocked. Defaults to none."
             }
           },
           {
+            "_TODO": "SOUND EVENT EDITOR",
             "key": "disabled_sound",
             "schema": {
-              "kind": "union",
-              "options": [
-                {
-                  "kind": "scalar",
-                  "type": "string"
-                },
-                {
-                  "kind": "reference",
-                  "ref": "sound_event",
-                  "semantic_type": "sound_event"
-                }
-              ],
-              "description": "One sound event (an ID , or a new sound event definition) to play when the item goes on its disabled cooldown due to an attack. Defaults to none."
+              "kind": "scalar",
+              "type": "string",
+              "description": "One sound event (an ID, or a new sound event definition) to play when the item goes on its disabled cooldown due to an attack. Defaults to none."
             }
           },
           {
+            "_TODO": "DAMAGE ID SELECTION",
             "key": "bypassed_by",
             "schema": {
               "kind": "scalar",
@@ -508,19 +429,9 @@
       "id": "minecraft:break_sound",
       "label": "break_sound",
       "value_schema": {
-        "kind": "union",
-        "options": [
-          {
-            "kind": "scalar",
-            "type": "string"
-          },
-          {
-            "kind": "reference",
-            "ref": "sound_event",
-            "semantic_type": "sound_event"
-          }
-        ],
-        "description": "One sound event (an ID , or a new sound event definition) to play when the item runs out of durability and breaks."
+        "kind": "scalar",
+        "type": "string",
+        "description": "One sound event (an ID, or a new sound event definition) to play when the item runs out of durability and breaks."
       }
     },
     {
@@ -590,7 +501,7 @@
             "schema": {
               "kind": "scalar",
               "type": "int",
-              "description": "Turns into Age entity tag for axolotls and tadpoles ."
+              "description": "Turns into Age entity tag for axolotls and tadpoles."
             }
           },
           {
@@ -598,7 +509,7 @@
             "schema": {
               "kind": "scalar",
               "type": "long",
-              "description": "Turns into the expiry time of the memory module has_hunting_cooldown for axolotls ."
+              "description": "Turns into the expiry time of the memory module has_hunting_cooldown for axolotls."
             }
           }
         ],
@@ -611,35 +522,24 @@
       "value_schema": {
         "kind": "list",
         "item": {
+          "_TODO": "THIS RECURSES TO ITEM STACK EDITOR (ITEM SELECTOR + DATA COMPONENT EDITOR)",
           "kind": "reference",
           "ref": "item_stack",
           "description": "A single item stack."
         },
-        "description": "The items stored inside this bundle . Adding this component to any item other than a bundle does nothing. If this component is removed from a bundle , it cannot be used by the player and the usual instruction and fullness bar does not appear in the tooltip."
+        "description": "The items stored inside this bundle. Adding this component to any item other than a bundle does nothing. If this component is removed from a bundle , it cannot be used by the player and the usual instruction and fullness bar does not appear in the tooltip."
       }
     },
     {
       "id": "minecraft:can_break",
       "label": "can_break",
       "value_schema": {
-        "kind": "union",
-        "options": [
-          {
-            "kind": "object",
-            "fields": []
-          },
-          {
-            "kind": "list",
-            "item": {
-              "kind": "scalar",
-              "type": "string"
-            }
-          },
-          {
-            "kind": "object",
-            "fields": []
-          }
-        ],
+        "kind": "list",
+        "item": {
+          "_TODO": "BLOCK (MULTI) SELECTION EDITOR",
+          "kind": "scalar",
+          "type": "string"
+        },
         "description": "The only blocks this item may break when used by a player in Adventure mode. If defined as a compound, corresponds to A single block predicate. Items are listed in the tooltip in the order specified."
       }
     },
@@ -647,24 +547,12 @@
       "id": "minecraft:can_place_on",
       "label": "can_place_on",
       "value_schema": {
-        "kind": "union",
-        "options": [
-          {
-            "kind": "object",
-            "fields": []
-          },
-          {
-            "kind": "list",
-            "item": {
-              "kind": "scalar",
-              "type": "string"
-            }
-          },
-          {
-            "kind": "object",
-            "fields": []
-          }
-        ],
+        "kind": "list",
+        "item": {
+          "_TODO": "BLOCK (MULTI) SELECTION EDITOR",
+          "kind": "scalar",
+          "type": "string"
+        },
         "description": "Determines which blocks that blocks with this component can be placed against in Adventure mode. If defined as a compound, corresponds to A single block predicate. Items are listed in the tooltip in the order specified."
       }
     },
@@ -672,13 +560,14 @@
       "id": "minecraft:charged_projectiles",
       "label": "charged_projectiles",
       "value_schema": {
+        "_TODO": "RECURSE TO ITEM STACK EDITOR (ITEM SELECTOR + DATA COMPONENT EDITOR):",
         "kind": "list",
         "item": {
           "kind": "reference",
           "ref": "item_stack",
           "description": "A single projectile item stack."
         },
-        "description": "The items loaded as projectiles into this crossbow. If there are item stacks in this component, the item name for item stack is listed in the tooltip of the item as \"Projectile: [ <name> ]\", and any duplicate item stack entries are grouped together as \"Projectile: N x [ <name> ]\". If not present, this crossbow is not charged."
+        "description": "The items loaded as projectiles into this crossbow. If there are item stacks in this component, the item name for item stack is listed in the tooltip of the item as \"Projectile: [<name>]\", and any duplicate item stack entries are grouped together as \"Projectile: N x [ <name> ]\". If not present, this crossbow is not charged."
       }
     },
     {
@@ -973,17 +862,18 @@
       "id": "minecraft:debug_stick_state",
       "label": "debug_stick_state",
       "value_schema": {
-        "kind": "object",
-        "fields": [
-          {
-            "key": "<block ID>",
-            "schema": {
-              "kind": "scalar",
-              "type": "string",
-              "description": "A key-value pair, where the key is a block ID and the value is a block state key to edit on the block, for example \"minecraft:oak_fence\": \"east\" ."
-            }
-          }
-        ],
+        "kind": "map",
+        "key": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "A block ID.",
+          "semantic_type": "resource_location"
+        },
+        "value": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "A key-value pair, where the key is a block ID and the value is a block state key to edit on the block, for example \"minecraft:oak_fence\": \"east\" ."
+        },
         "description": "The selected block state properties used by this debug stick ."
       }
     },
@@ -1054,18 +944,18 @@
       "id": "minecraft:enchantments",
       "label": "enchantments",
       "value_schema": {
-        "kind": "object",
-        "fields": [
-          {
-            "key": "<enchantment ID>",
-            "schema": {
-              "kind": "scalar",
-              "type": "int",
-              "semantic_type": "resource_location",
-              "description": "A single key-value pair, where the key is the resource location of an enchantment, and the value is the level."
-            }
-          }
-        ],
+        "kind": "map",
+        "key": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "The resource location of an enchantment.",
+          "semantic_type": "resource_location"
+        },
+        "value": {
+          "kind": "scalar",
+          "type": "int",
+          "description": "A single key-value pair, where the key is the resource location of an enchantment, and the value is the level."
+        },
         "description": "Contains a map of each of this item's enchantments to its enchantment level. This and minecraft:enchantable must exist on an item for it to be able to be enchanted in an enchanting table. If present on an item, the color of the item name is aqua if its rarity is common or uncommon , and light purple if its rarity is rare or epic . If present on an item, the enchantments are listed in the item's tooltip. The order of the enchantments in the tooltip is defined by the #minecraft:tooltip_order enchantment tag."
       }
     },
@@ -1712,86 +1602,86 @@
       "id": "minecraft:map_decorations",
       "label": "map_decorations",
       "value_schema": {
-        "kind": "object",
-        "fields": [
-          {
-            "key": "<key>",
-            "schema": {
-              "kind": "object",
-              "fields": [
-                {
-                  "key": "type",
-                  "schema": {
-                    "kind": "scalar",
-                    "type": "string",
-                    "description": "The type of the icon. Can be player , frame , red_marker , blue_marker , target_x , target_point , player_off_map , player_off_limits , mansion , monument , banner_white , banner_orange , banner_magenta , banner_light_blue , banner_yellow , banner_lime , banner_pink , banner_gray , banner_light_gray , banner_cyan , banner_purple , banner_blue , banner_brown , banner_green , banner_red , banner_black , red_x , village_desert , village_plains , village_savanna , village_snowy , village_taiga , jungle_temple , or swamp_hut .",
-                    "choices": [
-                      "player",
-                      "frame",
-                      "red_marker",
-                      "blue_marker",
-                      "target_x",
-                      "target_point",
-                      "player_off_map",
-                      "player_off_limits",
-                      "mansion",
-                      "monument",
-                      "banner_white",
-                      "banner_orange",
-                      "banner_magenta",
-                      "banner_light_blue",
-                      "banner_yellow",
-                      "banner_lime",
-                      "banner_pink",
-                      "banner_gray",
-                      "banner_light_gray",
-                      "banner_cyan",
-                      "banner_purple",
-                      "banner_blue",
-                      "banner_brown",
-                      "banner_green",
-                      "banner_red",
-                      "banner_black",
-                      "red_x",
-                      "village_desert",
-                      "village_plains",
-                      "village_savanna",
-                      "village_snowy",
-                      "village_taiga",
-                      "jungle_temple",
-                      "swamp_hut"
-                    ]
-                  }
-                },
-                {
-                  "key": "x",
-                  "schema": {
-                    "kind": "scalar",
-                    "type": "double",
-                    "description": "The X world coordinate of the decoration."
-                  }
-                },
-                {
-                  "key": "z",
-                  "schema": {
-                    "kind": "scalar",
-                    "type": "double",
-                    "description": "The Z world coordinate of the decoration."
-                  }
-                },
-                {
-                  "key": "rotation",
-                  "schema": {
-                    "kind": "scalar",
-                    "type": "float",
-                    "description": "The rotation of the icon, ranging from 0.0 to 360.0, rotated clockwise from north in degrees."
-                  }
-                }
-              ],
-              "description": "The key-value pair of a single icon, where the key is an arbitrary unique string identifying the decoration."
+        "kind": "map",
+        "key": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "An arbitrary unique string identifying the decoration."
+        },
+        "value": {
+          "kind": "object",
+          "fields": [
+            {
+              "key": "type",
+              "schema": {
+                "kind": "scalar",
+                "type": "string",
+                "description": "The type of the icon. Can be player , frame , red_marker , blue_marker , target_x , target_point , player_off_map , player_off_limits , mansion , monument , banner_white , banner_orange , banner_magenta , banner_light_blue , banner_yellow , banner_lime , banner_pink , banner_gray , banner_light_gray , banner_cyan , banner_purple , banner_blue , banner_brown , banner_green , banner_red , banner_black , red_x , village_desert , village_plains , village_savanna , village_snowy , village_taiga , jungle_temple , or swamp_hut .",
+                "choices": [
+                  "player",
+                  "frame",
+                  "red_marker",
+                  "blue_marker",
+                  "target_x",
+                  "target_point",
+                  "player_off_map",
+                  "player_off_limits",
+                  "mansion",
+                  "monument",
+                  "banner_white",
+                  "banner_orange",
+                  "banner_magenta",
+                  "banner_light_blue",
+                  "banner_yellow",
+                  "banner_lime",
+                  "banner_pink",
+                  "banner_gray",
+                  "banner_light_gray",
+                  "banner_cyan",
+                  "banner_purple",
+                  "banner_blue",
+                  "banner_brown",
+                  "banner_green",
+                  "banner_red",
+                  "banner_black",
+                  "red_x",
+                  "village_desert",
+                  "village_plains",
+                  "village_savanna",
+                  "village_snowy",
+                  "village_taiga",
+                  "jungle_temple",
+                  "swamp_hut"
+                ]
+              }
+            },
+            {
+              "key": "x",
+              "schema": {
+                "kind": "scalar",
+                "type": "double",
+                "description": "The X world coordinate of the decoration."
+              }
+            },
+            {
+              "key": "z",
+              "schema": {
+                "kind": "scalar",
+                "type": "double",
+                "description": "The Z world coordinate of the decoration."
+              }
+            },
+            {
+              "key": "rotation",
+              "schema": {
+                "kind": "scalar",
+                "type": "float",
+                "description": "The rotation of the icon, ranging from 0.0 to 360.0, rotated clockwise from north in degrees."
+              }
             }
-          }
-        ],
+          ],
+          "description": "The key-value pair of a single icon, where the key is an arbitrary unique string identifying the decoration."
+        },
         "description": "Contains key-value pairs of the icons to display on this filled map ."
       }
     },
@@ -2071,18 +1961,18 @@
       "id": "minecraft:stored_enchantments",
       "label": "stored_enchantments",
       "value_schema": {
-        "kind": "object",
-        "fields": [
-          {
-            "key": "<enchantment ID>",
-            "schema": {
-              "kind": "scalar",
-              "type": "int",
-              "semantic_type": "resource_location",
-              "description": "A single key-value pair, where the key is the resource location of an enchantment, and the value is the level."
-            }
-          }
-        ],
+        "kind": "map",
+        "key": {
+          "kind": "scalar",
+          "type": "string",
+          "description": "The resource location of an enchantment.",
+          "semantic_type": "resource_location"
+        },
+        "value": {
+          "kind": "scalar",
+          "type": "int",
+          "description": "A single key-value pair, where the key is the resource location of an enchantment, and the value is the level."
+        },
         "description": "Contains a map of inactive enchantments and their levels. Adding this component to any item other than an enchanted book does nothing except add text to the item's tooltip. If this component is removed from an enchanted book, the item can no longer be combined with other enchanted books. If present on an item, the enchantments are listed in the item's tooltip. The order of the enchantments in the tooltip is defined by the #minecraft:tooltip_order enchantment tag."
       }
     },

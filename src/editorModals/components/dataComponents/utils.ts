@@ -22,6 +22,10 @@ export function createDefaultValue(schema: DataComponentValueSchema): unknown {
       if (schema.type === 'boolean') return false
       if (schema.type === 'int_array' || schema.type === 'byte_array') return []
       if (isNumericScalar(schema.type)) return schema.min ?? 0
+      if (schema.type === 'string') {
+        const firstChoice = schema.choices?.find((choice): choice is string => typeof choice === 'string')
+        return firstChoice ?? ''
+      }
       return ''
     case 'object': {
       const value: Record<string, unknown> = {}
@@ -30,6 +34,8 @@ export function createDefaultValue(schema: DataComponentValueSchema): unknown {
       }
       return value
     }
+    case 'map':
+      return {}
     case 'list':
       return []
     case 'union':
@@ -91,6 +97,8 @@ function matchesSchema(schema: DataComponentValueSchema, value: unknown): boolea
       if (schema.type === 'int_array' || schema.type === 'byte_array') return Array.isArray(value)
       return typeof value === 'number'
     case 'object':
+      return typeof value === 'object' && value !== null && !Array.isArray(value)
+    case 'map':
       return typeof value === 'object' && value !== null && !Array.isArray(value)
     case 'list':
       return Array.isArray(value)

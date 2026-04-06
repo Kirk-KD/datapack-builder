@@ -116,6 +116,35 @@
   background: var(--colour-surface-app);
 }
 
+.dataComponentMapList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dataComponentMapEntry {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.4fr) auto;
+  gap: 8px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid var(--colour-border-default);
+  border-radius: 8px;
+  background: var(--colour-surface-app);
+}
+
+.dataComponentMapKeyInput {
+  min-width: 0;
+}
+
+.dataComponentMapValue {
+  min-width: 0;
+}
+
+.dataComponentMapRemoveButton {
+  align-self: stretch;
+}
+
 .dataComponentTextarea {
   min-height: 104px;
   resize: vertical;
@@ -203,4 +232,14 @@
   border-radius: 8px;
   background: var(--colour-surface-app);
   color: var(--colour-text-secondary);
+}
+
+@media (max-width: 900px) {
+  .dataComponentMapEntry {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dataComponentMapRemoveButton {
+    justify-self: start;
+  }
 }

@@ -37,6 +37,17 @@ export type DataComponentObjectSchema = {
   max?: number
 }
 
+export type DataComponentMapSchema = {
+  kind: 'map'
+  key: DataComponentScalarSchema & { type: 'string' }
+  value: DataComponentValueSchema
+  description?: string
+  default?: unknown
+  choices?: unknown[]
+  min?: number
+  max?: number
+}
+
 export type DataComponentListSchema = {
   kind: 'list'
   item: DataComponentValueSchema
@@ -80,6 +91,7 @@ export type DataComponentOpaqueSchema = {
 export type DataComponentValueSchema =
   | DataComponentScalarSchema
   | DataComponentObjectSchema
+  | DataComponentMapSchema
   | DataComponentListSchema
   | DataComponentUnionSchema
   | DataComponentReferenceSchema
