@@ -49,7 +49,7 @@ function ItemSprite({ spriteFileName, large = false }: { spriteFileName: string;
   )
 }
 
-function ItemSelector({ value, onChange, onResolvedChange, layout = 'auto' }: ItemSelectorProps) {
+export default function ItemSelector({ value, onChange, onResolvedChange, layout = 'auto' }: ItemSelectorProps) {
   const [entries, setEntries] = useState<readonly MinecraftItemEntry[] | null>(null)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
@@ -172,5 +172,3 @@ function ItemSelector({ value, onChange, onResolvedChange, layout = 'auto' }: It
     </div>
   )
 }
-
-export default ItemSelector

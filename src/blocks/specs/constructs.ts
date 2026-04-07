@@ -79,6 +79,7 @@ export const constructBlockSpecs: BlockSpec[] = [
       }
 
       block.getEditorContext = function(this: ItemStackBlock) {
+        // TODO define specific context type
         return {
           value: this.itemStackValue_,
           spriteFileName: this.itemStackSpriteFile_,
@@ -87,36 +88,10 @@ export const constructBlockSpecs: BlockSpec[] = [
       }
 
       block.applyEditorResult = function(this: ItemStackBlock, result: unknown) {
-        if (typeof result === 'string') {
-          this.itemStackValue_ = result
-          this.itemStackSpriteFile_ = ''
-          this.updatePreview_()
-          return
-        }
-
-        if (!result || typeof result !== 'object') return
-
-        const nextValue =
-          'value' in result && typeof result.value === 'string'
-            ? result.value
-            : null
-        const nextSpriteFile =
-          'spriteFileName' in result && typeof result.spriteFileName === 'string'
-            ? result.spriteFileName
-            : ''
-        const nextComponents =
-          'components' in result
-          && result.components
-          && typeof result.components === 'object'
-          && !Array.isArray(result.components)
-            ? { ...(result.components as Record<string, unknown>) }
-            : {}
-
-        if (nextValue === null) return
-
-        this.itemStackValue_ = nextValue
-        this.itemStackSpriteFile_ = nextSpriteFile
-        this.itemStackComponents_ = nextComponents
+        // TODO receive results
+        // this.itemStackValue_ = nextValue
+        // this.itemStackSpriteFile_ = nextSpriteFile
+        // this.itemStackComponents_ = nextComponents
         this.updatePreview_()
       }
 

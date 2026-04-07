@@ -3,7 +3,6 @@ import * as Blockly from 'blockly'
 import { registerEditorModalController } from './bridge'
 import { loadEditorModal } from './registry'
 import type { EditorBlock, EditorComponent, EditorComponentProps, EditorModalRequest } from './types'
-import './editors'
 import './EditorModalHost.css'
 
 function FallbackEditorModal({ request, block }: EditorComponentProps) {
