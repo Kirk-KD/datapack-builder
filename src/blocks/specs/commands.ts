@@ -425,7 +425,7 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'ITEM',
-          check: ['mc_param', 'mc_item_stack']
+          check: ['mc_param', 'mc_string']
         },
         {
           type: 'input_value',
@@ -445,7 +445,7 @@ export const commandBlockSpecs: BlockSpec[] = [
     },
     setShadowBlocks(this) {
       setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
-      setShadowState(this, 'ITEM', { type: 'mc_item_stack' })
+      setShadowState(this, 'ITEM', { type: 'mc_string' })
       setShadowState(this, 'COUNT', { type: 'number', fields: { VALUE: '1' } })
     }
   }

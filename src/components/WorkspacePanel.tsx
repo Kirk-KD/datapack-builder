@@ -5,11 +5,11 @@ import {registerContinuousToolbox, additionalOptions, setupWorkspace} from '../w
 import getToolboxContents from '../blocks'
 import { compile } from '../compiler'
 import { updateWorkspaceRegistry} from '../compiler/workspaceRegistry'
-import EditorModalHost from '../editorModals/EditorModalHost.tsx'
 import './WorkspacePanel.css'
 
 import type {WorkspaceSvg} from "blockly";
 import {useProjectConfigStore} from "../stores/projectConfig.ts";
+import {loadDataComponentSchemas} from "../catalog/dataComponentSchemaCatalog.ts";
 
 // Register outside useEffect to avoid error due to variables category
 registerContinuousToolbox()
@@ -106,9 +106,10 @@ function WorkspacePanel() {
     updateConfig({ noNameMangling: !projectConfig.noNameMangling })
   }
 
+  loadDataComponentSchemas().then((val) => console.log(val))
+
   return (
     <>
-      <EditorModalHost />
       <div style={{
         display: 'flex',
         flexDirection: 'row',
