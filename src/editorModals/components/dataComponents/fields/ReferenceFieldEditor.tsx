@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 import type { DataComponentReferenceSchema } from '../types'
 import { parseJsonText } from '../utils'
 import HelpTooltip from '../HelpTooltip'
+import { renderReferenceInlineEditor, supportsTextMode } from '../referenceEditorRegistry'
 
 type ReferenceFieldEditorProps = {
   schema: DataComponentReferenceSchema
@@ -26,11 +27,12 @@ function stringifyReferenceValue(value: unknown) {
   }
 }
 
-function supportsTextMode(ref: string) {
-  return ref === 'text_component' || ref === 'sound_event'
-}
-
 function ReferenceFieldEditor({ schema, label, value, onChange }: ReferenceFieldEditorProps) {
+  const inlineEditor = renderReferenceInlineEditor({ schema, label, value, onChange })
+  if (inlineEditor) {
+    return inlineEditor
+  }
+
   const mode = supportsTextMode(schema.ref) && typeof value === 'string' ? 'text' : 'json'
   const text = stringifyReferenceValue(value)
   const parsedJson = useMemo(() => parseJsonText(text), [text])

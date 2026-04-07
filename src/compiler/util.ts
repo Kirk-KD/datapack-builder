@@ -24,6 +24,10 @@ function formatPrimitive(value: Exclude<SNBT, Record<string, SNBT> | SNBT[]>) {
   return String(value)
 }
 
+function formatSnbtKey(key: string) {
+  return `"${escapeSnbtString(key)}"`
+}
+
 function isSnbtObject(value: SNBT): value is Record<string, SNBT> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
@@ -39,7 +43,7 @@ export function snbtToString(
       return String(snbt)
     }
 
-    const entries = Object.entries(snbt).map(([key, value]) => `${key}:"${value}"`)
+    const entries = Object.entries(snbt).map(([key, value]) => `${formatSnbtKey(key)}:"${value}"`)
     return `{${entries.join(',')}}`
   }
 
@@ -56,6 +60,6 @@ export function snbtToString(
   }
 
   const entries = Object.entries(snbt)
-    .map(([key, value]) => `${key}:${snbtToString(value, config)}`)
+    .map(([key, value]) => `${formatSnbtKey(key)}:${snbtToString(value, config)}`)
   return `{${entries.join(',')}}`
 }

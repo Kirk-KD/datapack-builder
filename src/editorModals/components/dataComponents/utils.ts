@@ -1,8 +1,11 @@
 import type {
-  DataComponentReferenceSchema,
   DataComponentScalarSchema,
   DataComponentValueSchema,
 } from './types'
+import {
+  createDefaultReferenceValue,
+  matchesReferenceValue,
+} from './referenceEditorRegistry'
 
 function isNumericScalar(type: DataComponentScalarSchema['type']) {
   return type === 'byte'
@@ -45,14 +48,6 @@ export function createDefaultValue(schema: DataComponentValueSchema): unknown {
     case 'opaque':
       return ''
   }
-}
-
-function createDefaultReferenceValue(schema: DataComponentReferenceSchema) {
-  if (schema.ref === 'text_component' || schema.ref === 'sound_event') {
-    return ''
-  }
-
-  return {}
 }
 
 export function validateScalarValue(schema: DataComponentScalarSchema, value: unknown): string | null {
@@ -103,10 +98,7 @@ function matchesSchema(schema: DataComponentValueSchema, value: unknown): boolea
     case 'list':
       return Array.isArray(value)
     case 'reference':
-      if (schema.ref === 'text_component' || schema.ref === 'sound_event') {
-        return typeof value === 'string' || (typeof value === 'object' && value !== null)
-      }
-      return typeof value === 'object' && value !== null
+      return matchesReferenceValue(schema, value)
     case 'union':
       return schema.options.some((option) => matchesSchema(option, value))
     case 'opaque':
