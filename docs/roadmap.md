@@ -45,74 +45,220 @@ Deferred for now.
 - Native blocks expose Minecraft semantics, but with strong validation and UX support.
 - The editor should prevent invalid structures where possible.
 
-## Editor Modal System
-The editor modal system exists to support block fields whose value is too complex or too awkward to edit inline.
-It should stay small and block-driven rather than becoming a separate application state layer.
+## Editor System
+The editor system provides an interface for the user to certain block properties, such as an Item Stack Editor.
+They are intended to be opened via a clickable field on a Blockly block, but the implementation should allow
+future access outside a Blockly workspace and blocks.
 
-Each block that wants a modal editor exposes two functions:
-- `getEditorContext`, which returns the current structured value for the editor
-- `applyEditorResult`, which accepts the editor output and stores it back on the block
+### Data
+The core of the Editor system relies on data being returned bottom-up, with context passed top-down.
+This is due to the nested and potentially recursive nature of an Editor, where it is made up of nested Editors and elementary input fields.
 
-The modal host only manages generic concerns:
-- open/close lifecycle
-- lazy loading of editor components by `editorType`
-- passing block context into the editor
-- collecting a pending result and committing it on save
+For ease of design, the following will all be considered Editor input fields:
+- String input
+- Numeric input
+- Object input
+- List input
+- Colour picker
+- Item selector
+- Data Component editor
+- etc.
 
-This keeps the ownership boundaries clear.
-The modal host does not know what an item stack, selector, or NBT value means.
-The block remains the owner of its own state shape and compilation behaviour.
-The editor component is only responsible for editing a structured value and emitting the next structured value.
+There should be two unified type definitions, `EditorContext` and `EditorResult`.
 
-This design is intentionally simple:
-- one shared host
-- one registry for editor components
-- one bridge for opening a modal from a Blockly field
-- no global editor store
-- no editor-specific persistence outside block extra state
+The `EditorContext` provides at least the Editor source (e.g. a Blockly block instance), to Editors.
+It should be extended via generics (`EditorContext<{key: ValueType}>`) in specific Editors to include other relevant information, such as the Item Selector associated with a Data Modifier Editor.
+It is the responsibility of the source to provide the initial context (e.g. a Blockly block informing its opened Editor of its identity).
+It is the responsibility of the parent Editor to provide its inner Editors necessary information (e.g. a Projectile Editor informing its inner Item Stack Editor of the whitelisted projectile items).
+The behaviour of conditionally disabled input fields is achieved via this system too.
 
-The result is that modal editors are reusable UI helpers for complex native-layer values, not an independent document model.
+The `EditorResult` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data up to the Editor source.
+It should have at least two fields: `error` and `data`. The `data` can be any type, either primitive or an object.
+`Error` is a boolean flag that marks the user input of a particular Editor as erronous, and the UX should reflect this information.
+There should also be an optional `compileValue` string function for the compiled Minecraft command fragment by the Editor.
+The `compileValue` function optionally takes in an `options` object of `Record<string, unknown>` via a generic.
 
-## Item Component Editor System
-The item component editor is designed as a schema-driven React component used inside the item stack editor, not as its own top-level modal.
-This is important because item components are part of a larger `mc_item_stack` value alongside the selected item id and sprite preview.
+For example, the `data` returned by an Item Stack Editor could be
 
-The system is split into a few narrow responsibilities:
-- a data component schema catalog in `src/catalog/`, which lazy-loads the generated component schema JSON
-- a `DataComponentEditor`, which loads schemas and renders the component editing UI
-- a `ComponentListEditor`, which manages the list of chosen components for one item
-- a recursive `SchemaValueEditor`, which renders a value editor from schema nodes
-- a small set of field editors for scalar and reference-like schema types
+```
+{
+  id: 'minecraft:egg',
+  components: [
+    {
+      'minecraft:chicken/variant': {
+        'variant': 'cold'
+      }
+    }
+  ],
+  count: 16,
+  spriteSrc: 'egg.png'
+}
+```
 
-The main design choice is that editors are created per schema node kind, not per Minecraft component.
-There should not be a handwritten React editor for every item component.
-Instead, each component schema describes its value shape, and the UI walks that schema recursively.
+But its `compileValue` function should return either
 
-Supported schema node kinds are intentionally minimal:
-- `scalar`
-- `object`
-- `list`
-- `union`
-- `reference`
-- `opaque` as a fallback for imperfect schema entries
+```'minecraft:egg[minecraft:chicken/variant="cold"] 16'```
 
-This keeps the system practical while the schema is still being refined.
-If a component is parsed imperfectly, the editor should still render something editable instead of blocking the entire feature.
+or
 
-Validation is also intentionally minimal.
-The editor should enforce only what the schema directly declares:
-- primitive type shape
-- `choices`
-- `min`
-- `max`
-- `default`
-- `description`
+```'{id:"minecraft:egg",components:{"minecraft:chicken/variant":"cold"},count:16}'```
 
-Descriptions are available through help tooltips rather than always-visible text, so the editor stays dense enough for real use.
+depending on the options passed to the function.
 
-For now, reference types are edited using generic text or JSON inputs where a fully specialized UI does not yet exist.
-That keeps the system immediately usable without requiring a large up-front library of special-purpose editors.
-More specific editors can be added later only where they materially improve usability.
+### UI / UX
+
+#### Editor
+All inputs of an Editor should have a two-column design: field labels in the left column, and inputs/inner Editors in the right one.
+The label column should be left aligned and take up the minimum width needed to display the longest label, plus some margin.
+The input column should at least fill the remaining horizontal space and expand respect any width demands by its inner inputs and Editors.
+
+Notice how an inner Editor could encounter overflow too. An inner Editor should never have its own horizontal scrollbar.
+Instead, the root editor should satisfy its content's width requirement by increasing its own width and letting its parent handle horizontal scroll behaviours.
+
+To avoid elementary input components gaining width infinitely due to nested Editors and to ensure correct alignment, the same `max-width` must be defined for them.
+To facilitate horizontal overflow of the root Editor, a `min-width` must also be defined similarly.
+
+Each input component (both elementary and Editor) requires a "reset" button.
+Consequently, a default value must be defined for each input.
+For an inner Editor, the reset button will iteratively reset its inner inputs to their defined default values.
+
+Each input component must also allow for an optional `description` and `note`.
+Descriptions will be displayed via a tooltip component upon hovering over the input's label.
+A note will be displayed as muted text above the input component, if provided.
+
+Each input component must also allow a specification of it being `optional`.
+An optional input field will have a checkbox to the left of its label.
+If an input is optional, the checkbox is by default unchecked.
+When the checkbox is unchecked, the input component is disabled and greyed out.
+The disabled status of an input element must be reported via the `EditorResult` pipeline.
+Upon disabling, the input's value (or values if it is an inner Editor) must be kept and not reset.
+By default, an input component is not optional.
+This optional input toggle avoids the need to implement an "unset" value/option for each input type.
+
+Any inner Editor input must be collapsable, including list Editors.
+Upon collapsing or expanding, the parent/root Editor must adjust its width responsively under the new layout.
+The initial `collapsed` state can be specified via a prop, or defaults to false.
+
+A visual container is used around a nested Editor to separate it from the other input elements.
+This means the root editor should not be wrapped in a container (unless otherwise needed).
+The value of the container background colour should rotate through (and wrap around) three light to dark variants depending on its nested depth.
+This visual container should not be applied to list editors.
+
+It is the responsibility of the Editor host (e.g. a modal containing this editor, or a Settings page) to
+provide a save/cancel functionality and to delete or reset the Editor appropriately.
+
+#### Changed State
+
+Any input field is considered **changed** if its current state differs from its `oldState`.
+The label text of a changed input should be bolded and slightly brighter to reflect this visually.
+
+`oldState` is a prop with two fields:
+- `value`: the value the input was initialized with. This may be the last saved state (e.g. the value when the Editor modal was opened) or a defined default, depending on what the Editor host provides.
+- `enabled`: whether the input was enabled when initialized
+
+Composite Editors (Editors containing other input components) do not receive or compare `oldState.value` themselves.
+Their changed state is derived entirely from their children.
+
+Elementary Editor inputs are considered changed if:
+- Their current enabled status differs from `oldState.enabled`, or
+- Their current value differs from `oldState.value`.
+
+The `oldState.enabled` status check takes precedence.
+If the enabled status is different, the input is considered changed regardless of whether its value differs from the old value.
+
+Changed state reflects the current difference against `oldState`, not edit history.
+
+Composite Editor inputs are considered changed if:
+- Their own current enabled status differs from their `oldState.enabled`, or
+- Any of their inner input components are considered changed.
+
+List Editor inputs are considered changed if:
+- Their current enabled status differs from `oldState.enabled`, or
+- Any of its items are considered changed, or
+- The order of items has changed.
+
+List items do not have a label or optional toggle. 
+Consequently, their oldState omits the enabled field, and only the value comparison applies.
+If a list item is a composite Editor, its changed state is derived from its children as normal, with no enabled check.
+
+#### String Input
+Simply a text input with the option to be a text field.
+
+#### Integer & Number Input
+A text input with a validator that runs on every keystroke.
+The validator does not correct the input, but the input component should set the `error` flag of the `EditorResult`.
+
+A min and max can be specified.
+
+#### Object Input
+Essentially an empty Editor able to take in inputs components as children.
+`key` props will be the label texts for inner inputs in the Object input.
+It will return data as an Object with keys being the value of the `key` props of its children.
+
+#### List Input
+A list input is an Editor that has a predetermined input component type.
+To the top-right of each item, there will be a button to remove the item.
+The "add" button will be placed in its own row and right aligned.
+The "add" button row will be placed below the last list item if the list is not empty.
+An empty list simply has only one row for the "add" button, nothing else. 
+
+The return data will be an array containing the returned data of its contents.
+
+At this time, no minimum or maximum list size needs to be specified.
+
+#### Dropdown
+A dropdown of string values. If the number of options is greater than 25, there should be a small search/filter textbox.
+A default value can optionally be explicitly defined, otherwise it treats the first option as the default.
+
+#### Boolean
+Simply a checkbox with the text "true" or "false" to the right of it.
+
+#### Keyboard Navigation
+Deferred for now. Need an App-wide unified design.
+
+### JSON Schema
+The support for a JSON schema (such as `data_component_schema.json`) is neccessary for Editors working on complex sets
+of inputs unfit for definition in TypeScript files.
+A parser should receive an Editor schema object and return the recursively constructed Editor/input components.
+
+#### Schema
+```ts
+type EditorSchema = {
+  kind: "scalar" | "object" | "reference" | "list"
+  optional?: boolean
+  description?: string
+  note?: string
+  
+  // if kind = scalar
+  type?: "string" | "int" | "float" | "double" | "select" | "boolean"
+  
+  // if type = string/int/float/double/select/boolean
+  default?: string | number | boolean
+  
+  // if type = int/float/double
+  min?: number
+  max?: number
+  
+  // if type = select
+  options?: string[]
+  
+  // if kind = object
+  fields?: {
+    key: string // label defaults to key
+    schema: EditorSchema
+  }[]
+  
+  // if kind = list
+  item?: EditorSchema
+  
+  // if kind = reference
+  ref?: string // ID of an editor
+}
+```
+
+#### Editor Registry
+Editor React components will be kept tracked via a simple ID-to-Component registry. 
+A `reference`-kind schema simply provides the ID of the editor, and the corresponding Editor will be created by the parser.
 
 ## Data Types
 Data types are key to Minecraft commands.
