@@ -20,6 +20,42 @@ function App() {
             console.log('field_number_two', data)
           }} type={'int'} />
         </EditorRow>
+        <EditorRow label={'noted_input'} note={'This one has a note.'}>
+          <NumberEditor context={{}} callback={() => {}} type={'int'} />
+        </EditorRow>
+        <EditorRow label={'nested'} isNested={true}>
+          <KeyValueEditor>
+            <EditorRow label={'field_1'}>
+              <NumberEditor context={{}} callback={({data}) => {
+                console.log('field_1', data)
+              }} type={'float'} />
+            </EditorRow>
+            <EditorRow label={'field_2'} isNested={true}>
+              <KeyValueEditor>
+                <EditorRow label={'field_2_1'}>
+                  <NumberEditor context={{}} callback={({data}) => {
+                    console.log('field_2_1', data)
+                  }} type={'float'} />
+                </EditorRow>
+                <EditorRow label={'field_2_2'}>
+                  <NumberEditor context={{}} callback={({data}) => {
+                    console.log('field_2_2', data)
+                  }} type={'float'} />
+                </EditorRow>
+                <EditorRow label={'field_2_3'}>
+                  <NumberEditor context={{}} callback={({data}) => {
+                    console.log('field_2_3', data)
+                  }} type={'float'} />
+                </EditorRow>
+              </KeyValueEditor>
+            </EditorRow>
+          </KeyValueEditor>
+        </EditorRow>
+        <EditorRow label={'optional'} optional={true}>
+          <NumberEditor context={{}} callback={({data}) => {
+            console.log('optional', data)
+          }} type={'int'} />
+        </EditorRow>
       </KeyValueEditor>
     )
   })

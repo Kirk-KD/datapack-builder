@@ -118,9 +118,8 @@ Instead, the root editor should satisfy its content's width requirement by incre
 To avoid elementary input components gaining width infinitely due to nested Editors and to ensure correct alignment, the same `max-width` must be defined for them.
 To facilitate horizontal overflow of the root Editor, a `min-width` must also be defined similarly.
 
-Each input component (both elementary and Editor) requires a "reset" button.
+Each elementary input component (and not inner Editors) requires a "reset" button.
 Consequently, a default value must be defined for each input.
-For an inner Editor, the reset button will iteratively reset its inner inputs to their defined default values.
 
 Each input component must also allow for an optional `description` and `note`.
 Descriptions will be displayed via a tooltip component upon hovering over the input's label.

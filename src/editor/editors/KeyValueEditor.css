@@ -1,7 +1,29 @@
-.editor {
+.keyValueEditor {
     display: grid;
     grid-template-columns: min-content 1fr;
 
+    width: fit-content;
+    padding: 0.3rem;
+
+    column-gap: 1.5rem;
+    --input-field-height: 1.6rem;
+}
+
+.keyValueEditor > *:not(.editorNote):not(:nth-last-child(-n+2)) {
+    margin-bottom: 0.5rem;
+}
+
+/* Contains a input and its reset button, within `.editorRowInput`. */
+.keyValueEditor .inputContainer {
     width: 100%;
-    padding: 0;
+    max-width: 20rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* The input element */
+.keyValueEditor .inputContainer > *:first-child {
+    flex-grow: 1;
 }

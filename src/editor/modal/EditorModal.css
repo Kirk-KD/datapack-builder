@@ -1,3 +1,5 @@
+@import "../components/editorCheckbox.css";
+
 .editorModal {
     background-color: var(--colour-surface-panel);
     border: 1px solid var(--colour-border-default);

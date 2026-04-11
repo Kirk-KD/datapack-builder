@@ -18,7 +18,12 @@
   --colour-shadow-strong: rgb(0 0 0 / 45%);
   --colour-focus-ring: rgb(141 184 255 / 22%);
 
+  --colour-input-field: #2e3547;
+  --colour-input-button: #2e3547;
+  --colour-input-button-hover: #354051;
+
   --border-radius-default: 10px;
+  --border-radius-small: 5px;
 }
 
 * {

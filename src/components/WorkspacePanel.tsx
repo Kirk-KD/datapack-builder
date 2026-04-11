@@ -105,9 +105,7 @@ function WorkspacePanel() {
   function toggleNoNameMangling() {
     updateConfig({ noNameMangling: !projectConfig.noNameMangling })
   }
-
-  loadDataComponentSchemas().then((val) => console.log(val))
-
+  
   return (
     <>
       <div style={{

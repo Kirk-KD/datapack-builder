@@ -1,7 +1,7 @@
 import type { ChangeEventHandler } from "react"
 import './TextInput.css'
-import './inputContainer.css'
 import * as React from "react"
+import ResetButton from "./ResetButton.tsx";
 
 type TextInputProps = {
   defaultValue: string
@@ -33,7 +33,7 @@ export default function TextInput({ defaultValue, value, setValue, onChange, dis
         disabled={disabled}
         placeholder={placeholder}
       />
-      <button onClick={handleReset} disabled={disabled} className='resetButton'>↺</button>
+      <ResetButton handleReset={handleReset} disabled={disabled} />
     </div>
   )
 }

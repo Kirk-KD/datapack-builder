@@ -1,0 +1,13 @@
+.textInput {
+    background-color: var(--colour-input-field);
+    border: 1px solid transparent;
+
+    color: var(--colour-text-primary);
+    height: var(--input-field-height);
+
+    padding: 0.1rem 0.35rem;
+}
+
+.textInput:focus {
+    border: 1px solid var(--colour-focus-ring);
+}

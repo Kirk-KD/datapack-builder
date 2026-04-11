@@ -1,23 +1,15 @@
 import * as React from "react"
 import './KeyValueEditor.css'
 
-type EditorProps = {
-  children: React.ReactNode
-  darkBackground?: boolean
-}
-
 /**
  * A conventional key-value paired editor, with labels on the left column and inputs on the right.
  *
  */
-export default function KeyValueEditor({ children, darkBackground }: EditorProps) {
+export default function KeyValueEditor({ children }: {
+  children: React.ReactNode
+}) {
   return (
-    <div
-      className='editor'
-      style={darkBackground ? {
-        backgroundColor: `rgba(0 0 0 10%)`
-      } : {}}
-    >
+    <div className='editor keyValueEditor'>
       {children}
     </div>
   )
