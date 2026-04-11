@@ -1,0 +1,11 @@
+/* Contains a input and its reset button, within `.editorRowInput`. */
+.inputContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+/* The input element */
+.inputContainer > *:first-child {
+    flex-grow: 1;
+}

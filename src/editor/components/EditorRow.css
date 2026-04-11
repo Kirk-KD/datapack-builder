@@ -1,0 +1,18 @@
+.editorNote {
+    grid-column: 1 / -1;
+    color: var(--colour-text-muted)
+}
+
+/* Contains enable checkbox and label text */
+.editorRowLabel {
+    display: flex;
+    flex-direction: row;
+}
+
+.editorRowLabel > .enableCheckbox {
+
+}
+
+.editorRowInput {
+
+}
