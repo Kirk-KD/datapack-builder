@@ -63,7 +63,7 @@ export type OldState<T> = {
 
 // Props
 
-type EditorBaseProps<AdditionalContext extends Record<string, unknown>, Result> = {
+export type EditorBaseProps<AdditionalContext extends Record<string, unknown>, Result> = {
   context: EditorContext<AdditionalContext>
   callback: EditorResultCallback<Result>
 
