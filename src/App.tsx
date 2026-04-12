@@ -10,7 +10,7 @@ function App() {
     title: 'Hello',
     editor: (
       <KeyValueEditor>
-        <EditorRow label={'field_1'} description={'Hello hello hello'}>
+        <EditorRow label={'field_1'} description={'Hello hello hello hello hello hello hello hello hello'}>
           <NumberEditor context={{}} callback={({data}) => {
             console.log('field_1', data)
           }} type={'float'} />

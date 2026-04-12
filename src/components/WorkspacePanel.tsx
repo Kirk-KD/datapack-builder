@@ -9,7 +9,6 @@ import './WorkspacePanel.css'
 
 import type {WorkspaceSvg} from "blockly";
 import {useProjectConfigStore} from "../stores/projectConfig.ts";
-import {loadDataComponentSchemas} from "../catalog/dataComponentSchemaCatalog.ts";
 
 // Register outside useEffect to avoid error due to variables category
 registerContinuousToolbox()
