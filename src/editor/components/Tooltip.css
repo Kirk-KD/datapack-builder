@@ -1,0 +1,25 @@
+.tooltipWrapper {
+    position: relative;
+    display: inline-flex;
+    overflow: visible;
+}
+
+.tooltipWrapper .tooltip {
+    visibility: hidden;
+    position: absolute;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--colour-surface-panel-hover-strong);
+    color: var(--colour-text-primary);
+    padding: 0.3rem 0.6rem;
+    border-radius: var(--border-radius-small);
+    white-space: nowrap;
+    font-size: var(--font-size-small);
+    pointer-events: none;
+    z-index: 999999;
+}
+
+.tooltipWrapper:hover .tooltip {
+    visibility: visible;
+}

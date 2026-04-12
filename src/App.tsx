@@ -10,7 +10,7 @@ function App() {
     title: 'Hello',
     editor: (
       <KeyValueEditor>
-        <EditorRow label={'field_1'}>
+        <EditorRow label={'field_1'} description={'Hello hello hello'}>
           <NumberEditor context={{}} callback={({data}) => {
             console.log('field_1', data)
           }} type={'float'} />
@@ -23,7 +23,7 @@ function App() {
         <EditorRow label={'noted_input'} note={'This one has a note.'}>
           <NumberEditor context={{}} callback={() => {}} type={'int'} />
         </EditorRow>
-        <EditorRow label={'nested'} isNested={true} optional={true}>
+        <EditorRow label={'nested'} isNested={true} optional={true} description={'Hello hello hello'}>
           <KeyValueEditor>
             <EditorRow label={'field_1'}>
               <NumberEditor context={{}} callback={({data}) => {

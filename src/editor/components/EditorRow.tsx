@@ -2,6 +2,7 @@ import * as React from "react"
 import './EditorRow.css'
 import EnableCheckbox from "./EnableCheckbox.tsx";
 import {useState} from "react";
+import Tooltip from "./Tooltip.tsx";
 
 type EditorRowProps = {
   label: string
@@ -24,8 +25,9 @@ export default function EditorRow({ label, description, note, optional, children
 
       <div className={`editorRowLabel ${enabled ? '' : 'disabled'}`}>
         <EnableCheckbox show={optional} setEnabled={setEnabled} />
-        <span>{label}</span>
-        {/* TODO add tooltip for description */}
+        <Tooltip text={description}>
+          <span className={'editorLabelSpan'}>{label}</span>
+        </Tooltip>
       </div>
 
       <div
