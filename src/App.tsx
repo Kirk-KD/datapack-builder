@@ -23,7 +23,7 @@ function App() {
         <EditorRow label={'noted_input'} note={'This one has a note.'}>
           <NumberEditor context={{}} callback={() => {}} type={'int'} />
         </EditorRow>
-        <EditorRow label={'nested'} isNested={true}>
+        <EditorRow label={'nested'} isNested={true} optional={true}>
           <KeyValueEditor>
             <EditorRow label={'field_1'}>
               <NumberEditor context={{}} callback={({data}) => {
