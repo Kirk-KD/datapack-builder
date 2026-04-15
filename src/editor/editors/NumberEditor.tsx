@@ -1,6 +1,6 @@
 import type {NumberEditorProps} from "../types.ts";
 import TextInput from "../components/TextInput.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 export default function NumberEditor({callback, type, defaultValue, min, max}: NumberEditorProps) {
   const defaultValueStr = (defaultValue ?? 0).toString()
@@ -23,6 +23,15 @@ export default function NumberEditor({callback, type, defaultValue, min, max}: N
 
     return true
   }
+
+  // TODO wrap callback()
+  useEffect(() => {
+    callback({
+      error: false,
+      data: parseNumber(value),
+      compileValue: () => value.toString()
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <TextInput

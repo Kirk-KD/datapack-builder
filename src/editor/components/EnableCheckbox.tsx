@@ -1,8 +1,6 @@
-import * as React from "react"
-
 type EnableCheckboxProps = {
   show?: boolean
-  setEnabled: React.Dispatch<React.SetStateAction<boolean>>
+  setEnabled: (enabled: boolean) => void
 }
 
 export default function EnableCheckbox({ show, setEnabled }: EnableCheckboxProps) {

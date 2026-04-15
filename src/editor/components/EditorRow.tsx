@@ -1,7 +1,6 @@
 import * as React from "react"
 import './EditorRow.css'
 import EnableCheckbox from "./EnableCheckbox.tsx";
-import {useState} from "react";
 import Tooltip from "./Tooltip.tsx";
 
 type EditorRowProps = {
@@ -11,14 +10,14 @@ type EditorRowProps = {
   optional?: boolean
   children: React.ReactElement
   isNested?: boolean
+  enabled: boolean
+  setEnabled: (enabled: boolean) => void
 }
 
 /**
  * A row holding the label and input for a `KeyValueEditor`.
  */
-export default function EditorRow({ label, description, note, optional, children, isNested }: EditorRowProps ) {
-  const [enabled, setEnabled] = useState(!optional)
-
+export default function EditorRow({ label, description, note, optional, children, isNested, enabled, setEnabled }: EditorRowProps ) {
   return (
     <>
       {note && <div className='editorNote'>{note}</div>}

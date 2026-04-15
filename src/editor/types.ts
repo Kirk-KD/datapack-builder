@@ -7,7 +7,7 @@ export type EditorContext<T extends Record<string, unknown> = Record<string, nev
 } & T
 
 export type EditorResult<T> = {
-  error?: boolean
+  error: boolean
   data?: T
   compileValue?: (options?: Record<string, unknown>) => string
 }

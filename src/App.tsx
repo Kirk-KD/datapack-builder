@@ -2,61 +2,60 @@ import WorkspacePanel from './components/WorkspacePanel'
 import EditorModal from "./editor/modal/EditorModal.tsx";
 import {controller} from "./editor/modal/controller.ts";
 import KeyValueEditor from "./editor/editors/KeyValueEditor.tsx";
-import EditorRow from "./editor/components/EditorRow.tsx";
 import NumberEditor from "./editor/editors/NumberEditor.tsx";
+import type {EditorResult} from "./editor/types.ts";
 
 function App() {
+  const outerCallback = ({error, data}: EditorResult<Record<string, unknown>>) => {
+    console.log('Error:', error, 'Data:', data)
+  }
   controller.openEditorModal({
     title: 'Hello',
     editor: (
-      <KeyValueEditor>
-        <EditorRow label={'field_1'} description={'Hello hello hello hello hello hello hello hello hello'}>
-          <NumberEditor context={{}} callback={({data}) => {
-            console.log('field_1', data)
-          }} type={'float'} />
-        </EditorRow>
-        <EditorRow label={'field_number_two'}>
-          <NumberEditor context={{}} callback={({data}) => {
-            console.log('field_number_two', data)
-          }} type={'int'} />
-        </EditorRow>
-        <EditorRow label={'noted_input'} note={'This one has a note.'}>
-          <NumberEditor context={{}} callback={() => {}} type={'int'} />
-        </EditorRow>
-        <EditorRow label={'nested'} isNested={true} optional={true} description={'Hello hello hello'}>
-          <KeyValueEditor>
-            <EditorRow label={'field_1'}>
-              <NumberEditor context={{}} callback={({data}) => {
-                console.log('field_1', data)
-              }} type={'float'} />
-            </EditorRow>
-            <EditorRow label={'field_2'} isNested={true}>
-              <KeyValueEditor>
-                <EditorRow label={'field_2_1'}>
-                  <NumberEditor context={{}} callback={({data}) => {
-                    console.log('field_2_1', data)
-                  }} type={'float'} />
-                </EditorRow>
-                <EditorRow label={'field_2_2'}>
-                  <NumberEditor context={{}} callback={({data}) => {
-                    console.log('field_2_2', data)
-                  }} type={'float'} />
-                </EditorRow>
-                <EditorRow label={'field_2_3'}>
-                  <NumberEditor context={{}} callback={({data}) => {
-                    console.log('field_2_3', data)
-                  }} type={'float'} />
-                </EditorRow>
-              </KeyValueEditor>
-            </EditorRow>
-          </KeyValueEditor>
-        </EditorRow>
-        <EditorRow label={'optional'} optional={true}>
-          <NumberEditor context={{}} callback={({data}) => {
-            console.log('optional', data)
-          }} type={'int'} />
-        </EditorRow>
-      </KeyValueEditor>
+      <KeyValueEditor entries={[
+        {
+          key: 'field_1',
+          description: 'This is a description.',
+          note: 'Note about this field.',
+          component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
+        },
+        {
+          key: 'nested_editor',
+          nested: true,
+          component: (callback) => <KeyValueEditor entries={[
+            {
+              key: 'field_1',
+              description: 'This is a description.',
+              note: 'Note about this field.',
+              optional: true,
+              component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
+            },
+            {
+              key: 'field_2',
+              description: 'This is a description.',
+              component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
+            },
+            {
+              key: 'nested_editor_2',
+              nested: true,
+              component: (callback) => <KeyValueEditor entries={[
+                {
+                  key: 'field_1',
+                  description: 'This is a description.',
+                  note: 'Note about this field.',
+                  optional: true,
+                  component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
+                },
+                {
+                  key: 'field_2',
+                  description: 'This is a description.',
+                  component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
+                },
+              ]} callback={callback} />
+            }
+          ]} callback={callback} />
+        }
+      ]} callback={outerCallback} />
     )
   })
   return (
