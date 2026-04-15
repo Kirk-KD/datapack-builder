@@ -2,8 +2,8 @@ import WorkspacePanel from './components/WorkspacePanel'
 import EditorModal from "./editor/modal/EditorModal.tsx";
 import {controller} from "./editor/modal/controller.ts";
 import {KeyValueEditor} from "./editor/editors/KeyValueEditor";
-import NumberEditor from "./editor/editors/NumberEditor.tsx";
 import type {EditorResult} from "./editor/types.ts";
+import ItemSelectorEditor from "./editor/editors/ItemSelectorEditor/ItemSelectorEditor.tsx";
 
 function App() {
   const outerCallback = ({error, data}: EditorResult<Record<string, unknown>>) => {
@@ -17,44 +17,9 @@ function App() {
           key: 'field_1',
           description: 'This is a description.',
           note: 'Note about this field.',
-          component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
-        },
-        {
-          key: 'nested_editor',
           nested: true,
-          component: (callback) => <KeyValueEditor entries={[
-            {
-              key: 'field_1',
-              description: 'This is a description.',
-              note: 'Note about this field.',
-              optional: true,
-              component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
-            },
-            {
-              key: 'field_2',
-              description: 'This is a description.',
-              component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
-            },
-            {
-              key: 'nested_editor_2',
-              nested: true,
-              component: (callback) => <KeyValueEditor entries={[
-                {
-                  key: 'field_1',
-                  description: 'This is a description.',
-                  note: 'Note about this field.',
-                  optional: true,
-                  component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
-                },
-                {
-                  key: 'field_2',
-                  description: 'This is a description.',
-                  component: (callback) => <NumberEditor context={{}} callback={callback} type={'int'}/>
-                },
-              ]} callback={callback} />
-            }
-          ]} callback={callback} />
-        }
+          component: (callback) => <ItemSelectorEditor context={{}} callback={callback}/>
+        },
       ]} callback={outerCallback} />
     )
   })

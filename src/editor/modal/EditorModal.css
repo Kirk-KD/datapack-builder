@@ -24,6 +24,7 @@
     padding: 0;
 
     --padding: 1.5rem;
+    --padding-small: 0.5rem;
     --padding-vertical: 0.7rem;
 }
 .editorModal.maximized {

@@ -1,0 +1,39 @@
+.itemSearchList {
+    width: 100%;
+    background-color: var(--colour-surface-panel);
+    border-bottom-left-radius: var(--border-radius-small);
+    border-bottom-right-radius: var(--border-radius-small);
+    border: 1px solid var(--colour-border-default);
+    border-top: none;
+
+    display: flex;
+    flex-direction: column;
+    padding: var(--padding-small);
+    gap: 0.25rem;
+
+    max-height: 25rem;
+    overflow: scroll;
+}
+
+.itemEntry {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: var(--padding-small);
+    border-bottom: 1px solid var(--colour-border-muted);
+    background-color: var(--colour-surface-panel);
+}
+
+.itemEntry:hover {
+    background-color: var(--colour-surface-panel-hover);
+    cursor: pointer;
+}
+
+.itemEntry span {
+    flex-grow: 1;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+}

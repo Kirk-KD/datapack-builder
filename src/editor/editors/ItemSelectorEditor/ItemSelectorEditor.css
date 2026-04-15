@@ -1,0 +1,30 @@
+.itemSelectorEditor {
+    min-width: 10rem;
+    width: 20rem;
+    padding: var(--padding-small);
+}
+
+.itemSelectorSearchContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.itemSelectorSearchContainer>input {
+    background-color: var(--colour-input-field);
+    border: 1px solid transparent;
+
+    color: var(--colour-text-primary);
+    height: 30px;
+
+    padding: 0.1rem 0.35rem;
+
+    flex-grow: 1;
+}
+
+.itemSelectorListContainer {
+    height: 0;
+    width: 100%;
+    overflow: visible;
+}
