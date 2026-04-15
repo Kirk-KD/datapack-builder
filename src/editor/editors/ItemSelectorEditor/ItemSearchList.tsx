@@ -1,8 +1,10 @@
 import './ItemSearchList.css'
 import ItemSprite from "../../components/ItemSprite.tsx";
 import type {MinecraftItemEntry} from "../../../catalog/itemCatalog.ts";
+import {memo, useMemo, useRef} from "react";
+import { useVirtualizer } from '@tanstack/react-virtual'
 
-function ItemEntry({ name, src, onClick }: { name: string, src: string, onClick: (item: MinecraftItemEntry) => void }) {
+const ItemEntry = memo(({ name, src, onClick }: { name: string, src: string, onClick: (item: MinecraftItemEntry) => void }) => {
   return (
     <div
       className={'itemEntry'}
@@ -13,7 +15,7 @@ function ItemEntry({ name, src, onClick }: { name: string, src: string, onClick:
       <span>{name}</span>
     </div>
   )
-}
+})
 
 type ItemSearchListProps = {
   items: readonly MinecraftItemEntry[]
@@ -23,11 +25,43 @@ type ItemSearchListProps = {
 }
 
 export default function ItemSearchList({items, onClickItem, visible, searchString}: ItemSearchListProps) {
+  const filtered = useMemo(() =>
+      items.filter(({name}) => !searchString || name.startsWith(searchString)),
+    [items, searchString]
+  )
+
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const virtualizer = useVirtualizer({
+    count: filtered.length,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 45,
+    measureElement: element => element.getBoundingClientRect().height
+  })
+
   return (
     <div className={'itemSearchList'} style={visible ? {} : {display: 'none'}}>
-      {items
-        .filter(({name}) => !searchString || name.startsWith(searchString))
-        .map(({ name, spriteFileName }) => <ItemEntry name={name} src={spriteFileName} onClick={onClickItem} key={name}/>)}
+      <div ref={scrollRef} style={{ height: 300, overflowY: 'auto' }}>
+        <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+          {virtualizer.getVirtualItems().map(virtualItem => {
+            const { name, spriteFileName } = filtered[virtualItem.index]
+            return (
+              <div
+                key={name}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualItem.start}px)`
+                }}
+              >
+                <ItemEntry name={name} src={spriteFileName} onClick={onClickItem} />
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </div>
   )
 }
