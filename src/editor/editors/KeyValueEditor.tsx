@@ -1,6 +1,6 @@
 import './KeyValueEditor.css'
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import type {EditorResult, EditorResultCallback} from "../types.ts";
 import EditorRow from "../components/EditorRow.tsx";
 
@@ -37,19 +37,20 @@ export default function KeyValueEditor({ callback, entries }: KeyValueEditorProp
       data: Object.fromEntries(enabledEntries.map(({ key }) => [key, entryStates[key].data]))
     })
   }, [entryStates]) // eslint-disable-line react-hooks/exhaustive-deps
+  // ^Including `callback` and `entries` in the useEffect dependencies causes infinite updates.
 
-  const makeEntryCallback = (key: string) => (result: EditorResult<unknown>) => {
+  const makeEntryCallback = useCallback((key: string) => (result: EditorResult<unknown>) => {
     setEntryStates(prev => ({
       ...prev,
       [key]: { ...prev[key], data: result.data, error: result.error }
     }))
-  }
+  }, [])
 
-  const makeSetEnabled = (key: string) => (enabled: boolean) =>
+  const makeSetEnabled = useCallback((key: string) => (enabled: boolean) =>
     setEntryStates(prev => ({
       ...prev,
       [key]: { ...prev[key], enabled }
-    }))
+    })), [])
 
   return (
     <div className='editor keyValueEditor'>

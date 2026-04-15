@@ -43,7 +43,7 @@ export default function NumberEditor({callback, type, defaultValue, min, max}: N
       defaultValue={defaultValueStr}
       value={value}
       setValue={setValue}
-      onChange={() => setHasError(validateAndCallback(value))}
+      onChange={(nextValue) => setHasError(validateAndCallback(nextValue))}
       hasError={hasError}
     />
   )
