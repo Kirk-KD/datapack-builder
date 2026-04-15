@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 export default function NumberEditor({callback, type, defaultValue, min, max}: NumberEditorProps) {
   const defaultValueStr = (defaultValue ?? 0).toString()
   const [value, setValue] = useState(defaultValueStr)
+  const [hasError, setHasError] = useState(false)
 
   function valid(value: string): boolean {
     const number = Number(value)
@@ -15,29 +16,35 @@ export default function NumberEditor({callback, type, defaultValue, min, max}: N
     return true
   }
 
-  function validateAndCallback(value: string) {
+  // Validate, callback, then returns whether there is an error
+  function validateAndCallback(value: string): boolean {
     if (valid(value)) {
       const number = Number(value)
       callback({
         error: false,
-        data: number,
+        data: Number(value),
         compileValue: () => number.toString()
       })
+      return false
     } else {
       callback({
         error: true
       })
+      return true
     }
   }
 
-  useEffect(() => validateAndCallback(value), []) // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    validateAndCallback(value)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <TextInput
       defaultValue={defaultValueStr}
       value={value}
       setValue={setValue}
-      onChange={validateAndCallback}
+      onChange={() => setHasError(validateAndCallback(value))}
+      hasError={hasError}
     />
   )
 }

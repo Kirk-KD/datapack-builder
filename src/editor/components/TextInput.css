@@ -11,3 +11,7 @@
 .textInput:focus {
     border: 1px solid var(--colour-focus-ring);
 }
+
+.textInput.hasError {
+    border: 1px solid var(--colour-border-error);
+}

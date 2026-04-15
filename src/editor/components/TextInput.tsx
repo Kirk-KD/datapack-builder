@@ -10,9 +10,10 @@ type TextInputProps = {
   onChange?: (value: string) => void
   disabled?: boolean
   placeholder?: string
+  hasError?: boolean
 }
 
-export default function TextInput({ defaultValue, value, setValue, onChange, disabled, placeholder }: TextInputProps) {
+export default function TextInput({ defaultValue, value, setValue, onChange, disabled, placeholder, hasError }: TextInputProps) {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setValue(e.target.value)
     onChange?.(e.target.value)
@@ -27,7 +28,7 @@ export default function TextInput({ defaultValue, value, setValue, onChange, dis
     <div className='inputContainer'>
       <input
         type='text'
-        className='textInput'
+        className={`textInput ${hasError ? 'hasError' : ''}`}
         value={value}
         onChange={handleChange}
         disabled={disabled}
