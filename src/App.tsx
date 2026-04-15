@@ -1,7 +1,7 @@
 import WorkspacePanel from './components/WorkspacePanel'
 import EditorModal from "./editor/modal/EditorModal.tsx";
 import {controller} from "./editor/modal/controller.ts";
-import KeyValueEditor from "./editor/editors/KeyValueEditor.tsx";
+import {KeyValueEditor} from "./editor/editors/KeyValueEditor";
 import NumberEditor from "./editor/editors/NumberEditor.tsx";
 import type {EditorResult} from "./editor/types.ts";
 

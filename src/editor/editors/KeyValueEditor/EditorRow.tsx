@@ -1,7 +1,7 @@
 import * as React from "react"
 import './EditorRow.css'
 import EnableCheckbox from "./EnableCheckbox.tsx";
-import Tooltip from "./Tooltip.tsx";
+import Tooltip from "../../components/Tooltip.tsx";
 
 type EditorRowProps = {
   label: string

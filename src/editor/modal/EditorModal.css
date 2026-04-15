@@ -1,4 +1,4 @@
-@import "../components/editorCheckbox.css";
+@import "editorCheckbox.css";
 
 .editorModal {
     background-color: var(--colour-surface-panel);

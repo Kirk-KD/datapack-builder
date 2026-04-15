@@ -1,8 +1,8 @@
 import './KeyValueEditor.css'
 import * as React from "react";
 import {useCallback, useEffect, useState} from "react";
-import type {EditorResult, EditorResultCallback} from "../types.ts";
-import EditorRow from "../components/EditorRow.tsx";
+import type {EditorResult, EditorResultCallback} from "../../types.ts";
+import EditorRow from "./EditorRow.tsx";
 
 type KeyValueEditorEntry = {
   key: string
