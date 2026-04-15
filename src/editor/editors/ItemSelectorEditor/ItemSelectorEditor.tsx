@@ -35,6 +35,11 @@ export default function ItemSelectorEditor({callback}: EditorBaseProps<Record<st
     getMinecraftItemByName(DEFAULT_ITEM).then(item => {
       if (item) setSelectedItemSrc(item.spriteFileName)
     })
+    callback({
+      error: false,
+      data: DEFAULT_ITEM,
+      compileValue: () => DEFAULT_ITEM
+    })
   }
 
   useEffect(() => {

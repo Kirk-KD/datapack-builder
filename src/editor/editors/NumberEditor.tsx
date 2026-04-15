@@ -2,7 +2,7 @@ import type {NumberEditorProps} from "../types.ts";
 import TextInput from "../components/TextInput.tsx";
 import {useEffect, useState} from "react";
 
-export default function NumberEditor({callback, type, defaultValue, min, max}: NumberEditorProps) {
+export default function NumberEditor({callback, type, defaultValue, min, max, className}: NumberEditorProps & {className?: string}) {
   const defaultValueStr = (defaultValue ?? 0).toString()
   const [value, setValue] = useState(defaultValueStr)
   const [hasError, setHasError] = useState(false)
@@ -45,6 +45,7 @@ export default function NumberEditor({callback, type, defaultValue, min, max}: N
       setValue={setValue}
       onChange={(nextValue) => setHasError(validateAndCallback(nextValue))}
       hasError={hasError}
+      className={className}
     />
   )
 }
