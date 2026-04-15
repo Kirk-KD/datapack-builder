@@ -6,53 +6,38 @@ export default function NumberEditor({callback, type, defaultValue, min, max}: N
   const defaultValueStr = (defaultValue ?? 0).toString()
   const [value, setValue] = useState(defaultValueStr)
 
-  function parseNumber(value: string): number {
-    let number = Number.parseFloat(value)
-    if (type === 'int') number = Math.round(number)
-    return number
-  }
-
   function valid(value: string): boolean {
-    let number = Number.parseFloat(value)
+    const number = Number(value)
     if (Number.isNaN(number)) return false
-
-    number = parseNumber(value)
-
+    if (type === 'int' && !Number.isInteger(number)) return false
     if (min !== undefined && number < min) return false
     if (max !== undefined && number > max) return false
-
     return true
   }
 
-  // TODO wrap callback()
-  useEffect(() => {
-    callback({
-      error: false,
-      data: parseNumber(value),
-      compileValue: () => value.toString()
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  function validateAndCallback(value: string) {
+    if (valid(value)) {
+      const number = Number(value)
+      callback({
+        error: false,
+        data: number,
+        compileValue: () => number.toString()
+      })
+    } else {
+      callback({
+        error: true
+      })
+    }
+  }
+
+  useEffect(() => validateAndCallback(value), []) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <TextInput
       defaultValue={defaultValueStr}
       value={value}
       setValue={setValue}
-      onChange={(value) => {
-        if (valid(value)) {
-          const number = parseNumber(value)
-
-          callback({
-            error: false,
-            data: number,
-            compileValue: () => number.toString()
-          })
-        } else {
-          callback({
-            error: true
-          })
-        }
-      }}
+      onChange={validateAndCallback}
     />
   )
 }
