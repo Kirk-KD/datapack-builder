@@ -42,8 +42,8 @@ export default function ItemSearchList({items, onClickItem, visible, searchStrin
 
   return (
     <div className={'itemSearchList'} style={visible ? {} : {display: 'none'}}>
-      <div ref={scrollRef} style={{ height: 300, overflowY: 'auto' }}>
-        <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+      <div ref={scrollRef} style={{ height: 300, overflowY: 'auto', zIndex: 99999 }}>
+        <div style={{ height: virtualizer.getTotalSize(), position: 'relative', zIndex: 99999 }}>
           {virtualizer.getVirtualItems().map(virtualItem => {
             const { name, spriteFileName } = filtered[virtualItem.index]
             return (
@@ -53,7 +53,8 @@ export default function ItemSearchList({items, onClickItem, visible, searchStrin
                   position: 'absolute',
                   top: 0,
                   width: '100%',
-                  transform: `translateY(${virtualItem.start}px)`
+                  transform: `translateY(${virtualItem.start}px)`,
+                  zIndex: 99999
                 }}
               >
                 <ItemEntry name={name} src={spriteFileName} onClick={onClickItem} />

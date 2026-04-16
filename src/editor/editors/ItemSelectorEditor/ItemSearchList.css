@@ -1,5 +1,6 @@
 .itemSearchList {
     width: 100%;
+    position: absolute;
     background-color: var(--colour-surface-panel);
     border-bottom-left-radius: var(--border-radius-small);
     border-bottom-right-radius: var(--border-radius-small);
@@ -13,6 +14,8 @@
 
     max-height: 25rem;
     overflow: scroll;
+
+    z-index: 999999;
 }
 
 .itemEntry {

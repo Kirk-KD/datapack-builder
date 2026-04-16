@@ -24,6 +24,7 @@
 }
 
 .itemSelectorListContainer {
+    position: relative;
     height: 0;
     width: 100%;
     overflow: visible;
