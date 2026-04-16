@@ -1,0 +1,25 @@
+.itemComponentList {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.itemComponentList > .top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    width: 30rem;
+}
+
+.itemComponentList > .top > .itemComponentDropdown {
+    flex-grow: 1;
+    width: fit-content;
+}
+
+.itemComponentList > .componentEditorsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}

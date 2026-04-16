@@ -1,4 +1,6 @@
 @import "editorCheckbox.css";
+@import "editorDropdown.css";
+@import "editorButton.css";
 
 .editorModal {
     background-color: var(--colour-surface-panel);

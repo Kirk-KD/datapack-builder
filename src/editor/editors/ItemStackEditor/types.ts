@@ -1,10 +1,11 @@
 export type ItemStackEditorResult = {
   item: string
   amount: number
-  components: ItemStackComponent[]
+  components: ItemComponent[]
 }
 
-export type ItemStackComponent = {
-  name: string
+export type ItemComponent = {
+  key: string
   value: unknown
+  negate: boolean
 }
