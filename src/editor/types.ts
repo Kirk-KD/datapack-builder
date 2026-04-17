@@ -26,7 +26,7 @@ export type EditorKind = 'scalar' | 'object' | 'reference' | 'list'
 
 export type ScalarSchema = BaseSchema & {
   kind: 'scalar'
-  type: 'string' | 'int' | 'float' | 'double' | 'select' | 'boolean'
+  type: 'string' | 'int' | 'long' | 'float' | 'double' | 'select' | 'boolean'
 
   defaultValue?: string | number | boolean
 
