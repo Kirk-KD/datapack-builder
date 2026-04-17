@@ -4,7 +4,7 @@ import {useCallback, useEffect, useState} from "react";
 import type {EditorResult, EditorResultCallback} from "../../types.ts";
 import EditorRow from "./EditorRow.tsx";
 
-type KeyValueEditorEntry = {
+export type KeyValueEditorEntry = {
   key: string
   description?: string
   note?: string

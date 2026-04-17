@@ -1,9 +1,4 @@
 {
-  "schema_version": 1,
-  "source": {
-    "page": "https://minecraft.wiki/w/Data_component_format",
-    "html_file": "scripts/data_component_format_wiki.html"
-  },
   "components": [
     {
       "id": "minecraft:attack_range",

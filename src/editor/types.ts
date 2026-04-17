@@ -22,6 +22,8 @@ type BaseSchema = {
   note?: string
 }
 
+export type EditorKind = 'scalar' | 'object' | 'reference' | 'list'
+
 export type ScalarSchema = BaseSchema & {
   kind: 'scalar'
   type: 'string' | 'int' | 'float' | 'double' | 'select' | 'boolean'
@@ -44,9 +46,11 @@ export type ObjectSchema = BaseSchema & {
   }[]
 }
 
+export type EditorReference = 'item_stack' // TODO more editors
+
 export type ReferenceSchema = BaseSchema & {
   kind: 'reference'
-  ref: string
+  ref: EditorReference
 }
 
 export type ListSchema = BaseSchema & {
