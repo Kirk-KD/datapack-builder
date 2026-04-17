@@ -1,7 +1,7 @@
 import type {
   EditorContext,
   EditorResultCallback,
-  EditorSchema,
+  EditorSchema, ListSchema,
   ObjectSchema, ReferenceSchema,
   ScalarSchema
 } from "../types.ts";
@@ -13,18 +13,19 @@ import {ItemStackEditor} from "../editors/ItemStackEditor";
 import StringEditor from "../editors/StringEditor.tsx";
 import BooleanEditor from "../editors/BooleanEditor.tsx";
 import SelectEditor from "../editors/SelectEditor.tsx";
+import ListEditor from "../editors/ListEditor/ListEditor.tsx";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>
   callback: EditorResultCallback<unknown>
 }
 
-// @ts-expect-error TODO list
 export default function loadFromSchema(schema: EditorSchema, props: BaseProps): React.ReactElement {
   switch (schema.kind) {
     case 'scalar': return makeScalar(schema as ScalarSchema, props)
     case 'object': return makeObject(schema as ObjectSchema, props)
     case 'reference': return makeReference(schema as ReferenceSchema, props)
+    case 'list': return makeList(schema as ListSchema, props)
   }
 }
 
@@ -34,7 +35,7 @@ function makeScalar(schema: ScalarSchema, {context, callback}: BaseProps): React
     case 'long':
     case 'float':
     case 'double':
-      return <NumberEditor context={context as EditorContext} callback={callback} type={'int'} defaultValue={schema.defaultValue as number} min={schema.min} max={schema.max}/>
+      return <NumberEditor context={context as EditorContext} callback={callback} type={schema.type as ('int' | 'long' | 'float' | 'double')} defaultValue={schema.defaultValue as number} min={schema.min} max={schema.max}/>
     case 'string':
       return <StringEditor context={context as EditorContext} callback={callback} defaultValue={schema.defaultValue as string}/>
     case 'boolean':
@@ -64,4 +65,8 @@ function makeReference(schema: ReferenceSchema, {context, callback}: BaseProps):
       <ItemStackEditor context={context} callback={callback}/>
     )
   }
+}
+
+function makeList(schema: ListSchema, {context, callback}: BaseProps): React.ReactElement {
+  return <ListEditor context={context} callback={callback} itemEditor={cb => loadFromSchema(schema.item, {context, callback: cb})}/>
 }

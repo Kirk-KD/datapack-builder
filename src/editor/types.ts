@@ -84,7 +84,7 @@ export type StringEditorProps = EditorBaseProps<Record<string, never>, string | 
 }
 
 export type NumberEditorProps = EditorBaseProps<Record<string, never>, number | null> & {
-  type: 'int' | 'float' | 'double'
+  type: 'int' | 'long' | 'float' | 'double'
   defaultValue?: number
   min?: number
   max?: number
