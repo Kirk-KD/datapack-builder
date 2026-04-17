@@ -24,6 +24,11 @@
     opacity: 0.4;
 }
 
+.editorRowInput {
+    width: fit-content;
+    min-width: 15rem;
+}
+
 .editorRowInput.disabled {
     pointer-events: none;
     opacity: 0.4;
