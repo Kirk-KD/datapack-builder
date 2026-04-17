@@ -6,7 +6,6 @@
     padding: 0.3rem;
 
     column-gap: 1.5rem;
-    --input-field-height: 1.6rem;
 }
 
 .keyValueEditor > *:not(.editorNote):not(:nth-last-child(-n+2)) {

@@ -18,7 +18,7 @@ export default function StringEditor({ callback, defaultValue, className }: Stri
       defaultValue={defaultValue || ''}
       value={value}
       setValue={setValue}
-      className={className}
+      className={`editor ${className}`}
       onChange={nextValue => callback({ error: false, data: nextValue, compileValue: () => nextValue})}
     />
   )

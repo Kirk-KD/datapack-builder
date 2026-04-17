@@ -28,6 +28,7 @@
     --padding: 1.5rem;
     --padding-small: 0.5rem;
     --padding-vertical: 0.7rem;
+    --input-field-height: 1.6rem;
 }
 .editorModal.maximized {
     inset: 0;

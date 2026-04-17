@@ -12,6 +12,7 @@ import type {KeyValueEditorEntry} from "../editors/KeyValueEditor/KeyValueEditor
 import {ItemStackEditor} from "../editors/ItemStackEditor";
 import StringEditor from "../editors/StringEditor.tsx";
 import BooleanEditor from "../editors/BooleanEditor.tsx";
+import SelectEditor from "../editors/SelectEditor.tsx";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>
@@ -27,7 +28,6 @@ export default function loadFromSchema(schema: EditorSchema, props: BaseProps): 
   }
 }
 
-// @ts-expect-error TODO select
 function makeScalar(schema: ScalarSchema, {context, callback}: BaseProps): React.ReactElement {
   switch (schema.type) {
     case 'int':
@@ -39,6 +39,8 @@ function makeScalar(schema: ScalarSchema, {context, callback}: BaseProps): React
       return <StringEditor context={context as EditorContext} callback={callback} defaultValue={schema.defaultValue as string}/>
     case 'boolean':
       return <BooleanEditor context={context as EditorContext} callback={callback} defaultValue={schema.defaultValue as boolean}/>
+    case 'select':
+      return <SelectEditor context={context as EditorContext} callback={callback} options={schema.options as string[]}/>
   }
 }
 

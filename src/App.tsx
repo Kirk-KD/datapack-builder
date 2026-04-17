@@ -12,82 +12,14 @@ function App() {
     title: 'Editor',
     editor: (
       loadFromSchema({
-        "kind": "object",
-        "fields": [
-          {
-            "key": "NoAI",
-            "schema": {
-              "kind": "scalar",
-              "type": "boolean",
-              "description": "Turns into NoAI entity tag for all bucketable entities."
-            }
-          },
-          {
-            "key": "Silent",
-            "schema": {
-              "kind": "scalar",
-              "type": "boolean",
-              "description": "Turns into Silent entity tag for all bucketable entities."
-            }
-          },
-          {
-            "key": "NoGravity",
-            "schema": {
-              "kind": "scalar",
-              "type": "boolean",
-              "description": "Turns into NoGravity entity tag for all bucketable entities."
-            }
-          },
-          {
-            "key": "Glowing",
-            "schema": {
-              "kind": "scalar",
-              "type": "boolean",
-              "description": "Turns into Glowing entity tag for all bucketable entities."
-            }
-          },
-          {
-            "key": "Invulnerable",
-            "schema": {
-              "kind": "scalar",
-              "type": "boolean",
-              "description": "Turns into Invulnerable entity tag for all bucketable entities."
-            }
-          },
-          {
-            "key": "AgeLocked",
-            "schema": {
-              "kind": "scalar",
-              "type": "boolean",
-              "description": "Turns into AgeLocked entity tag for axolotls and tadpoles."
-            }
-          },
-          {
-            "key": "Health",
-            "schema": {
-              "kind": "scalar",
-              "type": "float",
-              "description": "Turns into Health entity tag for all bucketable entities."
-            }
-          },
-          {
-            "key": "Age",
-            "schema": {
-              "kind": "scalar",
-              "type": "int",
-              "description": "Turns into Age entity tag for axolotls and tadpoles."
-            }
-          },
-          {
-            "key": "HuntingCooldown",
-            "schema": {
-              "kind": "scalar",
-              "type": "long",
-              "description": "Turns into the expiry time of the memory module has_hunting_cooldown for axolotls."
-            }
-          }
-        ],
-        "description": "NBT applied to an entity when placed from this bucket. Only tags below are applied."
+        "kind": "scalar",
+        "type": "select",
+        "description": "Display type. Can be default, hidden, or override.",
+        "options": [
+          "default",
+          "hidden",
+          "override"
+        ]
       }, { callback: outerCallback, context: {} })
     )
   })

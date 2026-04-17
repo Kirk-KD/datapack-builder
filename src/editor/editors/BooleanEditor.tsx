@@ -18,7 +18,7 @@ export default function BooleanEditor({ callback, defaultValue }: BooleanEditorP
       flexDirection: 'row',
       alignItems: 'center',
       gap: '0.5rem',
-    }}>
+    }} className={'editor'}>
       <input type={'checkbox'} checked={value} onChange={e => {
         setValue(e.target.checked)
         callback({
