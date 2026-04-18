@@ -9,12 +9,22 @@ type ItemComponentContainerProp = {
 
 export default function ItemComponentContainer({ name, editor, removeComponent }: ItemComponentContainerProp) {
   return (
-    <div className={'itemComponentContainer'}>
-      <div className={'itemComponentHeader'}>
-        <span className={'itemComponentName'}>{editor === null ? <b>!</b> : ''} {name}</span>
-        <button onClick={() => removeComponent(name)}>-</button>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'row',
+      gap: '0.5rem'
+    }}>
+      <div className={'itemComponentContainer'}>
+        <div className={'itemComponentHeader'}>
+          <span className={'itemComponentName'}>{editor === null ? <b>!</b> : ''} {name}</span>
+        </div>
+        <div>
+          <div style={{
+            padding: 'var(--padding-small)'
+          }}>{editor}</div>
+        </div>
       </div>
-      {editor}
+      <div><button onClick={() => removeComponent(name)}>-</button></div>
     </div>
   )
 }

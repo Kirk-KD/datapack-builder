@@ -10,7 +10,12 @@
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
-    width: fit-content;
+    max-width: 35rem;
+    padding: 0 var(--padding-small);
+}
+
+.itemComponentList > .top > span,button {
+    flex-shrink: 0;
 }
 
 .itemComponentList > .top > .itemComponentDropdown {
@@ -22,4 +27,6 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: fit-content;
+    padding: var(--padding-small);
 }

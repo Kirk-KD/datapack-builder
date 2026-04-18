@@ -4,6 +4,8 @@
 
     border: 1px solid var(--colour-border-muted);
     border-radius: var(--border-radius-small);
+
+    width: 100%;
 }
 
 .itemComponentHeader {
