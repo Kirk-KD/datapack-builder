@@ -258,6 +258,10 @@ type EditorSchema = {
 #### Editor Lookup
 A `reference`-kind schema simply provides the ID of the editor, and the corresponding Editor will be created by the parser.
 
+## Data Registry
+Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
+A catalogue system will be used to asynchronously load chosen JSON files.
+
 ## Data Types
 Data types are key to Minecraft commands.
 Blocks responsible for the definition and validation of these types are considered to be in the Native layer.

@@ -84,15 +84,6 @@
         "kind": "object",
         "fields": [
           {
-            "key": "type",
-            "schema": {
-              "kind": "scalar",
-              "type": "string",
-              "semantic_type": "resource_location",
-              "description": "The namespaced ID of the attribute this modifier is to act upon."
-            }
-          },
-          {
             "key": "id",
             "schema": {
               "kind": "scalar",
@@ -102,13 +93,24 @@
             }
           },
           {
-            "key": "slot",
+            "key": "type",
+            "_TODO": "DROPDOWN",
             "schema": {
               "kind": "scalar",
               "type": "string",
+              "semantic_type": "resource_location",
+              "description": "The namespaced ID of the attribute this modifier is to act upon."
+            }
+          },
+          {
+            "key": "slot",
+            "schema": {
+              "optional": true,
+              "kind": "scalar",
+              "type": "select",
               "description": "The equipment slot/slots the item must be in for the modifier to take effect. Note: 'any' refers to any equipment slot, not any inventory slot.",
               "default": "any",
-              "choices": [
+              "options": [
                 "any",
                 "hand",
                 "armor",
@@ -127,9 +129,9 @@
             "key": "operation",
             "schema": {
               "kind": "scalar",
-              "type": "string",
+              "type": "select",
               "description": "Modifier operation.",
-              "choices": [
+              "options": [
                 "add_value",
                 "add_multiplied_base",
                 "add_multiplied_total"
@@ -147,15 +149,16 @@
           {
             "key": "display",
             "schema": {
+              "optional": true,
               "kind": "object",
               "fields": [
                 {
                   "key": "type",
                   "schema": {
                     "kind": "scalar",
-                    "type": "string",
+                    "type": "select",
                     "description": "Display type. Can be default, hidden, or override.",
-                    "choices": [
+                    "options": [
                       "default",
                       "hidden",
                       "override"
@@ -166,18 +169,9 @@
                   "_TODO": "TEXT COMPONENT EDITOR",
                   "key": "value",
                   "schema": {
-                    "kind": "union",
-                    "options": [
-                      {
-                        "kind": "scalar",
-                        "type": "string"
-                      },
-                      {
-                        "kind": "reference",
-                        "ref": "text_component",
-                        "semantic_type": "text_component"
-                      }
-                    ],
+                    "kind": "reference",
+                    "ref": "text_component",
+                    "semantic_type": "text_component",
                     "description": "A text component to show for this attribute modifier entry."
                   }
                 }
