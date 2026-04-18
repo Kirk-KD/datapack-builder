@@ -17,7 +17,7 @@ export default function ItemStackEditor({context, callback}: EditorBaseProps<Rec
     amount: EditorResult<unknown> | null = amountResult,
     components: ItemComponent[] = itemComponents
   ) => {
-    if (item?.error || amount?.error || !item || !amount) {
+    if (item?.error || amount?.error || !item || !amount || components.some(({result}) => result?.error)) {
       callback({ error: true })
       return
     }
@@ -27,7 +27,10 @@ export default function ItemStackEditor({context, callback}: EditorBaseProps<Rec
       data: {
         item: item.data as string,
         amount: amount.data as number,
-        components: components
+        components: Object.fromEntries(components.map(component => [component.key, {
+          component: component.result?.data,
+          negate: component.negate
+        }]))
       }
     })
   }

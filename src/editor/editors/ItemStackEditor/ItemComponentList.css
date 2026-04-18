@@ -10,7 +10,7 @@
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
-    width: 30rem;
+    width: fit-content;
 }
 
 .itemComponentList > .top > .itemComponentDropdown {

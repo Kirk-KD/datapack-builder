@@ -1,44 +1,96 @@
 import './ItemComponentList.css'
 import DropdownInput from "../../components/DropdownInput.tsx";
-import {KeyValueEditor} from "../KeyValueEditor";
-import NumberEditor from "../NumberEditor.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {ItemComponent} from "./types.ts";
+import type {EditorResult, EditorResultCallback, EditorSchema} from "../../types.ts";
+import {useEffect, useMemo, useState} from "react";
+import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
+import loadFromSchema from "../../loader/loadFromSchema.tsx";
 
 type ItemComponentListProps = {
   callback: (components: ItemComponent[]) => void
 }
 
+type ItemComponentEntry = {
+  result: EditorResult<unknown> | null
+  negate: boolean
+  callback: EditorResultCallback<unknown>
+}
+
 export default function ItemComponentList({ callback }: ItemComponentListProps) {
+  const [selectedComponentId, setSelectedComponentId] = useState<string>()
+  const [componentLookup, setComponentLookup] = useState<Record<string, EditorSchema> | null>(null)
+  const [components, setComponents] = useState<Record<string, ItemComponentEntry>>({})
+
+  const addComponent = ({key, negate}: {key: string, negate?: boolean}) => {
+    setComponents(prev => ({
+      ...prev,
+      [key]: {
+        result: null,
+        negate: negate || false,
+        callback: result => {
+          setComponents(prev2 => ({
+            ...prev2,
+            [key]: {
+              ...prev2[key],
+              result
+            }
+          }))
+        }
+      }
+    }))
+  }
+
+  const removeComponent = (key: string) => {
+    setComponents(prev => {
+      const next = { ...prev }
+      delete next[key]
+      return next
+    })
+  }
+
+  const availableComponents = useMemo(
+    () => Object.keys(componentLookup ?? {}).filter(id => !Object.keys(components).includes(id)),
+    [componentLookup, components]
+  )
+
+  useEffect(() => {
+    loadDataComponentSchemas().then(schemas => {
+      setComponentLookup(Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema])))
+    })
+  }, [])
+
+  useEffect(() => {
+    callback(Object.entries(components).map(([key, {result, negate}]) => ({
+      key,
+      result,
+      negate
+    })))
+  }, [components])
+
+  if (componentLookup === null) return (
+    <div>Loading...</div>
+  )
+
   return (
     <div className={'itemComponentList'}>
       <div className={'top'}>
         <span>Add component:</span>
-        <DropdownInput className={'itemComponentDropdown'} options={['A', 'B', 'C']} />
-        <button>+</button>
-        <button>+ !</button>
+        <DropdownInput
+          className={'itemComponentDropdown'}
+          options={availableComponents}
+          value={selectedComponentId}
+          setValue={setSelectedComponentId}
+        />
+        <button onClick={() => selectedComponentId && addComponent({key: selectedComponentId})}>+</button>
+        <button onClick={() => selectedComponentId && addComponent({key: selectedComponentId, negate: true})}>+ !</button>
       </div>
 
-      <div className={'componentEditorsContainer'}>
-        <ItemComponentContainer name={'attack_range'} editor={
-          <KeyValueEditor callback={() => {}} entries={[
-            {
-              key: 'min_reach',
-              description: 'The minimum distance in blocks from the attacker to the target to be considered valid. Defaults to 0.0, valid from 0.0 to 64.0.',
-              component: cb => <NumberEditor context={{}} callback={cb} type={'float'} defaultValue={0} min={0} max={64}/>
-            }
-          ]}/>
-        }/>
-        <ItemComponentContainer name={'attack_range'} editor={
-          <KeyValueEditor callback={() => {}} entries={[
-            {
-              key: 'min_reach',
-              description: 'The minimum distance in blocks from the attacker to the target to be considered valid. Defaults to 0.0, valid from 0.0 to 64.0.',
-              component: cb => <NumberEditor context={{}} callback={cb} type={'float'} defaultValue={0} min={0} max={64}/>
-            }
-          ]}/>
-        }/>
-      </div>
+      <div className={'componentEditorsContainer'}>{
+        Object.entries(components).map(([key, { negate, callback}]) => (
+          <ItemComponentContainer key={key} name={key} editor={negate ? null : loadFromSchema(componentLookup[key], { context: {}, callback })} removeComponent={removeComponent}/>
+        ))
+      }</div>
     </div>
   )
 }
