@@ -255,8 +255,7 @@ type EditorSchema = {
 }
 ```
 
-#### Editor Registry
-Editor React components will be kept tracked via a simple ID-to-Component registry. 
+#### Editor Lookup
 A `reference`-kind schema simply provides the ID of the editor, and the corresponding Editor will be created by the parser.
 
 ## Data Types
