@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import ResetButton from "../components/ResetButton.tsx";
 
 export default function SelectEditor({ callback, defaultValue, options }: SelectEditorProps) {
+  console.log(defaultValue)
   const defaultVal = (defaultValue && options.includes(defaultValue)) ? defaultValue : options[0]
 
   const [value, setValue] = useState(defaultVal)

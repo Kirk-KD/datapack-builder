@@ -11,7 +11,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The minimum distance in blocks from the attacker to the target to be considered valid. Defaults to 0.0, valid from 0.0 to 64.0.",
-            "default": 0.0,
+            "defaultValue": 0.0,
             "min": 0.0,
             "max": 64
           }
@@ -22,7 +22,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The maximum distance in blocks from the attacker to the target to be considered valid. Defaults to 3.0, valid from 0.0 to 64.0.",
-            "default": 3.0,
+            "defaultValue": 3.0,
             "min": 0.0,
             "max": 64
           }
@@ -33,7 +33,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The minimum distance in blocks from the attacker to the target to be considered valid in Creative mode. Defaults to 0.0, valid from 0.0 to 64.0.",
-            "default": 0.0,
+            "defaultValue": 0.0,
             "min": 0.0,
             "max": 64
           }
@@ -44,7 +44,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The maximum distance in blocks from the attacker to the target to be considered valid in Creative mode. Defaults to 5.0, valid from 0.0 to 64.0.",
-            "default": 5.0,
+            "defaultValue": 5.0,
             "min": 0.0,
             "max": 64
           }
@@ -55,7 +55,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The margin applied to the target bounding box when checking for valid hitbox collision. Defaults to 0.3, valid from 0.0 to 1.0.",
-            "default": 0.3,
+            "defaultValue": 0.3,
             "min": 0.0,
             "max": 1
           }
@@ -66,7 +66,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The multiplier applied to min_range and max_range when checking for valid distance if item is used by a mob. Defaults to 1.0, valid from 0.0 to 2.0.",
-            "default": 1.0,
+            "defaultValue": 1.0,
             "min": 0.0,
             "max": 2
           }
@@ -109,7 +109,7 @@
               "kind": "scalar",
               "type": "select",
               "description": "The equipment slot/slots the item must be in for the modifier to take effect. Note: 'any' refers to any equipment slot, not any inventory slot.",
-              "default": "any",
+              "defaultValue": "any",
               "options": [
                 "any",
                 "hand",
@@ -200,10 +200,10 @@
     "label": "base_color",
     "value_schema": {
       "kind": "scalar",
-      "type": "string",
+      "type": "select",
       "description": "The base dye color of the banner applied on a shield. If neither this nor minecraft:banner_patterns is specified, then the shield model will show its normal wooden texture. If the minecraft:banner_patterns component is specified but this component is not, then white is used as the base banner color. If present on a shield item, the item name is overridden as \"<color> Shield\" (e.g. if set to green, the name will be \"Green Shield\").",
-      "choices": ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"],
-      "default": "white"
+      "options": ["white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray", "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"],
+      "defaultValue": "white"
     }
   },
   {
@@ -260,15 +260,8 @@
     "id": "minecraft:block_state",
     "label": "block_state",
     "value_schema": {
-      "kind": "map",
-      "key": {
-        "kind": "scalar",
-        "type": "string"
-      },
-      "value": {
-        "kind": "scalar",
-        "type": "string"
-      },
+      "kind": "scalar",
+      "type": "string",
       "description": "The block state properties to apply when placing this block."
     }
   },
@@ -284,7 +277,8 @@
             "kind": "scalar",
             "type": "float",
             "description": "The amount of time (in seconds) that must be held before successfully blocking attacks. Defaults to 0.",
-            "default": 0
+            "defaultValue": 0,
+            "min": 0
           }
         },
         {
@@ -293,7 +287,8 @@
             "kind": "scalar",
             "type": "float",
             "description": "The multiplier applied to the cooldown time for the item when attacked by a disabling attack (the multiplier for on the minecraft:weapon component). If set to 0, this item can never be disabled by attacks. Defaults to 1.",
-            "default": 1
+            "defaultValue": 1,
+            "min": 0
           }
         },
         {
@@ -337,7 +332,8 @@
                     "kind": "scalar",
                     "type": "float",
                     "description": "Positive float number. The maximum angle between the user's facing direction and the direction of the incoming attack to be blocked. Defaults to 90.",
-                    "default": 90
+                    "defaultValue": 90,
+                    "min": 0
                   }
                 }
               ],
@@ -357,7 +353,7 @@
                   "kind": "scalar",
                   "type": "float",
                   "description": "The minimum amount of damage dealt by the attack before item damage is applied to the item. Defaults to 0.",
-                  "default": 0
+                  "defaultValue": 0
                 }
               },
               {
@@ -366,7 +362,7 @@
                   "kind": "scalar",
                   "type": "float",
                   "description": "The constant amount of damage applied to the item, if threshold is passed. Defaults to 0.",
-                  "default": 0
+                  "defaultValue": 0
                 }
               },
               {
@@ -375,7 +371,7 @@
                   "kind": "scalar",
                   "type": "float",
                   "description": "The fraction of the dealt damage that should be applied to the item, if threshold is passed. Defaults to 1.5.",
-                  "default": 1.5
+                  "defaultValue": 1.5
                 }
               }
             ],
@@ -404,8 +400,12 @@
           "_TODO": "DAMAGE ID SELECTION",
           "key": "bypassed_by",
           "schema": {
-            "kind": "scalar",
-            "type": "string",
+            "kind": "list",
+            "item": {
+              "_TODO": "DAMAGE ID SELECTION",
+              "kind": "scalar",
+              "type": "string"
+            },
             "description": "A damage type tag with # of damage types that bypass the blocking. Defaults to none."
           }
         }
@@ -414,6 +414,7 @@
     }
   },
   {
+    "_TODO": "SOUND EDITOR",
     "id": "minecraft:break_sound",
     "label": "break_sound",
     "value_schema": {
@@ -431,6 +432,7 @@
         {
           "key": "NoAI",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Turns into NoAI entity tag for all bucketable entities."
@@ -439,6 +441,7 @@
         {
           "key": "Silent",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Turns into Silent entity tag for all bucketable entities."
@@ -447,6 +450,7 @@
         {
           "key": "NoGravity",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Turns into NoGravity entity tag for all bucketable entities."
@@ -455,6 +459,7 @@
         {
           "key": "Glowing",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Turns into Glowing entity tag for all bucketable entities."
@@ -463,6 +468,7 @@
         {
           "key": "Invulnerable",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Turns into Invulnerable entity tag for all bucketable entities."
@@ -471,6 +477,7 @@
         {
           "key": "AgeLocked",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Turns into AgeLocked entity tag for axolotls and tadpoles."
@@ -479,6 +486,7 @@
         {
           "key": "Health",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "float",
             "description": "Turns into Health entity tag for all bucketable entities."
@@ -487,6 +495,7 @@
         {
           "key": "Age",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "int",
             "description": "Turns into Age entity tag for axolotls and tadpoles."
@@ -495,6 +504,7 @@
         {
           "key": "HuntingCooldown",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "long",
             "description": "Turns into the expiry time of the memory module has_hunting_cooldown for axolotls."
@@ -510,7 +520,6 @@
     "value_schema": {
       "kind": "list",
       "item": {
-        "_TODO": "THIS RECURSES TO ITEM STACK EDITOR (ITEM SELECTOR + DATA COMPONENT EDITOR)",
         "kind": "reference",
         "ref": "item_stack",
         "description": "A single item stack."
@@ -548,7 +557,6 @@
     "id": "minecraft:charged_projectiles",
     "label": "charged_projectiles",
     "value_schema": {
-      "_TODO": "RECURSE TO ITEM STACK EDITOR (ITEM SELECTOR + DATA COMPONENT EDITOR):",
       "kind": "list",
       "item": {
         "kind": "reference",
@@ -567,52 +575,61 @@
         {
           "key": "consume_seconds",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "float",
             "description": "The amount of seconds it takes for a player to consume the item. Defaults to 1.6.",
-            "default": 1.6
+            "defaultValue": 1.6
           }
         },
         {
           "key": "animation",
           "schema": {
+            "optional": true,
             "kind": "scalar",
-            "type": "string",
+            "type": "select",
             "description": "The animation used during consumption of the item. Must be one of none, eat, drink, block, bow, spear, crossbow, spyglass, toot_horn, brush, bundle, or trident. Defaults to eat.",
-            "default": "eat"
+            "defaultValue": "eat",
+            "options": [
+              "none",
+              "eat",
+              "drink",
+              "block",
+              "bow",
+              "spear",
+              "crossbow",
+              "spyglass",
+              "toot_horn",
+              "brush",
+              "bundle",
+              "trident"
+            ]
           }
         },
         {
           "key": "sound",
           "schema": {
-            "kind": "union",
-            "options": [
-              {
-                "kind": "scalar",
-                "type": "string"
-              },
-              {
-                "kind": "reference",
-                "ref": "sound_event",
-                "semantic_type": "sound_event"
-              }
-            ],
+            "optional": true,
+            "kind": "scalar",
+            "type": "string",
             "description": "One sound event (an ID, or a new sound event definition) used during and on completion of the item's consumption. Defaults to entity.generic.eat.",
-            "default": "entity.generic.eat"
+            "defaultValue": "entity.generic.eat"
           }
         },
         {
           "key": "has_consume_particles",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether consumption particles are emitted while consuming this item. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         },
         {
           "key": "on_consume_effects",
           "schema": {
+            "optional": true,
             "kind": "list",
             "item": {
               "kind": "reference",
@@ -647,7 +664,9 @@
             "schema": {
               "kind": "scalar",
               "type": "int",
-              "description": "A slot in this container. Can be from 0 to 255 (inclusive)."
+              "description": "A slot in this container. Can be from 0 to 255 (inclusive).",
+              "min": 0,
+              "max": 255
             }
           }
         ],
@@ -673,9 +692,11 @@
         {
           "key": "seed",
           "schema": {
+            "optional": true,
             "kind": "scalar",
             "type": "long",
-            "description": "The pseudorandom seed to resolve the loot table with. If not specified or 0, a seed is randomly chosen by the game."
+            "description": "The pseudorandom seed to resolve the loot table with. If not specified or 0, a seed is randomly chosen by the game.",
+            "defaultValue": 0
           }
         }
       ],
@@ -686,17 +707,8 @@
     "id": "minecraft:custom_data",
     "label": "custom_data",
     "value_schema": {
-      "kind": "union",
-      "options": [
-        {
-          "kind": "scalar",
-          "type": "string"
-        },
-        {
-          "kind": "object",
-          "fields": []
-        }
-      ],
+      "kind": "scalar",
+      "type": "string",
       "description": "Contains key-value pairs of any custom data not used by the game, either as an object or a SNBT string."
     }
   },
@@ -986,7 +998,7 @@
               }
             ],
             "description": "One sound event (an ID, or a new sound event definition) to play when the item is equipped. Defaults to item.armor.equip_generic.",
-            "default": "item.armor.equip_generic"
+            "defaultValue": "item.armor.equip_generic"
           }
         },
         {
@@ -1024,7 +1036,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether the item can be dispensed by using a dispenser. [note 2] Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         },
         {
@@ -1033,7 +1045,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether the item can be equipped into the relevant slot by right-clicking. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         },
         {
@@ -1042,7 +1054,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether this item is damaged when the wearing entity is damaged. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         },
         {
@@ -1051,7 +1063,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether this item can be equipped onto a target mob by pressing on it (as long as this item can be equipped on the target at all). Defaults to false.",
-            "default": false
+            "defaultValue": false
           }
         },
         {
@@ -1069,7 +1081,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether this item can be unequipped from a target mob by right-clicking with Shears. Defaults to false.",
-            "default": false
+            "defaultValue": false
           }
         },
         {
@@ -1088,7 +1100,7 @@
               }
             ],
             "description": "One sound event (an ID, or a new sound event definition) to play when the item is sheared. Defaults to item.shears.snip.",
-            "default": "item.shears.snip"
+            "defaultValue": "item.shears.snip"
           }
         }
       ],
@@ -1174,7 +1186,7 @@
             "kind": "scalar",
             "type": "byte",
             "description": "The flight duration of this firework rocket (and the number of gunpowders used to craft it). Must be an integer between -128 and 127. Defaults to 1. If specified, gray \"Flight Duration: <flight_duration>\" text is added to the item's tooltip.",
-            "default": 1,
+            "defaultValue": 1,
             "min": -128,
             "max": 127
           }
@@ -1304,7 +1316,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "If true, this item can be eaten even if the player is not hungry. Defaults to false.",
-            "default": false
+            "defaultValue": false
           }
         }
       ],
@@ -1414,7 +1426,7 @@
             "kind": "scalar",
             "type": "int",
             "description": "The time in ticks required before weapon is effective. Defaults to 0.",
-            "default": 0
+            "defaultValue": 0
           }
         },
         {
@@ -1447,7 +1459,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The distance the item moves out of the wielder's hand during its animation. Defaults to 0.0.",
-            "default": 0.0
+            "defaultValue": 0.0
           }
         },
         {
@@ -1456,7 +1468,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The multiplier for the final damage from the relative speed. [note 3] Defaults to 1.0.",
-            "default": 1.0
+            "defaultValue": 1.0
           }
         },
         {
@@ -1546,7 +1558,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "If true, the component is removed when the lodestone is broken. If false, the component is kept. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         }
       ],
@@ -1745,7 +1757,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether the attack deals knockback. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         },
         {
@@ -1754,7 +1766,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether the attack dismounts the target. Defaults to false.",
-            "default": false
+            "defaultValue": false
           }
         },
         {
@@ -1986,7 +1998,7 @@
               "kind": "scalar",
               "type": "int",
               "description": "The duration of the effect in ticks . Defaults to 160.",
-              "default": 160
+              "defaultValue": 160
             }
           }
         ],
@@ -2007,7 +2019,7 @@
             "kind": "scalar",
             "type": "string",
             "description": "The type of swinging animation. Can be none, whack, or stab. Defaults to whack.",
-            "default": "whack",
+            "defaultValue": "whack",
             "choices": [
               "none",
               "whack",
@@ -2021,7 +2033,7 @@
             "kind": "scalar",
             "type": "int",
             "description": "A positive integer that determines the animation's duration in ticks. Defaults to 6.",
-            "default": 6
+            "defaultValue": 6
           }
         }
       ],
@@ -2040,7 +2052,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The default mining speed of this tool, used if no rules override it. Defaults to 1.0.",
-            "default": 1.0
+            "defaultValue": 1.0
           }
         },
         {
@@ -2049,7 +2061,7 @@
             "kind": "scalar",
             "type": "int",
             "description": "The amount of durability to remove each time a block is broken with this tool. Must be a non-negative integer. Defaults to 1.",
-            "default": 1,
+            "defaultValue": 1,
             "min": 0
           }
         },
@@ -2059,7 +2071,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether players can break blocks while holding this tool in Creative mode. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         },
         {
@@ -2235,7 +2247,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "If the player can sprint during use. Defaults to false.",
-            "default": false
+            "defaultValue": false
           }
         },
         {
@@ -2244,7 +2256,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "A ranged float (0.0-1.0 inclusive) speed multiplier inflicted during use. Defaults to 0.2.",
-            "default": 0.2
+            "defaultValue": 0.2
           }
         },
         {
@@ -2253,7 +2265,7 @@
             "kind": "scalar",
             "type": "boolean",
             "description": "Whether using this item emits the minecraft:item_interact_start and minecraft:item_interact_finish game events. Defaults to true.",
-            "default": true
+            "defaultValue": true
           }
         }
       ],
@@ -2281,7 +2293,7 @@
             "kind": "scalar",
             "type": "int",
             "description": "The amount to damage the item for each attack performed. Defaults to 1.",
-            "default": 1
+            "defaultValue": 1
           }
         },
         {
@@ -2290,7 +2302,7 @@
             "kind": "scalar",
             "type": "float",
             "description": "The amount of seconds that this item can disable a blocking shield on successful attack. If set to 0, this item cannot disable a blocking shield. Defaults to 0.",
-            "default": 0
+            "defaultValue": 0
           }
         }
       ],
@@ -2420,7 +2432,7 @@
             "kind": "scalar",
             "type": "int",
             "description": "The number of times this written book has been copied. 0 = original, 1 = copy of original, 2 = copy of copy, 3 = tattered. Defaults to 0. If the value is greater than 1, the book cannot be copied. If specified, this is shown in the item tooltip.",
-            "default": 0
+            "defaultValue": 0
           }
         },
         {
@@ -2430,7 +2442,7 @@
             "type": "boolean",
             "semantic_type": "text_component",
             "description": "If true , the text components have already been resolved by the server. If false , they are resolved either when the book is opened by an operator, when the book is placed into a lectern by an operator, or when the item stack is written to a lectern's Book tag by a command. Defaults to false .",
-            "default": false
+            "defaultValue": false
           }
         }
       ],

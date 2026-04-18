@@ -41,7 +41,7 @@ function makeScalar(schema: ScalarSchema, {context, callback}: BaseProps): React
     case 'boolean':
       return <BooleanEditor context={context as EditorContext} callback={callback} defaultValue={schema.defaultValue as boolean}/>
     case 'select':
-      return <SelectEditor context={context as EditorContext} callback={callback} options={schema.options as string[]}/>
+      return <SelectEditor context={context as EditorContext} callback={callback} options={schema.options as string[]} defaultValue={schema.defaultValue as string}/>
   }
 }
 
