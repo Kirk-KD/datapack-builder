@@ -72,7 +72,7 @@ It is the responsibility of the source to provide the initial context (e.g. a Bl
 It is the responsibility of the parent Editor to provide its inner Editors necessary information (e.g. a Projectile Editor informing its inner Item Stack Editor of the whitelisted projectile items).
 The behaviour of conditionally disabled input fields is achieved via this system too.
 
-The `EditorResult` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data up to the Editor source.
+The `EditorResult` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data and Editor state up to the Editor source to be used or saved.
 It should have at least two fields: `error` and `data`. The `data` can be any type, either primitive or an object.
 `Error` is a boolean flag that marks the user input of a particular Editor as erronous, and the UX should reflect this information.
 There should also be an optional `compileValue` string function for the compiled Minecraft command fragment by the Editor.
@@ -257,6 +257,15 @@ type EditorSchema = {
 
 #### Editor Lookup
 A `reference`-kind schema simply provides the ID of the editor, and the corresponding Editor will be created by the parser.
+
+### Editor Saving/Loading
+Regardless of the format an Editor's result is in, it should be able to load back the exact same value and state when given the same result and context.
+For example, an Item Stack Editor should be able to accept its own result data and populate itself and its inner Editors.
+
+> As of right now, the Editor result structure needs rework to allow this behaviour.
+> A possible solution may be for Editors to return a more complete **serialized state**, including the Editor ID, error state, enabled state, and value/nested serialized state.
+> `compileValue()` should consequently be moved to a separate definition outside a returned result object,
+> likely to a lookup Record mapping Editor IDs to their React Component.
 
 ## Data Registry
 Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
