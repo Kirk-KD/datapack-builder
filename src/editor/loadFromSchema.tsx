@@ -8,16 +8,16 @@ import type {
   EditorSchema, ListSchema,
   ObjectSchema, ReferenceSchema,
   ScalarSchema, EditorState
-} from "../types.ts";
-import NumberEditor from "../editors/NumberEditor.tsx";
+} from "./types.ts";
+import NumberEditor from "./editors/NumberEditor.tsx";
 import * as React from "react";
-import {ObjectEditor} from "../editors/ObjectEditor";
-import type {ObjectEditorEntry} from "../editors/ObjectEditor/ObjectEditor.tsx";
-import {ItemStackEditor, type ItemStackEditorResult} from "../editors/ItemStackEditor";
-import StringEditor from "../editors/StringEditor.tsx";
-import BooleanEditor from "../editors/BooleanEditor.tsx";
-import SelectEditor from "../editors/SelectEditor.tsx";
-import ListEditor from "../editors/ListEditor/ListEditor.tsx";
+import {ObjectEditor} from "./editors/ObjectEditor";
+import type {ObjectEditorEntry} from "./editors/ObjectEditor/ObjectEditor.tsx";
+import {ItemStackEditor, type ItemStackEditorResult} from "./editors/ItemStackEditor";
+import StringEditor from "./editors/StringEditor.tsx";
+import BooleanEditor from "./editors/BooleanEditor.tsx";
+import SelectEditor from "./editors/SelectEditor.tsx";
+import ListEditor from "./editors/ListEditor/ListEditor.tsx";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>

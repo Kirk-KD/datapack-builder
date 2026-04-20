@@ -4,7 +4,7 @@ import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "../../types.ts";
 import {type SetStateAction, useEffect, useMemo, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
-import loadFromSchema from "../../loader/loadFromSchema.tsx";
+import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
 
 type ItemComponentListProps = {
