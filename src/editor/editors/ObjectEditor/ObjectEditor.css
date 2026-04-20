@@ -1,4 +1,4 @@
-.keyValueEditor {
+.objectEditor {
     display: grid;
     grid-template-columns: min-content 1fr;
 
@@ -8,12 +8,12 @@
     column-gap: 1.5rem;
 }
 
-.keyValueEditor > *:not(.editorNote):not(:nth-last-child(-n+2)) {
+.objectEditor > *:not(.editorNote):not(:nth-last-child(-n+2)) {
     margin-bottom: 0.5rem;
 }
 
 /* Contains a input and its reset button, within `.editorRowInput`. */
-.keyValueEditor .inputContainer {
+.objectEditor .inputContainer {
     width: 100%;
     max-width: 20rem;
     display: flex;
@@ -23,6 +23,6 @@
 }
 
 /* The input element */
-.keyValueEditor .inputContainer > *:first-child {
+.objectEditor .inputContainer > *:first-child {
     flex-grow: 1;
 }

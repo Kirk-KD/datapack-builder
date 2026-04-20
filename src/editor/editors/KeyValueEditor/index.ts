@@ -1,1 +1,0 @@
-export { default as KeyValueEditor } from './KeyValueEditor'

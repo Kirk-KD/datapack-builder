@@ -7,8 +7,8 @@ import type {
 } from "../types.ts";
 import NumberEditor from "../editors/NumberEditor.tsx";
 import * as React from "react";
-import {KeyValueEditor} from "../editors/KeyValueEditor";
-import type {KeyValueEditorEntry} from "../editors/KeyValueEditor/KeyValueEditor.tsx";
+import {ObjectEditor} from "../editors/ObjectEditor";
+import type {ObjectEditorEntry} from "../editors/ObjectEditor/ObjectEditor.tsx";
 import {ItemStackEditor} from "../editors/ItemStackEditor";
 import StringEditor from "../editors/StringEditor.tsx";
 import BooleanEditor from "../editors/BooleanEditor.tsx";
@@ -48,7 +48,7 @@ function makeScalar(schema: ScalarSchema, {context, state, setState}: BaseProps)
 }
 
 function makeObject(schema: ObjectSchema, {context, state, setState}: BaseProps): React.ReactElement {
-  return <KeyValueEditor state={state as EditorState<Record<string, EditorState<unknown>>>} setState={setState as EditorStateCallback<Record<string, EditorState<unknown>>>} entries={schema.fields.map(({key, schema: fieldSchema}) => {
+  return <ObjectEditor state={state as EditorState<Record<string, EditorState<unknown>>>} setState={setState as EditorStateCallback<Record<string, EditorState<unknown>>>} entries={schema.fields.map(({key, schema: fieldSchema}) => {
     const { kind, optional, description, note } = fieldSchema
     return {
       key,
@@ -57,7 +57,7 @@ function makeObject(schema: ObjectSchema, {context, state, setState}: BaseProps)
       note,
       nested: kind !== 'scalar',
       component: (fieldState, setFieldState) => loadFromSchema(fieldSchema, {context, state: fieldState, setState: setFieldState})
-    } as KeyValueEditorEntry
+    } as ObjectEditorEntry
   })}/>
 }
 

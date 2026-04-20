@@ -15,7 +15,7 @@ type EditorRowProps = {
 }
 
 /**
- * A row holding the label and input for a `KeyValueEditor`.
+ * A row holding the label and input for an `ObjectEditor`.
  */
 export default function EditorRow({ label, description, note, optional, children, isNested, enabled, setEnabled }: EditorRowProps ) {
   return (

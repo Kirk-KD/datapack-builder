@@ -1,10 +1,10 @@
-import './KeyValueEditor.css'
+import './ObjectEditor.css'
 import * as React from "react";
 import {useCallback, useEffect, useState} from "react";
 import type {EditorState, EditorStateCallback} from "../../types.ts";
 import EditorRow from "./EditorRow.tsx";
 
-export type KeyValueEditorEntry = {
+export type ObjectEditorEntry = {
   key: string
   description?: string
   note?: string
@@ -13,13 +13,13 @@ export type KeyValueEditorEntry = {
   component: (fieldState: EditorState<unknown>, setFieldState: EditorStateCallback<unknown>) => React.ReactElement
 }
 
-type KeyValueEditorProps = {
+type ObjectEditorProps = {
   state: EditorState<Record<string, EditorState<unknown>>>
   setState: EditorStateCallback<Record<string, EditorState<unknown>>>
-  entries: KeyValueEditorEntry[]
+  entries: ObjectEditorEntry[]
 }
 
-export default function KeyValueEditor({ state, setState, entries }: KeyValueEditorProps) {
+export default function ObjectEditor({ state, setState, entries }: ObjectEditorProps) {
   const [entryStates, setEntryStates] = useState<Record<string, EditorState<unknown>>>(() =>
     Object.fromEntries(
       entries.map(entry => [
@@ -54,7 +54,7 @@ export default function KeyValueEditor({ state, setState, entries }: KeyValueEdi
     })), [])
 
   return (
-    <div className='editor keyValueEditor'>
+    <div className='editor objectEditor'>
       {entries.map(entry => (
         <EditorRow
           key={entry.key}
