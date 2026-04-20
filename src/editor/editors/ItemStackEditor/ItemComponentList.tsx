@@ -1,11 +1,11 @@
 import './ItemComponentList.css'
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
-import type {ItemComponent} from "./types.ts";
 import type {EditorState, EditorStateCallback, EditorSchema} from "../../types.ts";
 import {useEffect, useMemo, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loader/loadFromSchema.tsx";
+import type {ItemComponent} from "./ItemStackEditor.tsx";
 
 type ItemComponentListProps = {
   itemComponents: ItemComponent[]

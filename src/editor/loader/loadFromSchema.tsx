@@ -9,12 +9,11 @@ import NumberEditor from "../editors/NumberEditor.tsx";
 import * as React from "react";
 import {ObjectEditor} from "../editors/ObjectEditor";
 import type {ObjectEditorEntry} from "../editors/ObjectEditor/ObjectEditor.tsx";
-import {ItemStackEditor} from "../editors/ItemStackEditor";
+import {ItemStackEditor, type ItemStackEditorResult} from "../editors/ItemStackEditor";
 import StringEditor from "../editors/StringEditor.tsx";
 import BooleanEditor from "../editors/BooleanEditor.tsx";
 import SelectEditor from "../editors/SelectEditor.tsx";
 import ListEditor from "../editors/ListEditor/ListEditor.tsx";
-import type {ItemStackEditorResult} from "../editors/ItemStackEditor/types.ts";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>
@@ -31,19 +30,19 @@ export default function loadFromSchema(schema: EditorSchema, props: BaseProps): 
   }
 }
 
-function makeScalar(schema: ScalarSchema, {context, state, setState}: BaseProps): React.ReactElement {
+function makeScalar(schema: ScalarSchema, {state, setState}: BaseProps): React.ReactElement {
   switch (schema.type) {
     case 'int':
     case 'long':
     case 'float':
     case 'double':
-      return <NumberEditor context={context as EditorContext} state={state as EditorState<number>} setState={setState as EditorStateCallback<number>} type={schema.type as ('int' | 'long' | 'float' | 'double')} defaultValue={schema.defaultValue as number} min={schema.min} max={schema.max}/>
+      return <NumberEditor state={state as EditorState<number>} setState={setState as EditorStateCallback<number>} type={schema.type as ('int' | 'long' | 'float' | 'double')} defaultValue={schema.defaultValue as number} min={schema.min} max={schema.max}/>
     case 'string':
-      return <StringEditor context={context as EditorContext} state={state as EditorState<string>} setState={setState as EditorStateCallback<string>} defaultValue={schema.defaultValue as string}/>
+      return <StringEditor state={state as EditorState<string>} setState={setState as EditorStateCallback<string>} defaultValue={schema.defaultValue as string}/>
     case 'boolean':
-      return <BooleanEditor context={context as EditorContext} state={state as EditorState<boolean>} setState={setState as EditorStateCallback<boolean>} defaultValue={schema.defaultValue as boolean}/>
+      return <BooleanEditor state={state as EditorState<boolean>} setState={setState as EditorStateCallback<boolean>} defaultValue={schema.defaultValue as boolean}/>
     case 'select':
-      return <SelectEditor context={context as EditorContext} state={state as EditorState<string>} setState={setState as EditorStateCallback<string>} options={schema.options as string[]} defaultValue={schema.defaultValue as string}/>
+      return <SelectEditor state={state as EditorState<string>} setState={setState as EditorStateCallback<string>} options={schema.options as string[]} defaultValue={schema.defaultValue as string}/>
   }
 }
 

@@ -1,11 +1,22 @@
 import type {EditorBaseProps, EditorState} from "../../types.ts";
 import {ItemSelectorEditor} from "../ItemSelectorEditor";
 import {useEffect, useState} from "react";
-import type {ItemComponent, ItemStackEditorResult} from "./types.ts";
 import NumberEditor from "../NumberEditor.tsx";
 
 import './ItemStackEditor.css'
 import ItemComponentList from "./ItemComponentList.tsx";
+
+export type ItemComponent = {
+  key: string
+  state: EditorState<unknown>
+  negate: boolean
+}
+
+export type ItemStackEditorResult = {
+  item: EditorState<string>
+  amount: EditorState<number>
+  components: ItemComponent[]
+}
 
 export default function ItemStackEditor({context, state, setState}: EditorBaseProps<Record<string, unknown>, ItemStackEditorResult>) {
   const [itemState, setItemState] = useState<EditorState<string>>(state.data?.item ?? { error: false })
@@ -41,7 +52,7 @@ export default function ItemStackEditor({context, state, setState}: EditorBasePr
       <div className={'firstRow'}>
         <ItemSelectorEditor context={context} state={itemState} setState={setItemState}/>
         <span>count:</span>
-        <NumberEditor className={'amountEditor'} context={{}} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
+        <NumberEditor className={'amountEditor'} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
       </div>
       <ItemComponentList itemComponents={itemComponents} setItemComponents={result => {
         setItemComponents(result)
