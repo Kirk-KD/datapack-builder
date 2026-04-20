@@ -1,42 +1,42 @@
 import type {NumberEditorProps} from "../types.ts";
 import TextInput from "../components/TextInput.tsx";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 
-export default function NumberEditor({callback, type, defaultValue, min, max, className}: NumberEditorProps & {className?: string}) {
+export default function NumberEditor({state, setState, type, defaultValue, min, max, className}: NumberEditorProps & {className?: string}) {
   const defaultValueStr = (defaultValue ?? 0).toString()
-  const [value, setValue] = useState(defaultValueStr)
+  const [value, setValue] = useState(state.data === undefined ? defaultValueStr : state.data.toString())
   const [hasError, setHasError] = useState(false)
 
-  function valid(value: string): boolean {
+  const valid = useCallback((value: string): boolean => {
+    if (value === '') return false
     const number = Number(value)
     if (Number.isNaN(number)) return false
     if (type === 'int' && !Number.isInteger(number)) return false
     if (min !== undefined && number < min) return false
     if (max !== undefined && number > max) return false
     return true
-  }
+  }, [max, min, type])
 
   // Validate, callback, then returns whether there is an error
-  function validateAndCallback(value: string): boolean {
+  const validateAndCallback = useCallback((value: string): boolean => {
     if (valid(value)) {
-      const number = Number(value)
-      callback({
+      setState({
         error: false,
         data: Number(value),
-        compileValue: () => number.toString()
       })
       return false
     } else {
-      callback({
+      setState({
+        ...state,
         error: true
       })
       return true
     }
-  }
+  }, [setState, state, valid])
 
   useEffect(() => {
-    validateAndCallback(value)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (state.data === undefined) validateAndCallback(defaultValueStr)
+  }, [defaultValueStr, state.data, validateAndCallback])
 
   return (
     <TextInput

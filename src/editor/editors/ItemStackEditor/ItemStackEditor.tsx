@@ -1,4 +1,4 @@
-import type {EditorBaseProps, EditorResult} from "../../types.ts";
+import type {EditorBaseProps, EditorState} from "../../types.ts";
 import {ItemSelectorEditor} from "../ItemSelectorEditor";
 import {useEffect, useState} from "react";
 import type {ItemComponent, ItemStackEditorResult} from "./types.ts";
@@ -7,50 +7,43 @@ import NumberEditor from "../NumberEditor.tsx";
 import './ItemStackEditor.css'
 import ItemComponentList from "./ItemComponentList.tsx";
 
-export default function ItemStackEditor({context, callback}: EditorBaseProps<Record<string, unknown>, ItemStackEditorResult>) {
-  const [itemResult, setItemResult] = useState<EditorResult<unknown> | null>(null)
-  const [amountResult, setAmountResult] = useState<EditorResult<unknown> | null>(null)
-  const [itemComponents, setItemComponents] = useState<ItemComponent[]>([])
+export default function ItemStackEditor({context, state, setState}: EditorBaseProps<Record<string, unknown>, ItemStackEditorResult>) {
+  const [itemState, setItemState] = useState<EditorState<string>>(state.data?.item ?? { error: false })
+  const [amountState, setAmountState] = useState<EditorState<number>>(state.data?.amount ?? { error: false })
+  const [itemComponents, setItemComponents] = useState<ItemComponent[]>(state.data?.components ?? [])
 
   const doCallback = (
-    item: EditorResult<unknown> | null = itemResult,
-    amount: EditorResult<unknown> | null = amountResult,
+    item: EditorState<string> = itemState,
+    amount: EditorState<number> = amountState,
     components: ItemComponent[] = itemComponents
   ) => {
-    if (item?.error || amount?.error || !item || !amount || components.some(({result}) => result?.error)) {
-      callback({ error: true })
+    if (item?.error || amount?.error || !item || !amount || components.some(({state}) => state?.error)) {
+      setState({ ...state, error: true })
       return
     }
 
-    callback({
+    setState({
       error: false,
       data: {
-        item: item.data as string,
-        amount: amount.data as number,
-        components: Object.fromEntries(components.map(component => [component.key, {
-          component: component.result?.data,
-          negate: component.negate
-        }]))
+        item: item,
+        amount: amount,
+        components: components
       }
     })
   }
 
   useEffect(() => {
     doCallback()
-  }, [itemResult, amountResult, itemComponents]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [itemState, amountState, itemComponents]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className={'editor itemStackEditor'}>
       <div className={'firstRow'}>
-        <ItemSelectorEditor context={context} callback={result => {
-          setItemResult(result)
-        }}/>
+        <ItemSelectorEditor context={context} state={itemState} setState={setItemState}/>
         <span>count:</span>
-        <NumberEditor className={'amountEditor'} context={{}} defaultValue={1} type={'int'} min={1} callback={result => {
-          setAmountResult(result)
-        }} />
+        <NumberEditor className={'amountEditor'} context={{}} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
       </div>
-      <ItemComponentList callback={result => {
+      <ItemComponentList itemComponents={itemComponents} setItemComponents={result => {
         setItemComponents(result)
       }}/>
     </div>

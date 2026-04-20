@@ -1,16 +1,13 @@
-import type {EditorResult} from "../../types.ts";
+import type {EditorState} from "../../types.ts";
 
 export type ItemStackEditorResult = {
-  item: string
-  amount: number
-  components: Record<string, {
-    component: unknown | null
-    negate: boolean
-  }>
+  item: EditorState<string>
+  amount: EditorState<number>
+  components: ItemComponent[]
 }
 
 export type ItemComponent = {
   key: string
-  result: EditorResult<unknown> | null
+  state: EditorState<unknown>
   negate: boolean
 }

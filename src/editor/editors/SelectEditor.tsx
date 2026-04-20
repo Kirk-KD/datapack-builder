@@ -1,19 +1,13 @@
 import type {SelectEditorProps} from "../types.ts";
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import ResetButton from "../components/ResetButton.tsx";
 
-export default function SelectEditor({ callback, defaultValue, options }: SelectEditorProps) {
-  console.log(defaultValue)
+export default function SelectEditor({ state, setState, defaultValue, options }: SelectEditorProps) {
   const defaultVal = (defaultValue && options.includes(defaultValue)) ? defaultValue : options[0]
 
-  const [value, setValue] = useState(defaultVal)
-
   useEffect(() => {
-    callback({
-      error: false,
-      data: defaultVal
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (state.data === undefined) setState({...state, data: defaultVal})
+  }, [defaultVal, setState, state]);
 
   return (
     <div style={{
@@ -26,10 +20,10 @@ export default function SelectEditor({ callback, defaultValue, options }: Select
         style={{
           flexGrow: 1
         }}
-        value={value}
+        value={state.data}
         onChange={e => {
-          setValue(e.target.value)
-          callback({
+          // setValue(e.target.value)
+          setState({
             error: false,
             data: e.target.value
           })
@@ -37,7 +31,7 @@ export default function SelectEditor({ callback, defaultValue, options }: Select
       >
         {options.map(option => <option key={option}>{option}</option>)}
       </select>
-      <ResetButton handleReset={() => setValue(defaultVal)}/>
+      <ResetButton handleReset={() => setState({...state, data: defaultVal})}/>
     </div>
   )
 }

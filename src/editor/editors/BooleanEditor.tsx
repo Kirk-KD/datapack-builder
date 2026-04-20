@@ -2,15 +2,12 @@ import type {BooleanEditorProps} from "../types.ts";
 import {useEffect, useState} from "react";
 import ResetButton from "../components/ResetButton.tsx";
 
-export default function BooleanEditor({ callback, defaultValue }: BooleanEditorProps) {
-  const [value, setValue] = useState(Boolean(defaultValue))
+export default function BooleanEditor({ state, setState, defaultValue }: BooleanEditorProps) {
+  const [value, setValue] = useState(state.data === undefined ? Boolean(defaultValue) : state.data)
 
   useEffect(() => {
-    callback({
-      error: false,
-      data: Boolean(defaultValue)
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (state.data === undefined) setState({...state, data: Boolean(defaultValue)})
+  }, [defaultValue, setState, state])
 
   return (
     <div style={{
@@ -21,7 +18,7 @@ export default function BooleanEditor({ callback, defaultValue }: BooleanEditorP
     }} className={'editor'}>
       <input type={'checkbox'} checked={value} onChange={e => {
         setValue(e.target.checked)
-        callback({
+        setState({
           error: false,
           data: e.target.checked
         })

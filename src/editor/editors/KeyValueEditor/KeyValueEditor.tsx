@@ -1,7 +1,7 @@
 import './KeyValueEditor.css'
 import * as React from "react";
 import {useCallback, useEffect, useState} from "react";
-import type {EditorResult, EditorResultCallback} from "../../types.ts";
+import type {EditorState, EditorStateCallback} from "../../types.ts";
 import EditorRow from "./EditorRow.tsx";
 
 export type KeyValueEditorEntry = {
@@ -10,20 +10,21 @@ export type KeyValueEditorEntry = {
   note?: string
   optional?: boolean
   nested?: boolean
-  component: (callback: EditorResultCallback<unknown>) => React.ReactElement
+  component: (fieldState: EditorState<unknown>, setFieldState: EditorStateCallback<unknown>) => React.ReactElement
 }
 
 type KeyValueEditorProps = {
-  callback: EditorResultCallback<Record<string, unknown>>
+  state: EditorState<Record<string, EditorState<unknown>>>
+  setState: EditorStateCallback<Record<string, EditorState<unknown>>>
   entries: KeyValueEditorEntry[]
 }
 
-export default function KeyValueEditor({ callback, entries }: KeyValueEditorProps) {
-  const [entryStates, setEntryStates] = useState<Record<string, { enabled: boolean; data: unknown; error: boolean }>>(() =>
+export default function KeyValueEditor({ state, setState, entries }: KeyValueEditorProps) {
+  const [entryStates, setEntryStates] = useState<Record<string, EditorState<unknown>>>(() =>
     Object.fromEntries(
       entries.map(entry => [
         entry.key,
-        { enabled: entry.optional !== true, data: null, error: false }
+        (state.data !== undefined && state.data[entry.key] !== undefined) ? state.data[entry.key] : { enabled: entry.optional !== true, error: false }
       ])
     )
   )
@@ -31,18 +32,18 @@ export default function KeyValueEditor({ callback, entries }: KeyValueEditorProp
   useEffect(() => {
     const enabledEntries = entries.filter(({ key }) => entryStates[key].enabled)
 
-    if (enabledEntries.some(({ key }) => entryStates[key].error)) callback({ error: true })
-    else callback({
+    if (enabledEntries.some(({ key }) => entryStates[key].error)) setState({ ...state, error: true })
+    else setState({
       error: false,
-      data: Object.fromEntries(enabledEntries.map(({ key }) => [key, entryStates[key].data]))
+      data: Object.fromEntries(enabledEntries.map(({ key }) => [key, entryStates[key]]))
     })
   }, [entryStates]) // eslint-disable-line react-hooks/exhaustive-deps
   // ^Including `callback` and `entries` in the useEffect dependencies causes infinite updates.
 
-  const makeEntryCallback = useCallback((key: string) => (result: EditorResult<unknown>) => {
+  const makeEntryCallback = useCallback((key: string) => (result: EditorState<unknown>) => {
     setEntryStates(prev => ({
       ...prev,
-      [key]: { ...prev[key], data: result.data, error: result.error }
+      [key]: { ...prev[key], ...result }
     }))
   }, [])
 
@@ -62,10 +63,10 @@ export default function KeyValueEditor({ callback, entries }: KeyValueEditorProp
           note={entry.note}
           optional={entry.optional}
           isNested={entry.nested}
-          enabled={entryStates[entry.key].enabled}
+          enabled={Boolean(entryStates[entry.key].enabled)}
           setEnabled={makeSetEnabled(entry.key)}
         >
-          {entry.component(makeEntryCallback(entry.key))}
+          {entry.component(entryStates[entry.key], makeEntryCallback(entry.key) as EditorStateCallback<unknown>)}
         </EditorRow>
       ))}
     </div>

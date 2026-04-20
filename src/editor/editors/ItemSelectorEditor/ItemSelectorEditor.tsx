@@ -12,7 +12,7 @@ import ResetButton from "../../components/ResetButton.tsx";
 
 const DEFAULT_ITEM = 'cobblestone'
 
-export default function ItemSelectorEditor({callback}: EditorBaseProps<Record<string, unknown>, unknown>) {
+export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Record<string, unknown>, string>) {
   const [items, setItems] = useState<readonly MinecraftItemEntry[] | null>(null)
   const [searchString, setSearchString] = useState(DEFAULT_ITEM)
   const [selectedItemSrc, setSelectedItemSrc] = useState<string | null>(null)
@@ -20,13 +20,12 @@ export default function ItemSelectorEditor({callback}: EditorBaseProps<Record<st
 
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const selectItem = (name: string, spriteFileName: string | null) => {
+  const selectItem = ({name, spriteFileName}: {name: string, spriteFileName: string | null}) => {
     setSearchString(name)
     setSelectedItemSrc(spriteFileName)
-    callback({
+    setState({
       error: false,
       data: name,
-      compileValue: () => name
     })
   }
 
@@ -35,19 +34,23 @@ export default function ItemSelectorEditor({callback}: EditorBaseProps<Record<st
     getMinecraftItemByName(DEFAULT_ITEM).then(item => {
       if (item) setSelectedItemSrc(item.spriteFileName)
     })
-    callback({
+    setState({
       error: false,
       data: DEFAULT_ITEM,
-      compileValue: () => DEFAULT_ITEM
     })
   }
 
   useEffect(() => {
     loadMinecraftItemCatalog().then(catalog => {
       setItems(catalog)
-      setDefaultItem()
+      if (state.data === undefined) setDefaultItem()
+      else getMinecraftItemByName(state.data)
+        .then(item => selectItem({
+          name: state.data as string,
+          spriteFileName: item?.spriteFileName ?? null
+        }))
     })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!items) {
     return <div>Loading...</div>
@@ -65,11 +68,11 @@ export default function ItemSelectorEditor({callback}: EditorBaseProps<Record<st
             if (!itemName) {
               setSearchString(itemName)
               setSelectedItemSrc(null)
-              callback({ error: true })
+              setState({ ...state, error: true })
               return
             }
             getMinecraftItemByName(itemName).then(item => {
-              selectItem(itemName, item?.spriteFileName ?? null)
+              selectItem({name: itemName, spriteFileName: item?.spriteFileName ?? null})
             })
           }}
           onFocus={() => setSearchListVisible(true)}
@@ -80,7 +83,7 @@ export default function ItemSelectorEditor({callback}: EditorBaseProps<Record<st
 
       <div className='itemSelectorListContainer'>
         <ItemSearchList items={items} searchString={searchString} visible={searchListVisible} onClickItem={({name, spriteFileName}) => {
-          selectItem(name, spriteFileName)
+          selectItem({name, spriteFileName})
           setSearchListVisible(false)
           inputRef.current?.blur()
         }} />

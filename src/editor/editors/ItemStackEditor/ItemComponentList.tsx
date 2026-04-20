@@ -2,41 +2,42 @@ import './ItemComponentList.css'
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {ItemComponent} from "./types.ts";
-import type {EditorResult, EditorResultCallback, EditorSchema} from "../../types.ts";
+import type {EditorState, EditorStateCallback, EditorSchema} from "../../types.ts";
 import {useEffect, useMemo, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loader/loadFromSchema.tsx";
 
 type ItemComponentListProps = {
-  callback: (components: ItemComponent[]) => void
+  itemComponents: ItemComponent[]
+  setItemComponents: (components: ItemComponent[]) => void
 }
 
 type ItemComponentEntry = {
-  result: EditorResult<unknown> | null
+  state: EditorState<unknown>
+  setState: EditorStateCallback<unknown>
   negate: boolean
-  callback: EditorResultCallback<unknown>
 }
 
-export default function ItemComponentList({ callback }: ItemComponentListProps) {
+export default function ItemComponentList({ itemComponents, setItemComponents }: ItemComponentListProps) {
   const [selectedComponentId, setSelectedComponentId] = useState<string>()
   const [componentLookup, setComponentLookup] = useState<Record<string, EditorSchema> | null>(null)
   const [components, setComponents] = useState<Record<string, ItemComponentEntry>>({})
 
-  const addComponent = ({key, negate}: {key: string, negate?: boolean}) => {
+  const addComponent = ({key, state, negate}: {key: string, state?: EditorState<unknown>, negate?: boolean}) => {
     setComponents(prev => ({
       ...prev,
       [key]: {
-        result: null,
+        state: state ?? { error: false },
         negate: negate || false,
-        callback: result => {
+        setState: (result => {
           setComponents(prev2 => ({
             ...prev2,
             [key]: {
               ...prev2[key],
-              result
-            }
+              state: result
+            } as ItemComponentEntry
           }))
-        }
+        })
       }
     }))
   }
@@ -57,16 +58,17 @@ export default function ItemComponentList({ callback }: ItemComponentListProps) 
   useEffect(() => {
     loadDataComponentSchemas().then(schemas => {
       setComponentLookup(Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema])))
+      itemComponents.forEach(addComponent)
     })
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    callback(Object.entries(components).map(([key, {result, negate}]) => ({
+    setItemComponents(Object.entries(components).map(([key, {state, negate}]) => ({
       key,
-      result,
+      state,
       negate
     })))
-  }, [components])
+  }, [components]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (componentLookup === null) return (
     <div>Loading...</div>
@@ -87,8 +89,8 @@ export default function ItemComponentList({ callback }: ItemComponentListProps) 
       </div>
 
       <div className={'componentEditorsContainer'}>{
-        Object.entries(components).map(([key, { negate, callback}]) => (
-          <ItemComponentContainer key={key} name={key} editor={negate ? null : loadFromSchema(componentLookup[key], { context: {}, callback })} removeComponent={removeComponent}/>
+        Object.entries(components).map(([key, { negate, state, setState}]) => (
+          <ItemComponentContainer key={key} name={key} editor={negate ? null : loadFromSchema(componentLookup[key], { context: {}, state, setState })} removeComponent={removeComponent}/>
         ))
       }</div>
     </div>

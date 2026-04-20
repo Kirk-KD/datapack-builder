@@ -1,37 +1,59 @@
-import type {EditorBaseProps, EditorResult, EditorResultCallback} from "../../types.ts";
+import type {EditorBaseProps, EditorState, EditorStateCallback} from "../../types.ts";
 import * as React from "react";
-import {useEffect, useRef, useState} from "react";
+import {type SetStateAction, useEffect, useRef, useState} from "react";
 import './ListEditor.css'
 import ResetButton from "../../components/ResetButton.tsx";
 
 type ListEditorProps = EditorBaseProps<Record<string, unknown>, unknown[]> & {
-  itemEditor: (cb: EditorResultCallback<unknown>) => React.ReactElement
+  itemEditor: (itemState: EditorState<unknown>, setItemState: EditorStateCallback<unknown>) => React.ReactElement
 }
 
 type ListItemEntry = {
-  result: EditorResult<unknown> | null
-  callback: EditorResultCallback<unknown>
+  state: EditorState<unknown>
+  setState: EditorStateCallback<unknown>
 }
 
-export default function ListEditor({ callback, itemEditor }: ListEditorProps) {
-  const [items, setItems] = useState<Record<string, ListItemEntry>>({})
-
+export default function ListEditor({ state, setState, itemEditor }: ListEditorProps) {
   const nextKey = useRef(0)
+
+  const [items, setItems] = useState<Record<string, ListItemEntry>>(() => {
+    if (state.data === undefined) return {}
+
+    const initial: Record<string, ListItemEntry> = {}
+    state.data.forEach((value, index) => {
+      const key = index.toString()
+      nextKey.current = index + 1
+      initial[key] = {
+        state: value as EditorState<unknown>,
+        setState: itemState => {
+          // eslint-disable-next-line react-hooks/immutability
+          setItems((prev => ({
+            ...prev,
+            [key]: {
+              ...prev[key],
+              state: itemState
+            }
+          })) as SetStateAction<Record<string, ListItemEntry>>)
+        }
+      }
+    })
+    return initial
+  })
 
   const addItem = () => {
     const key = (nextKey.current++).toString()
     setItems(prev => ({
       ...prev,
       [key]: {
-        result: null,
-        callback: result => {
-          setItems(prev2 => ({
+        state: { error: false },
+        setState: state => {
+          setItems((prev2 => ({
             ...prev2,
             [key]: {
               ...prev2[key],
-              result
+              state
             }
-          }))
+          })) as SetStateAction<Record<string, ListItemEntry>>)
         }
       }
     }))
@@ -46,10 +68,10 @@ export default function ListEditor({ callback, itemEditor }: ListEditorProps) {
   }
 
   useEffect(() => {
-    if (Object.values(items).some(({ result }) => result?.error)) callback({ error: true })
-    else callback({
+    if (Object.values(items).some(({ state }) => state.error)) setState({ ...state, error: true })
+    else setState({
       error: false,
-      data: Object.values(items).map(({ result }) => result?.data)
+      data: Object.values(items).map(({ state }) => state)
     })
   }, [items]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,8 +87,8 @@ export default function ListEditor({ callback, itemEditor }: ListEditorProps) {
       </div>
       {Object.keys(items).length ? <div className={'listEditorList'}>{
         Object.entries(items)
-          .map(([key, {callback: cb}]) => (
-            <ListItem editor={itemEditor(cb)} key={key} addItem={addItem} removeItem={() => removeItem(key)}/>
+          .map(([key, {state: itemState, setState: setItemState}]) => (
+            <ListItem editor={itemEditor(itemState, setItemState)} key={key} addItem={addItem} removeItem={() => removeItem(key)}/>
           ))
       }</div> : null}
     </div>

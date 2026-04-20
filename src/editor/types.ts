@@ -1,4 +1,5 @@
 import Blockly from "blockly"
+import type {Dispatch, SetStateAction} from "react";
 
 // Data flow
 
@@ -6,13 +7,13 @@ export type EditorContext<T extends Record<string, unknown> = Record<string, nev
   source?: Blockly.Block
 } & T
 
-export type EditorResult<T> = {
+export type EditorState<T> = {
   error: boolean
   data?: T
-  compileValue?: (options?: Record<string, unknown>) => string
+  enabled?: boolean
 }
 
-export type EditorResultCallback<T> = (result: EditorResult<T>) => void
+export type EditorStateCallback<T> = Dispatch<SetStateAction<EditorState<T>>>
 
 // JSON Schema
 
@@ -69,7 +70,8 @@ export type OldState<T> = {
 
 export type EditorBaseProps<AdditionalContext extends Record<string, unknown>, Result> = {
   context: EditorContext<AdditionalContext>
-  callback: EditorResultCallback<Result>
+  state: EditorState<Result>
+  setState: EditorStateCallback<Result>
 
   optional?: boolean
   description?: string
@@ -79,22 +81,22 @@ export type EditorBaseProps<AdditionalContext extends Record<string, unknown>, R
   oldState?: OldState<Result>
 }
 
-export type StringEditorProps = EditorBaseProps<Record<string, never>, string | null> & {
+export type StringEditorProps = EditorBaseProps<Record<string, never>, string> & {
   defaultValue?: string
 }
 
-export type NumberEditorProps = EditorBaseProps<Record<string, never>, number | null> & {
+export type NumberEditorProps = EditorBaseProps<Record<string, never>, number> & {
   type: 'int' | 'long' | 'float' | 'double'
   defaultValue?: number
   min?: number
   max?: number
 }
 
-export type BooleanEditorProps = EditorBaseProps<Record<string, never>, boolean | null> & {
+export type BooleanEditorProps = EditorBaseProps<Record<string, never>, boolean> & {
   defaultValue?: boolean
 }
 
-export type SelectEditorProps = EditorBaseProps<Record<string, never>, string | null> & {
+export type SelectEditorProps = EditorBaseProps<Record<string, never>, string> & {
   defaultValue?: string
   options: string[]
 }

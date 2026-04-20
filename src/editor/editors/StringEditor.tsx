@@ -1,25 +1,21 @@
 import type {StringEditorProps} from "../types.ts";
-import {useEffect, useState} from "react";
 import TextInput from "../components/TextInput.tsx";
+import {useEffect} from "react";
 
-export default function StringEditor({ callback, defaultValue, className }: StringEditorProps & {className?: string}) {
-  const [value, setValue] = useState(defaultValue || '')
-
+export default function StringEditor({ state, setState, defaultValue, className }: StringEditorProps & {className?: string}) {
   useEffect(() => {
-    callback({
-      error: false,
-      data: value,
-      compileValue: () => value
-    })
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (state.data === undefined) setState({...state, data: defaultValue ?? ''})
+  }, [defaultValue, setState, state]);
 
   return (
     <TextInput
       defaultValue={defaultValue || ''}
-      value={value}
-      setValue={setValue}
+      value={state.data ?? ''}
+      setValue={value => setState({
+        error: false,
+        data: value
+      })}
       className={`editor ${className}`}
-      onChange={nextValue => callback({ error: false, data: nextValue, compileValue: () => nextValue})}
     />
   )
 }
