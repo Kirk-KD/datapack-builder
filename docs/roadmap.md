@@ -64,7 +64,7 @@ For ease of design, the following will all be considered Editor input fields:
 - Data Component editor
 - etc.
 
-There should be two unified type definitions, `EditorContext` and `EditorResult`.
+There should be two unified type definitions, `EditorContext` and `EditorState`.
 
 The `EditorContext` provides at least the Editor source (e.g. a Blockly block instance), to Editors.
 It should be extended via generics (`EditorContext<{key: ValueType}>`) in specific Editors to include other relevant information, such as the Item Selector associated with a Data Modifier Editor.
@@ -72,12 +72,14 @@ It is the responsibility of the source to provide the initial context (e.g. a Bl
 It is the responsibility of the parent Editor to provide its inner Editors necessary information (e.g. a Projectile Editor informing its inner Item Stack Editor of the whitelisted projectile items).
 The behaviour of conditionally disabled input fields is achieved via this system too.
 
-The `EditorResult` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data and Editor state up to the Editor source to be used or saved.
-It should have at least two fields: `error` and `data`. The `data` can be any type, either primitive or an object.
+The `EditorState` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data and Editor state up to the Editor source to be used or saved.
+The principle behind Editor States is serializability, where the outputted State can be used to reopen the same Editor containing the same values.
+It should have at least three fields: `compiler`, `error`, and `data`. The `data` can be any type, either primitive or an object.
 `Error` is a boolean flag that marks the user input of a particular Editor as erronous, and the UX should reflect this information.
-There should also be an optional `compileValue` string function for the compiled Minecraft command fragment by the Editor.
-The `compileValue` function optionally takes in an `options` object of `Record<string, unknown>` via a generic.
+`Compiler` indicates the compiler type (e.g. `scalar`, `list`, `item_stack`) used to by the Editor State Compiler.
 
+An Editor State Compiler receives an Editor State and an options object and converts the State to a string of code.
+The compiled code may vary depending on options passed to the compiler.
 For example, the `data` returned by an Item Stack Editor could be
 
 ```
@@ -95,15 +97,15 @@ For example, the `data` returned by an Item Stack Editor could be
 }
 ```
 
-But its `compileValue` function should return either
+But its compiler function should return either:
 
 ```'minecraft:egg[minecraft:chicken/variant="cold"] 16'```
 
-or
+or:
 
 ```'{id:"minecraft:egg",components:{"minecraft:chicken/variant":"cold"},count:16}'```
 
-depending on the options passed to the function.
+depending on the option specifying whether SNBT mode is used.
 
 ### UI / UX
 
@@ -261,11 +263,6 @@ A `reference`-kind schema simply provides the ID of the editor, and the correspo
 ### Editor Saving/Loading
 Regardless of the format an Editor's result is in, it should be able to load back the exact same value and state when given the same result and context.
 For example, an Item Stack Editor should be able to accept its own result data and populate itself and its inner Editors.
-
-> As of right now, the Editor result structure needs rework to allow this behaviour.
-> A possible solution may be for Editors to return a more complete **serialized state**, including the Editor ID, error state, enabled state, and value/nested serialized state.
-> `compileValue()` should consequently be moved to a separate definition outside a returned result object,
-> likely to a lookup Record mapping Editor IDs to their React Component.
 
 ## Data Registry
 Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
