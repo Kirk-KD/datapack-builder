@@ -1,6 +1,13 @@
-import type {NumberEditorProps} from "../types.ts";
 import TextInput from "../components/TextInput.tsx";
 import {useCallback, useEffect, useState} from "react";
+import type {EditorBaseProps} from "../types.ts";
+
+export type NumberEditorProps = EditorBaseProps<never, number> & {
+  type: 'int' | 'long' | 'float' | 'double'
+  defaultValue?: number
+  min?: number
+  max?: number
+}
 
 export default function NumberEditor({state, setState, type, defaultValue, min, max, className}: NumberEditorProps & {className?: string}) {
   const defaultValueStr = (defaultValue ?? 0).toString()

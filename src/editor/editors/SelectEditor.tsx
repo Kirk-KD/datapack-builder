@@ -1,6 +1,11 @@
-import type {SelectEditorProps} from "../types.ts";
 import {useEffect} from "react";
 import ResetButton from "../components/ResetButton.tsx";
+import type {EditorBaseProps} from "../types.ts";
+
+export type SelectEditorProps = EditorBaseProps<never, string> & {
+  defaultValue?: string
+  options: string[]
+}
 
 export default function SelectEditor({ state, setState, defaultValue, options }: SelectEditorProps) {
   const defaultVal = (defaultValue && options.includes(defaultValue)) ? defaultValue : options[0]

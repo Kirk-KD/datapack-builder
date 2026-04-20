@@ -1,6 +1,10 @@
-import type {BooleanEditorProps} from "../types.ts";
+import type {EditorBaseProps} from "../types.ts";
 import {useEffect, useState} from "react";
 import ResetButton from "../components/ResetButton.tsx";
+
+export type BooleanEditorProps = EditorBaseProps<never, boolean> & {
+  defaultValue?: boolean
+}
 
 export default function BooleanEditor({ state, setState, defaultValue }: BooleanEditorProps) {
   const [value, setValue] = useState(state.data === undefined ? Boolean(defaultValue) : state.data)

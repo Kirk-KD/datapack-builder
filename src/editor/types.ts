@@ -80,23 +80,3 @@ export type EditorBaseProps<AdditionalContext extends Record<string, unknown>, R
   initialValue?: Result
   oldState?: OldState<Result>
 }
-
-export type StringEditorProps = EditorBaseProps<Record<string, never>, string> & {
-  defaultValue?: string
-}
-
-export type NumberEditorProps = EditorBaseProps<Record<string, never>, number> & {
-  type: 'int' | 'long' | 'float' | 'double'
-  defaultValue?: number
-  min?: number
-  max?: number
-}
-
-export type BooleanEditorProps = EditorBaseProps<Record<string, never>, boolean> & {
-  defaultValue?: boolean
-}
-
-export type SelectEditorProps = EditorBaseProps<Record<string, never>, string> & {
-  defaultValue?: string
-  options: string[]
-}
