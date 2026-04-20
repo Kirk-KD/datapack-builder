@@ -48,7 +48,7 @@ export default function ListEditor({ state, setState, itemEditor }: ListEditorPr
     setItems(prev => ({
       ...prev,
       [key]: {
-        state: { error: false },
+        state: { compiler: 'list', error: false },
         setState: state => {
           setItems(prev2 => ({
             ...prev2,
@@ -73,6 +73,7 @@ export default function ListEditor({ state, setState, itemEditor }: ListEditorPr
   useEffect(() => {
     if (Object.values(items).some(({ state }) => state.error)) setState({ ...state, error: true })
     else setState({
+      compiler: 'list',
       error: false,
       data: Object.values(items).map(({ state }) => state)
     })

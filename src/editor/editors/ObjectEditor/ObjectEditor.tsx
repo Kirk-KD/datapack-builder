@@ -1,10 +1,18 @@
 import './ObjectEditor.css'
 import * as React from "react";
 import {type SetStateAction, useCallback, useEffect, useState} from "react";
-import type {AnyEditorState, AnyEditorStateCallback, EditorStateMap, EditorState, EditorStateCallback} from "../../types.ts";
+import type {
+  AnyEditorState,
+  AnyEditorStateCallback,
+  EditorStateMap,
+  EditorState,
+  EditorStateCallback,
+  CompilerType
+} from "../../types.ts";
 import EditorRow from "./EditorRow.tsx";
 
 export type ObjectEditorEntry = {
+  compiler: CompilerType
   key: string
   description?: string
   note?: string
@@ -24,7 +32,11 @@ export default function ObjectEditor({ state, setState, entries }: ObjectEditorP
     Object.fromEntries(
       entries.map(entry => [
         entry.key,
-        (state.data !== undefined && state.data[entry.key] !== undefined) ? state.data[entry.key] : { enabled: entry.optional !== true, error: false }
+        (state.data !== undefined && state.data[entry.key] !== undefined) ? state.data[entry.key] : ({
+          compiler: entry.compiler,
+          enabled: entry.optional !== true,
+          error: false
+        })
       ])
     )
   )
@@ -34,6 +46,7 @@ export default function ObjectEditor({ state, setState, entries }: ObjectEditorP
 
     if (enabledEntries.some(({ key }) => entryStates[key].error)) setState({ ...state, error: true })
     else setState({
+      compiler: 'object',
       error: false,
       data: Object.fromEntries(enabledEntries.map(({ key }) => [key, entryStates[key]]))
     })

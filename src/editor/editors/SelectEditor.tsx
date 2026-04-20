@@ -29,6 +29,7 @@ export default function SelectEditor({ state, setState, defaultValue, options }:
         onChange={e => {
           // setValue(e.target.value)
           setState({
+            compiler: 'scalar',
             error: false,
             data: e.target.value
           })

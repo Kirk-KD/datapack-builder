@@ -7,7 +7,16 @@ export type EditorContext<T extends Record<string, unknown> = Record<string, nev
   source?: Blockly.Block
 } & T
 
+export type EditorReference = 'item' | 'item_stack'
+
+export type CompilerType = 'scalar' | 'list' | 'object' | EditorReference
+
+export type CompilerOptions = {
+  nbt?: boolean
+}
+
 export type EditorState<T> = {
+  compiler: CompilerType
   error: boolean
   data?: T
   enabled?: boolean
@@ -51,8 +60,6 @@ export type ObjectSchema = BaseSchema & {
     schema: EditorSchema
   }[]
 }
-
-export type EditorReference = 'item_stack' // TODO more editors
 
 export type ReferenceSchema = BaseSchema & {
   kind: 'reference'

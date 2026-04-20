@@ -18,6 +18,8 @@ import StringEditor from "./editors/StringEditor.tsx";
 import BooleanEditor from "./editors/BooleanEditor.tsx";
 import SelectEditor from "./editors/SelectEditor.tsx";
 import ListEditor from "./editors/ListEditor/ListEditor.tsx";
+import {ItemSelectorEditor} from "./editors/ItemSelectorEditor";
+import {inferCompilerType} from "./compileEditorState.ts";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>
@@ -86,6 +88,7 @@ function makeObject(schema: ObjectSchema, {context, state, setState}: BaseProps)
       entries={schema.fields.map(({key, schema: fieldSchema}) => {
         const { kind, optional, description, note } = fieldSchema
         return {
+          compiler: inferCompilerType(fieldSchema),
           key,
           optional,
           description,
@@ -101,6 +104,12 @@ function makeObject(schema: ObjectSchema, {context, state, setState}: BaseProps)
 
 function makeReference(schema: ReferenceSchema, {context, state, setState}: BaseProps): React.ReactElement {
   switch (schema.ref) {
+    case 'item': return (
+      <ItemSelectorEditor
+        state={state as EditorState<string>}
+        setState={setState as EditorStateCallback<string>}
+      />
+    )
     case 'item_stack': return (
       <ItemStackEditor
         context={context}

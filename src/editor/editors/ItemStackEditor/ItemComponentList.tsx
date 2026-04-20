@@ -6,6 +6,7 @@ import {type SetStateAction, useEffect, useMemo, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
+import {inferCompilerType} from "../../compileEditorState.ts";
 
 type ItemComponentListProps = {
   itemComponents: ItemComponent[]
@@ -26,11 +27,11 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
   const [componentLookup, setComponentLookup] = useState<Record<string, EditorSchema> | null>(null)
   const [components, setComponents] = useState<Record<string, ItemComponentEntry>>({})
 
-  const addComponent = ({key, state, negate}: {key: string, state?: AnyEditorState, negate?: boolean}) => {
+  const addComponent = ({key, state, negate}: {key: string, state: AnyEditorState, negate?: boolean}) => {
     setComponents(prev => ({
       ...prev,
       [key]: {
-        state: state ?? { error: false },
+        state,
         negate: negate || false,
         setState: result => {
           setComponents(prev2 => ({
@@ -87,13 +88,25 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
           value={selectedComponentId}
           setValue={setSelectedComponentId}
         />
-        <button onClick={() => selectedComponentId && addComponent({key: selectedComponentId})}>+</button>
-        <button onClick={() => selectedComponentId && addComponent({key: selectedComponentId, negate: true})}>+ !</button>
+        <button onClick={() => selectedComponentId && addComponent({
+          key: selectedComponentId,
+          state: {error: false, compiler: inferCompilerType(componentLookup[selectedComponentId])}
+        })}>+</button>
+        <button onClick={() => selectedComponentId && addComponent({
+          key: selectedComponentId,
+          negate: true,
+          state: {error: false, compiler: inferCompilerType(componentLookup[selectedComponentId])}
+        })}>+ !</button>
       </div>
 
       <div className={'componentEditorsContainer'}>{
         Object.entries(components).map(([key, { negate, state, setState}]) => (
-          <ItemComponentContainer key={key} name={key} editor={negate ? null : loadFromSchema(componentLookup[key], { context: {}, state, setState })} removeComponent={removeComponent}/>
+          <ItemComponentContainer
+            key={key}
+            name={key}
+            editor={negate ? null : loadFromSchema(componentLookup[key], { context: {}, state, setState })}
+            removeComponent={removeComponent}
+          />
         ))
       }</div>
     </div>

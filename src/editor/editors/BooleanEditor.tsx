@@ -23,6 +23,7 @@ export default function BooleanEditor({ state, setState, defaultValue }: Boolean
       <input type={'checkbox'} checked={value} onChange={e => {
         setValue(e.target.checked)
         setState({
+          compiler: 'scalar',
           error: false,
           data: e.target.checked
         })

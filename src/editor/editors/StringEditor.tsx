@@ -16,6 +16,7 @@ export default function StringEditor({ state, setState, defaultValue, className 
       defaultValue={defaultValue || ''}
       value={state.data ?? ''}
       setValue={value => setState({
+        compiler: 'scalar',
         error: false,
         data: value
       })}

@@ -28,6 +28,7 @@ export default function NumberEditor({state, setState, type, defaultValue, min, 
   const validateAndCallback = useCallback((value: string): boolean => {
     if (valid(value)) {
       setState({
+        compiler: 'scalar',
         error: false,
         data: Number(value),
       })

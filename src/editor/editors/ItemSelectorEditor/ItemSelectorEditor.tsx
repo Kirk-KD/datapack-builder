@@ -24,6 +24,7 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
     setSearchString(name)
     setSelectedItemSrc(spriteFileName)
     setState({
+      compiler: 'item',
       error: false,
       data: name,
     })
@@ -35,6 +36,7 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
       if (item) setSelectedItemSrc(item.spriteFileName)
     })
     setState({
+      compiler: 'item',
       error: false,
       data: DEFAULT_ITEM,
     })

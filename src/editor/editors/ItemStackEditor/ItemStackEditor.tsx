@@ -19,8 +19,8 @@ export type ItemStackEditorResult = {
 }
 
 export default function ItemStackEditor({context, state, setState}: EditorBaseProps<Record<string, unknown>, ItemStackEditorResult>) {
-  const [itemState, setItemState] = useState<EditorState<string>>(state.data?.item ?? { error: false })
-  const [amountState, setAmountState] = useState<EditorState<number>>(state.data?.amount ?? { error: false })
+  const [itemState, setItemState] = useState<EditorState<string>>(state.data?.item ?? { compiler: 'item_stack', error: false })
+  const [amountState, setAmountState] = useState<EditorState<number>>(state.data?.amount ?? { compiler: 'item_stack', error: false })
   const [itemComponents, setItemComponents] = useState<ItemComponent[]>(state.data?.components ?? [])
 
   const doCallback = (
@@ -34,6 +34,7 @@ export default function ItemStackEditor({context, state, setState}: EditorBasePr
     }
 
     setState({
+      compiler: 'item_stack',
       error: false,
       data: {
         item: item,

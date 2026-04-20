@@ -2,6 +2,7 @@ import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "./types
 import {useEffect, useState} from "react";
 import {controller} from "./modal/controller.ts";
 import loadFromSchema from "./loadFromSchema.tsx";
+import compileEditorState, {inferCompilerType} from "./compileEditorState.ts";
 
 export function useTestString() {
   useTestEditor({
@@ -297,6 +298,7 @@ export function useTestComplex() {
 
 export function useTestEditor(schema: EditorSchema, initData?: unknown) {
   const [state, setState] = useState<AnyEditorState>({
+    compiler: inferCompilerType(schema),
     error: false,
     data: initData
   }) as [AnyEditorState, AnyEditorStateCallback]
@@ -311,6 +313,9 @@ export function useTestEditor(schema: EditorSchema, initData?: unknown) {
   }, [schema, state])
 
   useEffect(() => {
-    console.log(state)
+    try {
+      console.log(compileEditorState(state, {}))
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) { /* empty */ }
   }, [state])
 }
