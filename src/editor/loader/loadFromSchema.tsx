@@ -1,5 +1,9 @@
 import type {
+  AnyEditorState,
+  AnyEditorStateCallback,
   EditorContext,
+  EditorStateList,
+  EditorStateMap,
   EditorStateCallback,
   EditorSchema, ListSchema,
   ObjectSchema, ReferenceSchema,
@@ -17,8 +21,8 @@ import ListEditor from "../editors/ListEditor/ListEditor.tsx";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>
-  state: EditorState<unknown>
-  setState: EditorStateCallback<unknown>
+  state: AnyEditorState
+  setState: AnyEditorStateCallback
 }
 
 export default function loadFromSchema(schema: EditorSchema, props: BaseProps): React.ReactElement {
@@ -36,38 +40,84 @@ function makeScalar(schema: ScalarSchema, {state, setState}: BaseProps): React.R
     case 'long':
     case 'float':
     case 'double':
-      return <NumberEditor state={state as EditorState<number>} setState={setState as EditorStateCallback<number>} type={schema.type as ('int' | 'long' | 'float' | 'double')} defaultValue={schema.defaultValue as number} min={schema.min} max={schema.max}/>
+      return (
+        <NumberEditor
+          state={state as EditorState<number>}
+          setState={setState as EditorStateCallback<number>}
+          type={schema.type as ('int' | 'long' | 'float' | 'double')}
+          defaultValue={schema.defaultValue as number}
+          min={schema.min}
+          max={schema.max}
+        />
+      )
     case 'string':
-      return <StringEditor state={state as EditorState<string>} setState={setState as EditorStateCallback<string>} defaultValue={schema.defaultValue as string}/>
+      return (
+        <StringEditor
+          state={state as EditorState<string>}
+          setState={setState as EditorStateCallback<string>}
+          defaultValue={schema.defaultValue as string}
+        />
+      )
     case 'boolean':
-      return <BooleanEditor state={state as EditorState<boolean>} setState={setState as EditorStateCallback<boolean>} defaultValue={schema.defaultValue as boolean}/>
+      return (
+        <BooleanEditor
+          state={state as EditorState<boolean>}
+          setState={setState as EditorStateCallback<boolean>}
+          defaultValue={schema.defaultValue as boolean}
+        />
+      )
     case 'select':
-      return <SelectEditor state={state as EditorState<string>} setState={setState as EditorStateCallback<string>} options={schema.options as string[]} defaultValue={schema.defaultValue as string}/>
+      return (
+        <SelectEditor
+          state={state as EditorState<string>}
+          setState={setState as EditorStateCallback<string>}
+          options={schema.options as string[]}
+          defaultValue={schema.defaultValue as string}
+        />
+      )
   }
 }
 
 function makeObject(schema: ObjectSchema, {context, state, setState}: BaseProps): React.ReactElement {
-  return <ObjectEditor state={state as EditorState<Record<string, EditorState<unknown>>>} setState={setState as EditorStateCallback<Record<string, EditorState<unknown>>>} entries={schema.fields.map(({key, schema: fieldSchema}) => {
-    const { kind, optional, description, note } = fieldSchema
-    return {
-      key,
-      optional,
-      description,
-      note,
-      nested: kind !== 'scalar',
-      component: (fieldState, setFieldState) => loadFromSchema(fieldSchema, {context, state: fieldState, setState: setFieldState})
-    } as ObjectEditorEntry
-  })}/>
+  return (
+    <ObjectEditor
+      state={state as EditorState<EditorStateMap>}
+      setState={setState as EditorStateCallback<EditorStateMap>}
+      entries={schema.fields.map(({key, schema: fieldSchema}) => {
+        const { kind, optional, description, note } = fieldSchema
+        return {
+          key,
+          optional,
+          description,
+          note,
+          nested: kind !== 'scalar',
+          component: (fieldState, setFieldState) =>
+            loadFromSchema(fieldSchema, {context, state: fieldState, setState: setFieldState})
+        } as ObjectEditorEntry
+      })}
+    />
+  )
 }
 
 function makeReference(schema: ReferenceSchema, {context, state, setState}: BaseProps): React.ReactElement {
   switch (schema.ref) {
     case 'item_stack': return (
-      <ItemStackEditor context={context} state={state as EditorState<ItemStackEditorResult>} setState={setState as EditorStateCallback<ItemStackEditorResult>}/>
+      <ItemStackEditor
+        context={context}
+        state={state as EditorState<ItemStackEditorResult>}
+        setState={setState as EditorStateCallback<ItemStackEditorResult>}
+      />
     )
   }
 }
 
 function makeList(schema: ListSchema, {context, state, setState}: BaseProps): React.ReactElement {
-  return <ListEditor context={context} state={state as EditorState<unknown[]>} setState={setState as EditorStateCallback<unknown[]>} itemEditor={(itemState, setItemState) => loadFromSchema(schema.item, {context, state: itemState, setState: setItemState})}/>
+  return (
+    <ListEditor
+      context={context}
+      state={state as EditorState<EditorStateList>}
+      setState={setState as EditorStateCallback<EditorStateList>}
+      itemEditor={(itemState, setItemState) =>
+        loadFromSchema(schema.item, {context, state: itemState, setState: setItemState})}/>
+  )
 }

@@ -15,6 +15,11 @@ export type EditorState<T> = {
 
 export type EditorStateCallback<T> = Dispatch<SetStateAction<EditorState<T>>>
 
+export type AnyEditorState = EditorState<unknown>
+export type AnyEditorStateCallback = EditorStateCallback<unknown>
+export type EditorStateMap = Record<string, AnyEditorState>
+export type EditorStateList = AnyEditorState[]
+
 // JSON Schema
 
 type BaseSchema = {

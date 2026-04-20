@@ -1,8 +1,8 @@
 import './ItemComponentList.css'
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
-import type {EditorState, EditorStateCallback, EditorSchema} from "../../types.ts";
-import {useEffect, useMemo, useState} from "react";
+import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "../../types.ts";
+import {type SetStateAction, useEffect, useMemo, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loader/loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
@@ -13,31 +13,34 @@ type ItemComponentListProps = {
 }
 
 type ItemComponentEntry = {
-  state: EditorState<unknown>
-  setState: EditorStateCallback<unknown>
+  state: AnyEditorState
+  setState: AnyEditorStateCallback
   negate: boolean
 }
+
+const applyStateAction = (prevState: AnyEditorState, nextState: SetStateAction<AnyEditorState>): AnyEditorState =>
+  typeof nextState === 'function' ? nextState(prevState) : nextState
 
 export default function ItemComponentList({ itemComponents, setItemComponents }: ItemComponentListProps) {
   const [selectedComponentId, setSelectedComponentId] = useState<string>()
   const [componentLookup, setComponentLookup] = useState<Record<string, EditorSchema> | null>(null)
   const [components, setComponents] = useState<Record<string, ItemComponentEntry>>({})
 
-  const addComponent = ({key, state, negate}: {key: string, state?: EditorState<unknown>, negate?: boolean}) => {
+  const addComponent = ({key, state, negate}: {key: string, state?: AnyEditorState, negate?: boolean}) => {
     setComponents(prev => ({
       ...prev,
       [key]: {
         state: state ?? { error: false },
         negate: negate || false,
-        setState: (result => {
+        setState: result => {
           setComponents(prev2 => ({
             ...prev2,
             [key]: {
               ...prev2[key],
-              state: result
+              state: applyStateAction(prev2[key].state, result)
             } as ItemComponentEntry
           }))
-        })
+        }
       }
     }))
   }

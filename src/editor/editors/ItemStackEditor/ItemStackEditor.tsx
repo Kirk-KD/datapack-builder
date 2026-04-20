@@ -1,4 +1,4 @@
-import type {EditorBaseProps, EditorState} from "../../types.ts";
+import type {AnyEditorState, EditorBaseProps, EditorState} from "../../types.ts";
 import {ItemSelectorEditor} from "../ItemSelectorEditor";
 import {useEffect, useState} from "react";
 import NumberEditor from "../NumberEditor.tsx";
@@ -8,7 +8,7 @@ import ItemComponentList from "./ItemComponentList.tsx";
 
 export type ItemComponent = {
   key: string
-  state: EditorState<unknown>
+  state: AnyEditorState
   negate: boolean
 }
 

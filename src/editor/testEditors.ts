@@ -1,4 +1,4 @@
-import type {EditorSchema, EditorState, EditorStateCallback} from "./types.ts"
+import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "./types.ts"
 import {useEffect, useState} from "react";
 import {controller} from "./modal/controller.ts";
 import loadFromSchema from "./loader/loadFromSchema.tsx";
@@ -296,10 +296,10 @@ export function useTestComplex() {
 }
 
 export function useTestEditor(schema: EditorSchema, initData?: unknown) {
-  const [state, setState] = useState<EditorState<unknown>>({
+  const [state, setState] = useState<AnyEditorState>({
     error: false,
     data: initData
-  }) as [EditorState<unknown>, EditorStateCallback<unknown>]
+  }) as [AnyEditorState, AnyEditorStateCallback]
 
   useEffect(() => {
     controller.openEditorModal({

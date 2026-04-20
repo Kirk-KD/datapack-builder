@@ -1,7 +1,7 @@
 import './ObjectEditor.css'
 import * as React from "react";
-import {useCallback, useEffect, useState} from "react";
-import type {EditorState, EditorStateCallback} from "../../types.ts";
+import {type SetStateAction, useCallback, useEffect, useState} from "react";
+import type {AnyEditorState, AnyEditorStateCallback, EditorStateMap, EditorState, EditorStateCallback} from "../../types.ts";
 import EditorRow from "./EditorRow.tsx";
 
 export type ObjectEditorEntry = {
@@ -10,17 +10,17 @@ export type ObjectEditorEntry = {
   note?: string
   optional?: boolean
   nested?: boolean
-  component: (fieldState: EditorState<unknown>, setFieldState: EditorStateCallback<unknown>) => React.ReactElement
+  component: (fieldState: AnyEditorState, setFieldState: AnyEditorStateCallback) => React.ReactElement
 }
 
 type ObjectEditorProps = {
-  state: EditorState<Record<string, EditorState<unknown>>>
-  setState: EditorStateCallback<Record<string, EditorState<unknown>>>
+  state: EditorState<EditorStateMap>
+  setState: EditorStateCallback<EditorStateMap>
   entries: ObjectEditorEntry[]
 }
 
 export default function ObjectEditor({ state, setState, entries }: ObjectEditorProps) {
-  const [entryStates, setEntryStates] = useState<Record<string, EditorState<unknown>>>(() =>
+  const [entryStates, setEntryStates] = useState<EditorStateMap>(() =>
     Object.fromEntries(
       entries.map(entry => [
         entry.key,
@@ -40,10 +40,13 @@ export default function ObjectEditor({ state, setState, entries }: ObjectEditorP
   }, [entryStates]) // eslint-disable-line react-hooks/exhaustive-deps
   // ^Including `callback` and `entries` in the useEffect dependencies causes infinite updates.
 
-  const makeEntryCallback = useCallback((key: string) => (result: EditorState<unknown>) => {
+  const makeEntryCallback = useCallback((key: string): AnyEditorStateCallback => (result: SetStateAction<AnyEditorState>) => {
     setEntryStates(prev => ({
       ...prev,
-      [key]: { ...prev[key], ...result }
+      [key]: {
+        ...prev[key],
+        ...(typeof result === 'function' ? result(prev[key]) : result)
+      }
     }))
   }, [])
 
@@ -66,7 +69,7 @@ export default function ObjectEditor({ state, setState, entries }: ObjectEditorP
           enabled={Boolean(entryStates[entry.key].enabled)}
           setEnabled={makeSetEnabled(entry.key)}
         >
-          {entry.component(entryStates[entry.key], makeEntryCallback(entry.key) as EditorStateCallback<unknown>)}
+          {entry.component(entryStates[entry.key], makeEntryCallback(entry.key))}
         </EditorRow>
       ))}
     </div>

@@ -1,17 +1,20 @@
-import type {EditorBaseProps, EditorState, EditorStateCallback} from "../../types.ts";
+import type {AnyEditorState, AnyEditorStateCallback, EditorBaseProps, EditorStateList} from "../../types.ts";
 import * as React from "react";
 import {type SetStateAction, useEffect, useRef, useState} from "react";
 import './ListEditor.css'
 import ResetButton from "../../components/ResetButton.tsx";
 
-type ListEditorProps = EditorBaseProps<Record<string, unknown>, unknown[]> & {
-  itemEditor: (itemState: EditorState<unknown>, setItemState: EditorStateCallback<unknown>) => React.ReactElement
+type ListEditorProps = EditorBaseProps<Record<string, unknown>, EditorStateList> & {
+  itemEditor: (itemState: AnyEditorState, setItemState: AnyEditorStateCallback) => React.ReactElement
 }
 
 type ListItemEntry = {
-  state: EditorState<unknown>
-  setState: EditorStateCallback<unknown>
+  state: AnyEditorState
+  setState: AnyEditorStateCallback
 }
+
+const applyStateAction = (prevState: AnyEditorState, nextState: SetStateAction<AnyEditorState>): AnyEditorState =>
+  typeof nextState === 'function' ? nextState(prevState) : nextState
 
 export default function ListEditor({ state, setState, itemEditor }: ListEditorProps) {
   const nextKey = useRef(0)
@@ -24,16 +27,16 @@ export default function ListEditor({ state, setState, itemEditor }: ListEditorPr
       const key = index.toString()
       nextKey.current = index + 1
       initial[key] = {
-        state: value as EditorState<unknown>,
+        state: value,
         setState: itemState => {
           // eslint-disable-next-line react-hooks/immutability
-          setItems((prev => ({
+          setItems(prev => ({
             ...prev,
             [key]: {
               ...prev[key],
-              state: itemState
+              state: applyStateAction(prev[key].state, itemState)
             }
-          })) as SetStateAction<Record<string, ListItemEntry>>)
+          }))
         }
       }
     })
@@ -47,13 +50,13 @@ export default function ListEditor({ state, setState, itemEditor }: ListEditorPr
       [key]: {
         state: { error: false },
         setState: state => {
-          setItems((prev2 => ({
+          setItems(prev2 => ({
             ...prev2,
             [key]: {
               ...prev2[key],
-              state
+              state: applyStateAction(prev2[key].state, state)
             }
-          })) as SetStateAction<Record<string, ListItemEntry>>)
+          }))
         }
       }
     }))
