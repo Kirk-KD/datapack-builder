@@ -1,10 +1,7 @@
 import WorkspacePanel from './components/WorkspacePanel'
-import EditorModal from "./editor/modal/EditorModal.tsx";
-import {useTestComplex} from "./editor/testEditors.ts";
+import EditorModal from "./editor/modal/EditorModal.tsx"
 
 function App() {
-  useTestComplex()
-
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
       <WorkspacePanel />

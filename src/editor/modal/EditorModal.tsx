@@ -31,12 +31,7 @@ function EditorModal() {
       {payload.editor}
     </div>
     <div className={'editorModalFooter'}>
-      <button
-        className='cancelButton'
-      >Cancel</button>
-      <button
-        className='saveButton'
-      >Save</button>
+      <button onClick={controller.closeEditorModal}>Done</button>
     </div>
   </div>
 }

@@ -19,7 +19,7 @@ import BooleanEditor from "./editors/BooleanEditor.tsx";
 import SelectEditor from "./editors/SelectEditor.tsx";
 import ListEditor from "./editors/ListEditor/ListEditor.tsx";
 import {ItemSelectorEditor} from "./editors/ItemSelectorEditor";
-import {inferCompilerType} from "./compileEditorState.ts";
+import {inferCompilerType} from "../compiler/compileEditorState.ts";
 
 type BaseProps = {
   context: EditorContext<Record<string, unknown>>

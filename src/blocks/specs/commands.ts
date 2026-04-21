@@ -415,7 +415,7 @@ export const commandBlockSpecs: BlockSpec[] = [
     category: 'commands',
     json: {
       type: 'mc_give',
-      message0: 'give %1 %2 count: %3',
+      message0: 'give %1 %2',
       args0: [
         {
           type: 'input_value',
@@ -425,13 +425,8 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'ITEM',
-          check: ['mc_param', 'mc_string']
+          check: ['mc_param', 'mc_item_stack']
         },
-        {
-          type: 'input_value',
-          name: 'COUNT',
-          check: ['mc_param', 'number'],
-        }
       ],
       previousStatement: null,
       nextStatement: null,
@@ -440,13 +435,11 @@ export const commandBlockSpecs: BlockSpec[] = [
     generator(block) {
       const target = mcfunctionGenerator.valueToCode(block, 'TARGET', 0)
       const item = mcfunctionGenerator.valueToCode(block, 'ITEM', 0)
-      const count = mcfunctionGenerator.valueToCode(block, 'COUNT', 0)
-      return `give ${target} ${item} ${count}\n`
+      return `give ${target} ${item}\n`
     },
     setShadowBlocks(this) {
       setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
-      setShadowState(this, 'ITEM', { type: 'mc_string' })
-      setShadowState(this, 'COUNT', { type: 'number', fields: { VALUE: '1' } })
+      setShadowState(this, 'ITEM', { type: 'mc_item_stack' })
     }
   }
 ]

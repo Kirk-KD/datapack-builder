@@ -6,7 +6,7 @@ import {type SetStateAction, useEffect, useMemo, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
-import {inferCompilerType} from "../../compileEditorState.ts";
+import {inferCompilerType} from "../../../compiler/compileEditorState.ts";
 
 type ItemComponentListProps = {
   itemComponents: ItemComponent[]
