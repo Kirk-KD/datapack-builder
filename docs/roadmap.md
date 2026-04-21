@@ -140,6 +140,8 @@ Any inner Editor input must be collapsable, including list Editors.
 Upon collapsing or expanding, the parent/root Editor must adjust its width responsively under the new layout.
 The initial `collapsed` state can be specified via a prop, or defaults to false.
 
+> Collapsed state deferred for now.
+
 A visual container is used around a nested Editor to separate it from the other input elements.
 This means the root editor should not be wrapped in a container (unless otherwise needed).
 The value of the container background colour should rotate through (and wrap around) three light to dark variants depending on its nested depth.
@@ -147,40 +149,6 @@ This visual container should not be applied to list editors.
 
 It is the responsibility of the Editor host (e.g. a modal containing this editor, or a Settings page) to
 provide a save/cancel functionality and to delete or reset the Editor appropriately.
-
-#### Changed State
-
-Any input field is considered **changed** if its current state differs from its `oldState`.
-The label text of a changed input should be bolded and slightly brighter to reflect this visually.
-
-`oldState` is a prop with two fields:
-- `value`: the value the input was initialized with. This may be the last saved state (e.g. the value when the Editor modal was opened) or a defined default, depending on what the Editor host provides.
-- `enabled`: whether the input was enabled when initialized
-
-Composite Editors (Editors containing other input components) do not receive or compare `oldState.value` themselves.
-Their changed state is derived entirely from their children.
-
-Elementary Editor inputs are considered changed if:
-- Their current enabled status differs from `oldState.enabled`, or
-- Their current value differs from `oldState.value`.
-
-The `oldState.enabled` status check takes precedence.
-If the enabled status is different, the input is considered changed regardless of whether its value differs from the old value.
-
-Changed state reflects the current difference against `oldState`, not edit history.
-
-Composite Editor inputs are considered changed if:
-- Their own current enabled status differs from their `oldState.enabled`, or
-- Any of their inner input components are considered changed.
-
-List Editor inputs are considered changed if:
-- Their current enabled status differs from `oldState.enabled`, or
-- Any of its items are considered changed, or
-- The order of items has changed.
-
-List items do not have a label or optional toggle. 
-Consequently, their oldState omits the enabled field, and only the value comparison applies.
-If a list item is a composite Editor, its changed state is derived from its children as normal, with no enabled check.
 
 #### String Input
 Simply a text input with the option to be a text field.
