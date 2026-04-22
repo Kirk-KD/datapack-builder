@@ -117,6 +117,11 @@ function makeReference(schema: ReferenceSchema, {context, state, setState}: Base
         setState={setState as EditorStateCallback<ItemStackEditorResult>}
       />
     )
+    // Fallback to text input
+    default: return makeScalar(
+      { ...schema, kind: 'scalar', type: 'string', defaultValue: '{}' },
+      {context, state, setState}
+    )
   }
 }
 
