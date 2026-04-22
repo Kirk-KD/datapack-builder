@@ -71,8 +71,9 @@ export const constructBlockSpecs: BlockSpec[] = [
           .appendField(new TextButton(
             (() => {
               const itemName = this.itemStackEditorState_.data?.item.data
-              if (!itemName) return 'edit item stack'
-              return itemName + (this.itemStackEditorState_.data?.components.length ? `[...]` : '')
+              const itemAmt = this.itemStackEditorState_.data?.amount.data
+              if (!itemName || !itemAmt) return 'edit item stack'
+              return `${itemName}${this.itemStackEditorState_.data?.components.length ? '[...]' : ''} ${itemAmt === 1 ? '' : '×' + itemAmt}`
             })(), openEditor), 'item_stack_editor')
       }
 
