@@ -1,0 +1,118 @@
+@import "editorCheckbox.css";
+@import "editorDropdown.css";
+@import "editorButton.css";
+
+.editorModal {
+    background-color: var(--colour-surface-panel);
+    border: 1px solid var(--colour-border-default);
+    border-radius: var(--border-radius-default);
+
+    width: 800px;
+    height: 700px;
+    overflow: scroll;
+
+    position: fixed;
+    z-index: 9999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-family: var(--font-family), sans-serif;
+    font-size: var(--font-size-base);
+    color: var(--colour-text-primary);
+
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+
+    --padding: 1.5rem;
+    --padding-small: 0.5rem;
+    --padding-vertical: 0.7rem;
+    --input-field-height: 1.6rem;
+}
+.editorModal.maximized {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 0;
+    transform: none;
+}
+
+.editorModalHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    background-color: rgba(0, 0, 0, 15%);
+
+    padding: var(--padding-vertical) var(--padding);
+}
+
+.editorModalTitle {
+    font-size: var(--font-size-large) !important;
+    font-weight: 800;
+}
+
+.maximizeButton {
+    background: none;
+    padding: 0;
+    margin: 0;
+
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+
+    border: 1px solid var(--colour-border-muted);
+}
+.maximizeButton:hover {
+    background-color: var(--colour-surface-panel-hover);
+}
+
+.maximizeButton img {
+    width: 50%;
+    height: 50%;
+    display: block;
+}
+
+.editorModalBody {
+    flex-grow: 1;
+    padding: var(--padding);
+
+    overflow: scroll;
+}
+
+.editorModalFooter {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    padding: var(--padding-vertical) var(--padding);
+    gap: 0.5rem;
+    background-color: rgba(0, 0, 0, 15%);
+}
+
+.editorModalFooter button {
+    width: 5rem;
+    height: 2.5rem;
+
+    background: none;
+    padding: 0;
+    margin: 0;
+
+    cursor: pointer;
+
+    border: 1px solid var(--colour-border-muted);
+
+    font-family: var(--font-family), sans-serif;
+    font-size: var(--font-size-base);
+    color: var(--colour-text-primary);
+}
+.editorModalFooter button:hover {
+    background-color: var(--colour-surface-panel-hover);
+}

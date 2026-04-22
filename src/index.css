@@ -1,6 +1,7 @@
 :root {
   --font-family: "Helvetica Neue", Helvetica, sans-serif;
   --font-size-base: 12pt;
+  --font-size-large: 14pt;
   --font-size-small: 9pt;
 
   --colour-surface-app: #141a23;
@@ -10,12 +11,20 @@
   --colour-border-muted: #3f4858;
   --colour-border-default: #586173;
   --colour-border-focus: #8db8ff;
+  --colour-border-error: #ff8d8d;
   --colour-text-primary: #f2f5f8;
   --colour-text-secondary: #d4dae2;
-  --colour-text-placeholder: #8f9aab;
+  --colour-text-muted: #8f9aab;
   --colour-overlay: rgb(15 18 24 / 72%);
   --colour-shadow-strong: rgb(0 0 0 / 45%);
   --colour-focus-ring: rgb(141 184 255 / 22%);
+
+  --colour-input-field: #2e3547;
+  --colour-input-button: #2e3547;
+  --colour-input-button-hover: #354051;
+
+  --border-radius-default: 10px;
+  --border-radius-small: 5px;
 }
 
 * {

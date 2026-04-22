@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly'
 
-type StatefulBlock = Blockly.BlockSvg & {
+export type StatefulBlock = Blockly.BlockSvg & {
   saveExtraState?: () => object | null
   loadExtraState?: (state: object | null) => void
   updateShape_?: () => void

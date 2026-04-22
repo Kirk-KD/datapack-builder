@@ -9,7 +9,6 @@ import './WorkspacePanel.css'
 
 import type {WorkspaceSvg} from "blockly";
 import {useProjectConfigStore} from "../stores/projectConfig.ts";
-import {loadDataComponentSchemas} from "../catalog/dataComponentSchemaCatalog.ts";
 
 // Register outside useEffect to avoid error due to variables category
 registerContinuousToolbox()
@@ -105,9 +104,7 @@ function WorkspacePanel() {
   function toggleNoNameMangling() {
     updateConfig({ noNameMangling: !projectConfig.noNameMangling })
   }
-
-  loadDataComponentSchemas().then((val) => console.log(val))
-
+  
   return (
     <>
       <div style={{

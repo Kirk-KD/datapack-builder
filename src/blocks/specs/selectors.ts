@@ -69,7 +69,7 @@ export const selectorBlockSpecs: BlockSpec[] = [
       const block = this as TargetSelectorBlock
       block.showFilters_ = false
       block.setOutput(true, targetSelectorRootType)
-      block.setColour(colours.targetSelectors)
+      block.setColour(colours.constructs)
       block.setTooltip('')
       block.setHelpUrl('')
       block.setInputsInline(false)

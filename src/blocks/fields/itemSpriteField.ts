@@ -7,7 +7,7 @@ const SIZE = 26
 const MARGIN = 4
 
 export class ItemSpriteField extends Blockly.FieldImage {
-  private spriteSrc_: string
+  private readonly spriteSrc_: string
   private backgroundElement_: SVGImageElement | null = null
 
   constructor(initialSpriteSrc = PLACEHOLDER_SRC) {
@@ -37,21 +37,5 @@ export class ItemSpriteField extends Blockly.FieldImage {
     if (this.spriteSrc_ !== PLACEHOLDER_SRC)
       this.imageElement.setAttribute('image-rendering', 'pixelated')
     this.fieldGroup_.insertBefore(this.backgroundElement_, this.imageElement)
-  }
-
-  setSpriteSource(spriteSrc?: string) {
-    const nextSpriteSrc = spriteSrc || PLACEHOLDER_SRC
-    if (nextSpriteSrc === this.spriteSrc_) return
-
-    this.spriteSrc_ = nextSpriteSrc
-    this.setValue(nextSpriteSrc)
-
-    if (this.spriteSrc_ !== PLACEHOLDER_SRC && this.imageElement)
-      this.imageElement.setAttribute('image-rendering', 'pixelated')
-
-    const sourceBlock = this.getSourceBlock()
-    if (sourceBlock?.rendered && sourceBlock instanceof Blockly.BlockSvg) {
-      sourceBlock.render()
-    }
   }
 }

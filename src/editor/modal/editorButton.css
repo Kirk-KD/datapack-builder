@@ -1,0 +1,13 @@
+.editor button {
+    min-width: 1.5rem;
+    background-color: var(--colour-input-button);
+    border: none;
+    border-radius: var(--border-radius-small);
+    color: var(--colour-text-secondary);
+    cursor: pointer;
+    padding: 0.1rem var(--padding-small);
+}
+
+.editor button:hover {
+    background-color: var(--colour-input-button-hover);
+}

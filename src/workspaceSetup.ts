@@ -11,7 +11,7 @@ import {
 import {colours} from "./blocks/blockColours.ts";
 import {MetricsManager} from "blockly";
 
-// from index.css
+// from inputContainer.css
 const themeColours = {
   surfaceApp: '#141a23',
   surfacePanel: '#202733',

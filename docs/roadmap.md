@@ -64,7 +64,7 @@ For ease of design, the following will all be considered Editor input fields:
 - Data Component editor
 - etc.
 
-There should be two unified type definitions, `EditorContext` and `EditorResult`.
+There should be two unified type definitions, `EditorContext` and `EditorState`.
 
 The `EditorContext` provides at least the Editor source (e.g. a Blockly block instance), to Editors.
 It should be extended via generics (`EditorContext<{key: ValueType}>`) in specific Editors to include other relevant information, such as the Item Selector associated with a Data Modifier Editor.
@@ -72,13 +72,16 @@ It is the responsibility of the source to provide the initial context (e.g. a Bl
 It is the responsibility of the parent Editor to provide its inner Editors necessary information (e.g. a Projectile Editor informing its inner Item Stack Editor of the whitelisted projectile items).
 The behaviour of conditionally disabled input fields is achieved via this system too.
 
-The `EditorResult` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data up to the Editor source.
-It should have at least two fields: `error` and `data`. The `data` can be any type, either primitive or an object.
+The `EditorState` will be the argument type for a callback function, likely a React `useState` state setter, to pass user-entered data and Editor state up to the Editor source to be used or saved.
+The principle behind Editor States is serializability, where the outputted State can be used to reopen the same Editor containing the same values.
+It should have at least three fields: `compiler`, `error`, and `data`. The `data` can be any type, either primitive or an object.
 `Error` is a boolean flag that marks the user input of a particular Editor as erronous, and the UX should reflect this information.
-There should also be an optional `compileValue` string function for the compiled Minecraft command fragment by the Editor.
-The `compileValue` function optionally takes in an `options` object of `Record<string, unknown>` via a generic.
+`Compiler` indicates the compiler type (e.g. `scalar`, `list`, `item_stack`) used to by the Editor State Compiler.
 
-For example, the `data` returned by an Item Stack Editor could be
+### Editor State Compiler
+An Editor State Compiler receives an Editor State and an options object and converts the State to a string of code.
+The compiled code may vary depending on options passed to the compiler.
+For example, the `data` returned by an Editor could be
 
 ```
 {
@@ -95,15 +98,15 @@ For example, the `data` returned by an Item Stack Editor could be
 }
 ```
 
-But its `compileValue` function should return either
+But its compiler function should return either:
 
 ```'minecraft:egg[minecraft:chicken/variant="cold"] 16'```
 
-or
+or:
 
 ```'{id:"minecraft:egg",components:{"minecraft:chicken/variant":"cold"},count:16}'```
 
-depending on the options passed to the function.
+depending on the option specifying whether SNBT mode is used.
 
 ### UI / UX
 
@@ -118,9 +121,8 @@ Instead, the root editor should satisfy its content's width requirement by incre
 To avoid elementary input components gaining width infinitely due to nested Editors and to ensure correct alignment, the same `max-width` must be defined for them.
 To facilitate horizontal overflow of the root Editor, a `min-width` must also be defined similarly.
 
-Each input component (both elementary and Editor) requires a "reset" button.
+Each elementary input component (and not inner Editors) requires a "reset" button.
 Consequently, a default value must be defined for each input.
-For an inner Editor, the reset button will iteratively reset its inner inputs to their defined default values.
 
 Each input component must also allow for an optional `description` and `note`.
 Descriptions will be displayed via a tooltip component upon hovering over the input's label.
@@ -139,6 +141,8 @@ Any inner Editor input must be collapsable, including list Editors.
 Upon collapsing or expanding, the parent/root Editor must adjust its width responsively under the new layout.
 The initial `collapsed` state can be specified via a prop, or defaults to false.
 
+> Collapsed state deferred for now.
+
 A visual container is used around a nested Editor to separate it from the other input elements.
 This means the root editor should not be wrapped in a container (unless otherwise needed).
 The value of the container background colour should rotate through (and wrap around) three light to dark variants depending on its nested depth.
@@ -147,44 +151,10 @@ This visual container should not be applied to list editors.
 It is the responsibility of the Editor host (e.g. a modal containing this editor, or a Settings page) to
 provide a save/cancel functionality and to delete or reset the Editor appropriately.
 
-#### Changed State
-
-Any input field is considered **changed** if its current state differs from its `oldState`.
-The label text of a changed input should be bolded and slightly brighter to reflect this visually.
-
-`oldState` is a prop with two fields:
-- `value`: the value the input was initialized with. This may be the last saved state (e.g. the value when the Editor modal was opened) or a defined default, depending on what the Editor host provides.
-- `enabled`: whether the input was enabled when initialized
-
-Composite Editors (Editors containing other input components) do not receive or compare `oldState.value` themselves.
-Their changed state is derived entirely from their children.
-
-Elementary Editor inputs are considered changed if:
-- Their current enabled status differs from `oldState.enabled`, or
-- Their current value differs from `oldState.value`.
-
-The `oldState.enabled` status check takes precedence.
-If the enabled status is different, the input is considered changed regardless of whether its value differs from the old value.
-
-Changed state reflects the current difference against `oldState`, not edit history.
-
-Composite Editor inputs are considered changed if:
-- Their own current enabled status differs from their `oldState.enabled`, or
-- Any of their inner input components are considered changed.
-
-List Editor inputs are considered changed if:
-- Their current enabled status differs from `oldState.enabled`, or
-- Any of its items are considered changed, or
-- The order of items has changed.
-
-List items do not have a label or optional toggle. 
-Consequently, their oldState omits the enabled field, and only the value comparison applies.
-If a list item is a composite Editor, its changed state is derived from its children as normal, with no enabled check.
-
 #### String Input
 Simply a text input with the option to be a text field.
 
-#### Integer & Number Input
+#### Number Input
 A text input with a validator that runs on every keystroke.
 The validator does not correct the input, but the input component should set the `error` flag of the `EditorResult`.
 
@@ -196,15 +166,9 @@ Essentially an empty Editor able to take in inputs components as children.
 It will return data as an Object with keys being the value of the `key` props of its children.
 
 #### List Input
-A list input is an Editor that has a predetermined input component type.
-To the top-right of each item, there will be a button to remove the item.
-The "add" button will be placed in its own row and right aligned.
-The "add" button row will be placed below the last list item if the list is not empty.
-An empty list simply has only one row for the "add" button, nothing else. 
+A list input is an Editor that has a predetermined item Editor type.
 
-The return data will be an array containing the returned data of its contents.
-
-At this time, no minimum or maximum list size needs to be specified.
+> At this time, no minimum or maximum list size needs to be specified.
 
 #### Dropdown
 A dropdown of string values. If the number of options is greater than 25, there should be a small search/filter textbox.
@@ -214,51 +178,24 @@ A default value can optionally be explicitly defined, otherwise it treats the fi
 Simply a checkbox with the text "true" or "false" to the right of it.
 
 #### Keyboard Navigation
-Deferred for now. Need an App-wide unified design.
+> Deferred for now. Need an App-wide unified design.
 
-### JSON Schema
-The support for a JSON schema (such as `data_component_schema.json`) is neccessary for Editors working on complex sets
-of inputs unfit for definition in TypeScript files.
+### Schema
+A schema JSON object can be used to create Editors.
 A parser should receive an Editor schema object and return the recursively constructed Editor/input components.
+For example, this facilitates the dynamically loaded Item Stack data component editors from `data_component_schema.json`.
 
-#### Schema
-```ts
-type EditorSchema = {
-  kind: "scalar" | "object" | "reference" | "list"
-  optional?: boolean
-  description?: string
-  note?: string
-  
-  // if kind = scalar
-  type?: "string" | "int" | "float" | "double" | "select" | "boolean"
-  
-  // if type = string/int/float/double/select/boolean
-  default?: string | number | boolean
-  
-  // if type = int/float/double
-  min?: number
-  max?: number
-  
-  // if type = select
-  options?: string[]
-  
-  // if kind = object
-  fields?: {
-    key: string // label defaults to key
-    schema: EditorSchema
-  }[]
-  
-  // if kind = list
-  item?: EditorSchema
-  
-  // if kind = reference
-  ref?: string // ID of an editor
-}
-```
-
-#### Editor Registry
-Editor React components will be kept tracked via a simple ID-to-Component registry. 
+#### Editor Lookup
 A `reference`-kind schema simply provides the ID of the editor, and the corresponding Editor will be created by the parser.
+
+### Editor Saving/Loading
+Regardless of the format an Editor's result is in, it should be able to load back the exact same value and state when given the same result and context.
+For example, an Item Stack Editor should be able to accept its own result data and populate itself and its inner Editors.
+As such, consumers of an Editor intending to save and load its data must keep the whole Editor State instead of only `data`, in most cases.
+
+## Data Registry
+Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
+A catalogue system will be used to asynchronously load chosen JSON files.
 
 ## Data Types
 Data types are key to Minecraft commands.

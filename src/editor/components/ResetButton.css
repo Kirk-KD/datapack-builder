@@ -1,0 +1,14 @@
+.resetButton {
+    background-color: var(--colour-input-button);
+    border: none;
+    border-radius: var(--border-radius-small);
+    width: var(--input-field-height);
+    height: var(--input-field-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.resetButton:hover {
+    background-color: var(--colour-input-button-hover);
+    cursor: pointer;
+}

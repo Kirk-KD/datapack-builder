@@ -1,0 +1,35 @@
+.editorNote {
+    grid-column: 1 / -1;
+    color: var(--colour-text-muted);
+    padding-left: var(--input-field-height);
+}
+
+/* Contains enable checkbox and label text */
+.editorRowLabel {
+    display: flex;
+    flex-direction: row;
+    gap: 0.4rem;
+    align-items: center;
+    height: var(--input-field-height);
+    color: var(--colour-text-secondary);
+}
+
+.editorRowLabel .editorLabelSpan {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.editorRowLabel.disabled .editorLabelSpan {
+    opacity: 0.4;
+}
+
+.editorRowInput {
+    width: fit-content;
+    min-width: 15rem;
+}
+
+.editorRowInput.disabled {
+    pointer-events: none;
+    opacity: 0.4;
+}
