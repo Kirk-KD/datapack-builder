@@ -31,7 +31,7 @@ export const constructBlockSpecs: BlockSpec[] = [
         itemSpriteSrc_: null
       })
 
-      block.setColour(colours.commands)
+      block.setColour(colours.constructs)
       block.setTooltip('')
       block.setHelpUrl('')
       block.setInputsInline(true)
@@ -81,6 +81,7 @@ export const constructBlockSpecs: BlockSpec[] = [
     },
     generator(block: Blockly.Block) {
       const editorState = (block as ItemStackBlock).itemStackEditorState_
+      console.log(editorState)
       if (editorState.error || editorState.data === undefined) return ''
       return [compileEditorState(editorState, { nbt: false }), 0]
     }
