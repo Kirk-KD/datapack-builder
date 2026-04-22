@@ -78,9 +78,10 @@ It should have at least three fields: `compiler`, `error`, and `data`. The `data
 `Error` is a boolean flag that marks the user input of a particular Editor as erronous, and the UX should reflect this information.
 `Compiler` indicates the compiler type (e.g. `scalar`, `list`, `item_stack`) used to by the Editor State Compiler.
 
+### Editor State Compiler
 An Editor State Compiler receives an Editor State and an options object and converts the State to a string of code.
 The compiled code may vary depending on options passed to the compiler.
-For example, the `data` returned by an Item Stack Editor could be
+For example, the `data` returned by an Editor could be
 
 ```
 {
@@ -153,7 +154,7 @@ provide a save/cancel functionality and to delete or reset the Editor appropriat
 #### String Input
 Simply a text input with the option to be a text field.
 
-#### Integer & Number Input
+#### Number Input
 A text input with a validator that runs on every keystroke.
 The validator does not correct the input, but the input component should set the `error` flag of the `EditorResult`.
 
@@ -165,15 +166,9 @@ Essentially an empty Editor able to take in inputs components as children.
 It will return data as an Object with keys being the value of the `key` props of its children.
 
 #### List Input
-A list input is an Editor that has a predetermined input component type.
-To the top-right of each item, there will be a button to remove the item.
-The "add" button will be placed in its own row and right aligned.
-The "add" button row will be placed below the last list item if the list is not empty.
-An empty list simply has only one row for the "add" button, nothing else. 
+A list input is an Editor that has a predetermined item Editor type.
 
-The return data will be an array containing the returned data of its contents.
-
-At this time, no minimum or maximum list size needs to be specified.
+> At this time, no minimum or maximum list size needs to be specified.
 
 #### Dropdown
 A dropdown of string values. If the number of options is greater than 25, there should be a small search/filter textbox.
@@ -183,47 +178,12 @@ A default value can optionally be explicitly defined, otherwise it treats the fi
 Simply a checkbox with the text "true" or "false" to the right of it.
 
 #### Keyboard Navigation
-Deferred for now. Need an App-wide unified design.
+> Deferred for now. Need an App-wide unified design.
 
-### JSON Schema
-The support for a JSON schema (such as `data_component_schema.json`) is neccessary for Editors working on complex sets
-of inputs unfit for definition in TypeScript files.
+### Schema
+A schema JSON object can be used to create Editors.
 A parser should receive an Editor schema object and return the recursively constructed Editor/input components.
-
-#### Schema
-```ts
-type EditorSchema = {
-  kind: "scalar" | "object" | "reference" | "list"
-  optional?: boolean
-  description?: string
-  note?: string
-  
-  // if kind = scalar
-  type?: "string" | "int" | "float" | "double" | "select" | "boolean"
-  
-  // if type = string/int/float/double/select/boolean
-  default?: string | number | boolean
-  
-  // if type = int/float/double
-  min?: number
-  max?: number
-  
-  // if type = select
-  options?: string[]
-  
-  // if kind = object
-  fields?: {
-    key: string // label defaults to key
-    schema: EditorSchema
-  }[]
-  
-  // if kind = list
-  item?: EditorSchema
-  
-  // if kind = reference
-  ref?: string // ID of an editor
-}
-```
+For example, this facilitates the dynamically loaded Item Stack data component editors from `data_component_schema.json`.
 
 #### Editor Lookup
 A `reference`-kind schema simply provides the ID of the editor, and the corresponding Editor will be created by the parser.
@@ -231,6 +191,7 @@ A `reference`-kind schema simply provides the ID of the editor, and the correspo
 ### Editor Saving/Loading
 Regardless of the format an Editor's result is in, it should be able to load back the exact same value and state when given the same result and context.
 For example, an Item Stack Editor should be able to accept its own result data and populate itself and its inner Editors.
+As such, consumers of an Editor intending to save and load its data must keep the whole Editor State instead of only `data`, in most cases.
 
 ## Data Registry
 Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
