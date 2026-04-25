@@ -1,7 +1,7 @@
 import { type ChangeEventHandler, forwardRef } from "react"
 import * as React from "react"
 import ResetButton from "./ResetButton.tsx"
-import { InputAdornment, Stack, TextField, type TextFieldProps } from "@mui/material"
+import {InputAdornment, Stack, type SxProps, TextField, type TextFieldProps, type Theme} from "@mui/material"
 
 type TextInputProps = Omit<TextFieldProps, 'onChange' | 'value' | 'defaultValue'> & {
   defaultValue: string
@@ -11,12 +11,12 @@ type TextInputProps = Omit<TextFieldProps, 'onChange' | 'value' | 'defaultValue'
   disabled?: boolean
   placeholder?: string
   hasError?: boolean
-  className?: string
+  sx?: SxProps<Theme>
   startAdornment?: React.ReactNode
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
-  { defaultValue, value, setValue, onChange, disabled, hasError, className, startAdornment, ...rest },
+  { defaultValue, value, setValue, onChange, disabled, hasError, sx, startAdornment, ...rest },
   ref
 ) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -30,7 +30,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
   }
 
   return (
-    <Stack direction="row" className={className} sx={{ alignItems: 'center' }}>
+    <Stack direction="row" sx={{ ...sx, alignItems: 'center' }}>
       <TextField
         {...rest}
         inputRef={ref}

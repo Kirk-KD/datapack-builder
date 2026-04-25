@@ -1,6 +1,7 @@
 import TextInput from "../components/TextInput.tsx";
 import {useCallback, useEffect, useState} from "react";
 import type {EditorBaseProps} from "../types.ts";
+import type {SxProps, Theme} from "@mui/material";
 
 export type NumberEditorProps = EditorBaseProps<never, number> & {
   type: 'int' | 'long' | 'float' | 'double'
@@ -9,7 +10,7 @@ export type NumberEditorProps = EditorBaseProps<never, number> & {
   max?: number
 }
 
-export default function NumberEditor({state, setState, type, defaultValue, min, max, className}: NumberEditorProps & {className?: string}) {
+export default function NumberEditor({state, setState, type, defaultValue, min, max, sx}: NumberEditorProps & {sx?: SxProps<Theme>}) {
   const defaultValueStr = (defaultValue ?? 0).toString()
   const [value, setValue] = useState(state.data === undefined ? defaultValueStr : state.data.toString())
   const [hasError, setHasError] = useState(false)
@@ -53,7 +54,7 @@ export default function NumberEditor({state, setState, type, defaultValue, min, 
       setValue={setValue}
       onChange={(nextValue) => setHasError(validateAndCallback(nextValue))}
       hasError={hasError}
-      className={`editor ${className}`}
+      sx={sx}
     />
   )
 }

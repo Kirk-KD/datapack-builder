@@ -3,8 +3,8 @@ import {ItemSelectorEditor} from "../ItemSelectorEditor";
 import {useEffect, useState} from "react";
 import NumberEditor from "../NumberEditor.tsx";
 
-import './ItemStackEditor.css'
 import ItemComponentList from "./ItemComponentList.tsx";
+import {Box, Stack, Typography} from "@mui/material";
 
 export type ItemComponent = {
   key: string
@@ -49,15 +49,23 @@ export default function ItemStackEditor({context, state, setState}: EditorBasePr
   }, [itemState, amountState, itemComponents]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className={'editor itemStackEditor'}>
-      <div className={'firstRow'}>
+    <Stack>
+      <Stack spacing={1} direction={'row'} sx={{
+        alignItems: 'center'
+      }}>
         <ItemSelectorEditor context={context} state={itemState} setState={setItemState}/>
-        <span>count:</span>
-        <NumberEditor className={'amountEditor'} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
-      </div>
-      <ItemComponentList itemComponents={itemComponents} setItemComponents={result => {
-        setItemComponents(result)
-      }}/>
-    </div>
+        <Typography>count:</Typography>
+        <NumberEditor sx={{
+          maxWidth: '8rem'
+        }} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
+      </Stack>
+      <Box sx={{
+        pl: 1
+      }}>
+        <ItemComponentList itemComponents={itemComponents} setItemComponents={result => {
+          setItemComponents(result)
+        }}/>
+      </Box>
+    </Stack>
   )
 }

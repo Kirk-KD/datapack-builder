@@ -1,4 +1,3 @@
-import './ItemComponentList.css'
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "../../types.ts";
@@ -7,6 +6,8 @@ import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCata
 import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
 import {inferCompilerType} from "../../../compiler/compileEditorState.ts";
+import {Box, Stack, Typography} from "@mui/material";
+import EditorButton from "../../components/EditorButton.tsx";
 
 type ItemComponentListProps = {
   itemComponents: ItemComponent[]
@@ -79,27 +80,31 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
   )
 
   return (
-    <div className={'itemComponentList'}>
-      <div className={'top'}>
-        <span>Add component:</span>
+    <Box className={'itemComponentList'}>
+      <Stack direction={'row'} spacing={1} sx={{
+        alignItems: 'center'
+      }}>
+        <Typography>Add component:</Typography>
         <DropdownInput
-          className={'itemComponentDropdown'}
           options={availableComponents}
           value={selectedComponentId}
           setValue={setSelectedComponentId}
+          sx={{
+            flex: 1
+          }}
         />
-        <button onClick={() => selectedComponentId && addComponent({
+        <EditorButton onClick={() => selectedComponentId && addComponent({
           key: selectedComponentId,
           state: {error: false, compiler: inferCompilerType(componentLookup[selectedComponentId])}
-        })}>+</button>
-        <button onClick={() => selectedComponentId && addComponent({
+        })}>+</EditorButton>
+        <EditorButton onClick={() => selectedComponentId && addComponent({
           key: selectedComponentId,
           negate: true,
           state: {error: false, compiler: inferCompilerType(componentLookup[selectedComponentId])}
-        })}>+ !</button>
-      </div>
+        })}>+ !</EditorButton>
+      </Stack>
 
-      <div className={'componentEditorsContainer'}>{
+      <Box className={'componentEditorsContainer'}>{
         Object.entries(components).map(([key, { negate, state, setState}]) => (
           <ItemComponentContainer
             key={key}
@@ -108,7 +113,7 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
             removeComponent={removeComponent}
           />
         ))
-      }</div>
-    </div>
+      }</Box>
+    </Box>
   )
 }

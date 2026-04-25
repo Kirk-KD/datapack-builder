@@ -1,15 +1,14 @@
 import {useEffect} from "react";
-import {Autocomplete, TextField} from "@mui/material";
+import {Autocomplete, type SxProps, TextField, type Theme} from "@mui/material";
 
 type DropdownInputProps = {
-  className?: string
   disabled?: boolean
   options: string[]
   value?: string
   setValue: (newValue: string) => void
 }
 
-export default function DropdownInput({ className, disabled, options, value, setValue }: DropdownInputProps) {
+export default function DropdownInput({ disabled, options, value, setValue, sx }: DropdownInputProps & {sx?: SxProps<Theme>}) {
   useEffect(() => {
     if (options) setValue(options[0])
   }, [options, setValue])
@@ -19,9 +18,9 @@ export default function DropdownInput({ className, disabled, options, value, set
     options={options}
     value={value}
     renderInput={(params) => <TextField {...params} variant={'outlined'} size={'small'}/>}
-    className={className}
     disabled={disabled}
     sx={{
+      ...sx,
       width: '100%'
     }}
   />

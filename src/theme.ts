@@ -50,6 +50,13 @@ const theme = createTheme({
         },
       },
     },
+    MuiInputBase: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          backgroundColor: theme.palette.background.input,
+        }),
+      },
+    },
   },
 })
 
