@@ -42,6 +42,14 @@ const theme = createTheme({
         disableRipple: true,
       },
     },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 2,
+          height: 'fit-content',
+        },
+      },
+    },
   },
 })
 

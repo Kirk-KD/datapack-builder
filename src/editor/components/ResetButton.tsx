@@ -1,12 +1,12 @@
-import './ResetButton.css'
+import {IconButton} from "@mui/material";
 
 export default function ResetButton({ handleReset, disabled }: {
   handleReset: () => void
   disabled?: boolean
 }) {
   return (
-    <button onClick={handleReset} disabled={disabled} className='resetButton'>
+    <IconButton onClick={handleReset} disabled={disabled} size={'small'}>
       <img src={'/reset.svg'} alt={'reset button'} width={'20'} height={'20'} />
-    </button>
+    </IconButton>
   )
 }

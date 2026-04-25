@@ -1,16 +1,16 @@
 import {controller, useEditorModal} from "./controller.ts";
-import {Box, Button, Modal, Stack, Typography} from "@mui/material";
+import {Box, Button, IconButton, Modal, Stack, Typography} from "@mui/material";
 
 function MaximizeButton({ maximized }: { maximized: boolean }) {
   return (
-    <Button onClick={() => controller.setMaximized(!maximized)}>
+    <IconButton onClick={() => controller.setMaximized(!maximized)}>
       <img
         src={maximized ? '/minimize.svg' : '/maximize.svg'}
         alt={maximized ? 'minimize button' : 'maximize button'}
         width="20"
         height="20"
       />
-    </Button>
+    </IconButton>
   )
 }
 
@@ -23,19 +23,25 @@ function EditorModal() {
     <Modal open={open}>
       <Stack sx={{
         position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -25rem)',
-        width: maximized ? '100%' : '50rem',
-        maxHeight: maximized ? '100%' : '50rem',
+        ...(maximized ? {
+          width: '100%',
+          height: '100%'
+        } : {
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -25rem)',
+          width: '50rem',
+          maxHeight: '50rem',
+        })
       }}>
         <Stack direction={'row'} sx={{
           backgroundColor: 'background.paper',
-          alignItems: 'center'
+          alignItems: 'center',
+          p: 1,
+          pl: 2,
         }}>
           <Typography variant={'h5'} sx={{
             flex: 1,
-            p: 1
           }}>{payload.title}</Typography>
           <MaximizeButton maximized={maximized}/>
         </Stack>
@@ -43,7 +49,8 @@ function EditorModal() {
           backgroundColor: 'background.default',
           p: 2,
           width: '100%',
-          overflowX: 'auto'
+          overflowX: 'auto',
+          flex: maximized ? 1 : undefined
         }}>
           <Box sx={{
             width: 'fit-content',

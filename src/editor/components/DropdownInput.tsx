@@ -1,4 +1,5 @@
 import {useEffect} from "react";
+import {Autocomplete, TextField} from "@mui/material";
 
 type DropdownInputProps = {
   className?: string
@@ -13,9 +14,15 @@ export default function DropdownInput({ className, disabled, options, value, set
     if (options) setValue(options[0])
   }, [options, setValue])
 
-  return (
-    <select disabled={disabled} className={className || ''} value={value} onChange={e => setValue(e.target.value)}>
-      {options.map(option => <option key={option}>{option}</option>)}
-    </select>
-  )
+  return <Autocomplete
+    disablePortal
+    options={options}
+    value={value}
+    renderInput={(params) => <TextField {...params} variant={'outlined'} size={'small'}/>}
+    className={className}
+    disabled={disabled}
+    sx={{
+      width: '100%'
+    }}
+  />
 }
