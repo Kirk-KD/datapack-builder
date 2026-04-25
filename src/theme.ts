@@ -35,7 +35,14 @@ const theme = createTheme({
     fontWeightMedium: 600,
     fontSize: 12
   },
-  shadows: Array(25).fill('none') as Theme['shadows']
+  shadows: Array(25).fill('none') as Theme['shadows'],
+  components: {
+    MuiButtonBase: {
+      defaultProps: {
+        disableRipple: true,
+      },
+    },
+  },
 })
 
 export default theme

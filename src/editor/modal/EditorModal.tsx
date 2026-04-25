@@ -1,19 +1,16 @@
-import './EditorModal.css'
 import {controller, useEditorModal} from "./controller.ts";
+import {Box, Button, Modal, Stack, Typography} from "@mui/material";
 
 function MaximizeButton({ maximized }: { maximized: boolean }) {
   return (
-    <button
-      className="maximizeButton"
-      onClick={() => controller.setMaximized(!maximized)}
-    >
+    <Button onClick={() => controller.setMaximized(!maximized)}>
       <img
         src={maximized ? '/minimize.svg' : '/maximize.svg'}
         alt={maximized ? 'minimize button' : 'maximize button'}
         width="20"
         height="20"
       />
-    </button>
+    </Button>
   )
 }
 
@@ -22,18 +19,48 @@ function EditorModal() {
 
   if (!open || !payload) return null
 
-  return <div className={`editorModal ${maximized ? 'maximized' : ''}`}>
-    <div className={'editorModalHeader'}>
-      <div className={'editorModalTitle'}>{payload.title}</div>
-      <MaximizeButton maximized={maximized}/>
-    </div>
-    <div className={'editorModalBody'}>
-      {payload.editor}
-    </div>
-    <div className={'editorModalFooter'}>
-      <button onClick={controller.closeEditorModal}>Done</button>
-    </div>
-  </div>
+  return (
+    <Modal open={open}>
+      <Stack sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -25rem)',
+        width: maximized ? '100%' : '50rem',
+        maxHeight: maximized ? '100%' : '50rem',
+      }}>
+        <Stack direction={'row'} sx={{
+          backgroundColor: 'background.paper',
+          alignItems: 'center'
+        }}>
+          <Typography variant={'h5'} sx={{
+            flex: 1,
+            p: 1
+          }}>{payload.title}</Typography>
+          <MaximizeButton maximized={maximized}/>
+        </Stack>
+        <Box sx={{
+          backgroundColor: 'background.default',
+          p: 2,
+          width: '100%',
+          overflowX: 'auto'
+        }}>
+          <Box sx={{
+            width: 'fit-content',
+            minWidth: 'min-content',
+            mx: 'auto'
+          }}>
+            {payload.editor}
+          </Box>
+        </Box>
+        <Stack direction={'row-reverse'} sx={{
+          backgroundColor: 'background.paper'
+        }}>
+          <Button onClick={controller.closeEditorModal}>Done</Button>
+        </Stack>
+      </Stack>
+    </Modal>
+  )
 }
 
 export default EditorModal
