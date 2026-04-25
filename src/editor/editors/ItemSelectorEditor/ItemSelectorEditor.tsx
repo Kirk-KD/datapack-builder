@@ -5,10 +5,10 @@ import {
 } from '../../../catalog/itemCatalog.ts'
 import type { EditorBaseProps } from '../../types.ts'
 import {useState, useEffect, useRef} from 'react'
-import './ItemSelectorEditor.css'
 import ItemSprite from '../../components/ItemSprite.tsx'
 import ItemSearchList from './ItemSearchList.tsx'
-import ResetButton from "../../components/ResetButton.tsx";
+import {Box} from "@mui/material";
+import TextInput from "../../components/TextInput.tsx";
 
 const DEFAULT_ITEM = 'cobblestone'
 
@@ -19,6 +19,7 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
   const [searchListVisible, setSearchListVisible] = useState(false)
 
   const inputRef = useRef<HTMLInputElement>(null)
+  const searchListAnchorRef = useRef<HTMLDivElement>(null)
 
   const selectItem = ({name, spriteFileName}: {name: string, spriteFileName: string | null}) => {
     setSearchString(name)
@@ -59,14 +60,18 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
   }
 
   return (
-    <div className='itemSelectorEditor'>
-      <div className='itemSelectorSearchContainer'>
-        <ItemSprite size={30} showSlot={true} src={selectedItemSrc}/>
-        <input
-          ref={inputRef}
+    <Box sx={{
+      minWidth: '10rem',
+      width: '20rem',
+      p: 1
+    }}>
+      <Box ref={searchListAnchorRef}>
+        <TextInput
+          defaultValue={DEFAULT_ITEM}
           value={searchString}
-          onChange={e => {
-            const itemName = e.target.value.trim().toLowerCase()
+          setValue={setSearchString}
+          onChange={value => {
+            const itemName = value.trim().toLowerCase()
             if (!itemName) {
               setSearchString(itemName)
               setSelectedItemSrc(null)
@@ -79,17 +84,28 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
           }}
           onFocus={() => setSearchListVisible(true)}
           onBlur={() => setSearchListVisible(false)}
+          ref={inputRef}
+          startAdornment={<ItemSprite size={30} showSlot={true} src={selectedItemSrc}/>}
         />
-        <ResetButton handleReset={setDefaultItem}/>
-      </div>
-
-      <div className='itemSelectorListContainer'>
-        <ItemSearchList items={items} searchString={searchString} visible={searchListVisible} onClickItem={({name, spriteFileName}) => {
-          selectItem({name, spriteFileName})
-          setSearchListVisible(false)
-          inputRef.current?.blur()
-        }} />
-      </div>
-    </div>
+      </Box>
+      <Box sx={{
+        position: 'relative',
+        height: 'auto',
+        width: '100%',
+        overflow: 'visible'
+      }}>
+        <ItemSearchList
+          items={items}
+          searchString={searchString}
+          open={searchListVisible}
+          anchorEl={searchListAnchorRef}
+          onClickItem={({name, spriteFileName}) => {
+            selectItem({name, spriteFileName})
+            setSearchListVisible(false)
+            inputRef.current?.blur()
+          }}
+        />
+      </Box>
+    </Box>
   )
 }
