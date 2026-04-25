@@ -9,6 +9,7 @@ import './WorkspacePanel.css'
 
 import type {WorkspaceSvg} from "blockly";
 import {useProjectConfigStore} from "../stores/projectConfig.ts";
+import {Box, Button, Checkbox, FormControlLabel, Stack} from "@mui/material"
 
 // Register outside useEffect to avoid error due to variables category
 registerContinuousToolbox()
@@ -104,23 +105,26 @@ function WorkspacePanel() {
   function toggleNoNameMangling() {
     updateConfig({ noNameMangling: !projectConfig.noNameMangling })
   }
-  
+
   return (
-    <>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-        gap: '10px',
-      }}>
-        <button onClick={handleInspect}>Inspect</button>
-        <button onClick={handleDownload}>Download</button>
-        <label>
-          <input type={"checkbox"} checked={projectConfig.noNameMangling} onChange={toggleNoNameMangling} />
-          No name mangling
-        </label>
-      </div>
-      <div ref={divRef} style={{ width: '100%', height: '100%' }} />
-    </>
+    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+      {/* Temporary debug top bar */}
+      <Stack direction="row" spacing={1} sx={{ p: 1, backgroundColor: 'background.default' }}>
+        <Button variant="outlined" size="small" onClick={handleInspect}>Inspect</Button>
+        <Button variant="outlined" size="small" onClick={handleDownload}>Download</Button>
+        <FormControlLabel
+          control={
+            <Checkbox
+              size="small"
+              checked={projectConfig.noNameMangling}
+              onChange={toggleNoNameMangling}
+            />
+          }
+          label="No name mangling"
+        />
+      </Stack>
+      <Box ref={divRef} sx={{ flex: 1 }} />
+    </Box>
   )
 }
 

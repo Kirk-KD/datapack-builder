@@ -8,19 +8,8 @@ import {
   ContinuousToolbox,
   registerContinuousToolbox
 } from '@blockly/continuous-toolbox'
-import {colours} from "./blocks/blockColours.ts";
-import {MetricsManager} from "blockly";
-
-// from inputContainer.css
-const themeColours = {
-  surfaceApp: '#141a23',
-  surfacePanel: '#202733',
-  surfacePanelHover: '#2c3544',
-  borderDefault: '#586173',
-  textPrimary: '#f2f5f8',
-  textSecondary: '#d4dae2',
-  focus: '#8db8ff',
-}
+import {colours} from "./blocks/blockColours.ts"
+import theme from "./theme.ts"
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -31,40 +20,25 @@ const customTheme = Blockly.Theme.defineTheme('customDark', {
     }
   },
   componentStyles: {
-    workspaceBackgroundColour: themeColours.surfaceApp,
-    toolboxBackgroundColour: themeColours.surfacePanelHover,
-    toolboxForegroundColour: themeColours.textPrimary,
-    flyoutBackgroundColour: themeColours.surfacePanel,
-    flyoutForegroundColour: themeColours.textSecondary,
-    flyoutOpacity: 0.85,
-    scrollbarColour: themeColours.borderDefault,
+    workspaceBackgroundColour: theme.palette.background.default,
+    toolboxBackgroundColour: theme.palette.background.default,
+    toolboxForegroundColour: theme.palette.text.secondary,
+    flyoutBackgroundColour: theme.palette.background.paper,
+    flyoutForegroundColour: theme.palette.text.secondary,
+    scrollbarColour: theme.palette.scroll.main,
     scrollbarOpacity: 0.5,
-    insertionMarkerColour: themeColours.focus,
-    insertionMarkerOpacity: 0.35,
-    cursorColour: themeColours.textPrimary,
   },
   fontStyle: {
-    family: "Helvetica Neue",
-    weight: "500",
-    size: 12,
+    family: theme.typography.fontFamily,
+    weight: theme.typography.fontWeightMedium?.toString(),
+    size: theme.typography.fontSize,
   }
 })
-
-class CustomContinuousMetrics extends ContinuousMetrics {
-  override getViewMetrics(getWorkspaceCoordinates?: boolean): MetricsManager.ContainerRegion {
-    const metrics = super.getViewMetrics(getWorkspaceCoordinates);
-    // Decreasing view metrics height by 23 fixes the problem of the toolbox flyout and its contents being cut off at
-    // the bottom, while still letting it fill the screen vertically.
-    // The radius of the corners is 8px, so I'm not sure where this number comes from.
-    metrics.height -= 21
-    return metrics
-  }
-}
 
 const additionalOptions = {
   plugins: {
     flyoutsVerticalToolbox: ContinuousFlyout,
-    metricsManager: CustomContinuousMetrics,
+    metricsManager: ContinuousMetrics,
     toolbox: ContinuousToolbox,
   },
   theme: customTheme,
@@ -81,7 +55,7 @@ const additionalOptions = {
   grid: {
     spacing: 20,
     length: 3,
-    colour: themeColours.borderDefault,
+    colour: '#888',
     snap: true
   }
 }

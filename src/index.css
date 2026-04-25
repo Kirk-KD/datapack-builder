@@ -1,85 +1,11 @@
-:root {
-  --font-family: "Helvetica Neue", Helvetica, sans-serif;
-  --font-size-base: 12pt;
-  --font-size-large: 14pt;
-  --font-size-small: 9pt;
-
-  --colour-surface-app: #141a23;
-  --colour-surface-panel: #202733;
-  --colour-surface-panel-hover: #2c3544;
-  --colour-surface-panel-hover-strong: #364154;
-  --colour-border-muted: #3f4858;
-  --colour-border-default: #586173;
-  --colour-border-focus: #8db8ff;
-  --colour-border-error: #ff8d8d;
-  --colour-text-primary: #f2f5f8;
-  --colour-text-secondary: #d4dae2;
-  --colour-text-muted: #8f9aab;
-  --colour-overlay: rgb(15 18 24 / 72%);
-  --colour-shadow-strong: rgb(0 0 0 / 45%);
-  --colour-focus-ring: rgb(141 184 255 / 22%);
-
-  --colour-input-field: #2e3547;
-  --colour-input-button: #2e3547;
-  --colour-input-button-hover: #354051;
-
-  --border-radius-default: 10px;
-  --border-radius-small: 5px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--font-family), sans-serif !important;
-  font-size: var(--font-size-base) !important;
 }
 
 html, body {
   overflow: hidden;
-}
-
-html {
-  scrollbar-color: var(--colour-border-default) var(--colour-surface-panel);
-  scrollbar-width: thin;
-}
-
-/* Applies a shared scrollbar treatment across the app's scrollable panels. */
-*::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-*::-webkit-scrollbar-track {
-  background: var(--colour-surface-panel);
-}
-
-*::-webkit-scrollbar-thumb {
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 6%), rgb(255 255 255 / 0%)),
-    var(--colour-border-default);
-  border: 2px solid var(--colour-surface-panel);
-  border-radius: 999px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background:
-    linear-gradient(180deg, rgb(255 255 255 / 10%), rgb(255 255 255 / 0%)),
-    var(--colour-border-focus);
-}
-
-*::-webkit-scrollbar-corner {
-  background: var(--colour-surface-panel);
-}
-
-button:focus-visible,
-input:focus,
-input:focus-visible,
-select:focus,
-select:focus-visible,
-textarea:focus,
-textarea:focus-visible {
-  outline: none;
-  border-color: var(--colour-border-focus);
-  box-shadow: 0 0 0 2px var(--colour-focus-ring);
 }
