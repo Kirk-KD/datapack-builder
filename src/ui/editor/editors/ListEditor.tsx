@@ -1,10 +1,10 @@
-import type {AnyEditorState, AnyEditorStateCallback, EditorBaseProps, EditorStateList} from "../../../../core/editor";
+import type {AnyEditorState, AnyEditorStateCallback, EditorBaseProps, EditorStateList} from "../../../core/editor";
 import * as React from "react";
 import {type SetStateAction, useEffect, useRef, useState} from "react";
-import ResetButton from "../../components/ResetButton.tsx";
+import ResetButton from "../components/ResetButton.tsx";
 import {Box, Stack, Typography} from "@mui/material";
-import EditorButton from "../../components/EditorButton.tsx";
-import InnerEditorContainer from "../../components/InnerEditorContainer.tsx";
+import EditorButton from "../components/EditorButton.tsx";
+import InnerEditorContainer from "../components/InnerEditorContainer.tsx";
 
 type ListEditorProps = EditorBaseProps<Record<string, unknown>, EditorStateList> & {
   itemEditor: (itemState: AnyEditorState, setItemState: AnyEditorStateCallback) => React.ReactElement

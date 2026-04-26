@@ -27,7 +27,7 @@ type ObjectEditorProps = {
   entries: ObjectEditorEntry[]
 }
 
-export default function ObjectEditor({ state, setState, entries }: ObjectEditorProps) {
+export function ObjectEditor({ state, setState, entries }: ObjectEditorProps) {
   const [entryStates, setEntryStates] = useState<EditorStateMap>(() =>
     Object.fromEntries(
       entries.map(entry => [

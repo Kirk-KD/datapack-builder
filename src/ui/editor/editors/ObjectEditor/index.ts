@@ -1,1 +1,1 @@
-export { default as ObjectEditor } from './ObjectEditor.tsx'
+export * from './ObjectEditor.tsx'

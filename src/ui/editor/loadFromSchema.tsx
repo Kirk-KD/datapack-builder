@@ -12,12 +12,12 @@ import type {
 import NumberEditor from "./editors/NumberEditor.tsx";
 import * as React from "react";
 import {ObjectEditor} from "./editors/ObjectEditor";
-import type {ObjectEditorEntry} from "./editors/ObjectEditor/ObjectEditor.tsx";
+import type {ObjectEditorEntry} from "./editors/ObjectEditor";
 import {ItemStackEditor, type ItemStackEditorResult} from "./editors/ItemStackEditor";
 import StringEditor from "./editors/StringEditor.tsx";
 import BooleanEditor from "./editors/BooleanEditor.tsx";
 import SelectEditor from "./editors/SelectEditor.tsx";
-import ListEditor from "./editors/ListEditor/ListEditor.tsx";
+import ListEditor from "./editors/ListEditor.tsx";
 import {ItemSelectorEditor} from "./editors/ItemSelectorEditor";
 import {inferCompilerType} from "../../core/compiler/editor/compileEditorState.ts";
 
