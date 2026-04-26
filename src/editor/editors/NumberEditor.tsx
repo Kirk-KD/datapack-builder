@@ -54,7 +54,10 @@ export default function NumberEditor({state, setState, type, defaultValue, min, 
       setValue={setValue}
       onChange={(nextValue) => setHasError(validateAndCallback(nextValue))}
       hasError={hasError}
-      sx={sx}
+      sx={{
+        ...sx,
+        minWidth: theme => theme.shape.editorInputMinWidth
+      }}
     />
   )
 }
