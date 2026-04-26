@@ -5,10 +5,12 @@ declare module '@mui/material/styles' {
     input: string
   }
   interface Palette {
-    scroll: Palette['primary']
+    scroll: Palette['primary'],
+    inputBorder: string
   }
   interface PaletteOptions {
-    scroll?: PaletteOptions['primary']
+    scroll?: PaletteOptions['primary'],
+    inputBorder?: string
   }
 }
 
@@ -25,7 +27,8 @@ const theme = createTheme({
     },
     scroll: {
       main: '#605d54'
-    }
+    },
+    inputBorder: 'rgba(255, 255, 255, 0.23)',
   },
   shape: {
     borderRadius: 2

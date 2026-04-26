@@ -6,7 +6,7 @@ import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCata
 import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
 import {inferCompilerType} from "../../../compiler/compileEditorState.ts";
-import {Box, Stack, Typography} from "@mui/material";
+import {Stack, Typography} from "@mui/material";
 import EditorButton from "../../components/EditorButton.tsx";
 
 type ItemComponentListProps = {
@@ -80,8 +80,8 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
   )
 
   return (
-    <Box className={'itemComponentList'}>
-      <Stack direction={'row'} spacing={1} sx={{
+    <Stack spacing={1}>
+      <Stack direction={'row'} spacing={0.5} sx={{
         alignItems: 'center'
       }}>
         <Typography>Add component:</Typography>
@@ -104,7 +104,7 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
         })}>+ !</EditorButton>
       </Stack>
 
-      <Box className={'componentEditorsContainer'}>{
+      <Stack spacing={1}>{
         Object.entries(components).map(([key, { negate, state, setState}]) => (
           <ItemComponentContainer
             key={key}
@@ -113,7 +113,7 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
             removeComponent={removeComponent}
           />
         ))
-      }</Box>
-    </Box>
+      }</Stack>
+    </Stack>
   )
 }
