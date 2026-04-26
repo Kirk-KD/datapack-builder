@@ -1,5 +1,5 @@
-import WorkspacePanel from './components/WorkspacePanel'
-import EditorModal from "./editor/modal/EditorModal.tsx"
+import WorkspacePanel from './ui/workspace/WorkspacePanel'
+import EditorModal from "./ui/editor/modal/EditorModal.tsx"
 import {Box, CssBaseline, ThemeProvider} from "@mui/material";
 import theme from "./theme.ts";
 
