@@ -61,7 +61,8 @@ function EditorModal() {
           </Box>
         </Box>
         <Stack direction={'row-reverse'} sx={{
-          backgroundColor: 'background.paper'
+          backgroundColor: 'background.paper',
+          p: 1
         }}>
           <Button onClick={controller.closeEditorModal}>Done</Button>
         </Stack>
