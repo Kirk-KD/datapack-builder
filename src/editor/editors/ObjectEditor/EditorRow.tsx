@@ -1,7 +1,6 @@
 import * as React from "react"
 import EnableCheckbox from "./EnableCheckbox.tsx";
-import Tooltip from "../../components/Tooltip.tsx";
-import {Box, Typography} from "@mui/material";
+import {Box, Tooltip, Typography} from "@mui/material";
 import InnerEditorContainer from "../../components/InnerEditorContainer.tsx";
 
 type EditorRowProps = {
@@ -31,7 +30,7 @@ export default function EditorRow({ label, description, note, optional, children
         minHeight: theme => theme.shape.editorRowHeight,
       }}>
         <EnableCheckbox show={optional} setEnabled={setEnabled} />
-        <Tooltip text={description}>
+        <Tooltip describeChild title={description} placement={'top-start'}>
           <Typography variant="body2" sx={{
             opacity: enabled ? 1 : 0.4,
             transition: 'opacity 0.2s',
