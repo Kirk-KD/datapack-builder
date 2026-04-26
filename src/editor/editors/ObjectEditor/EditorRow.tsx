@@ -20,7 +20,17 @@ type EditorRowProps = {
 export default function EditorRow({ label, description, note, optional, children, isNested, enabled, setEnabled }: EditorRowProps) {
   return (
     <>
-      {note && <Box sx={{ gridColumn: '1 / -1' }}><Typography>{note}</Typography></Box>}
+      {note && (<Box sx={{
+        gridColumn: '1 / -1',
+        backgroundColor: 'background.paper',
+        width: 'fit-content',
+        maxWidth: '100%',
+        p: 1,
+        mt: 1,
+        borderRadius: theme => theme.shape.borderRadius
+      }}>
+        <Typography color={'textSecondary'}>{note}</Typography>
+      </Box>)}
 
       <Box sx={{
         display: 'flex',
