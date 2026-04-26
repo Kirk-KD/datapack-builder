@@ -1,6 +1,7 @@
 import type {EditorBaseProps} from "../types.ts";
 import {useEffect, useState} from "react";
 import ResetButton from "../components/ResetButton.tsx";
+import {Stack, ToggleButton, ToggleButtonGroup} from "@mui/material";
 
 export type BooleanEditorProps = EditorBaseProps<never, boolean> & {
   defaultValue?: boolean
@@ -13,25 +14,30 @@ export default function BooleanEditor({ state, setState, defaultValue }: Boolean
     if (state.data === undefined) setState({...state, data: Boolean(defaultValue)})
   }, [defaultValue, setState, state])
 
+  const handleChange = (_: React.MouseEvent, newValue: boolean | null) => {
+    if (newValue === null) return // prevent deselecting
+    setValue(newValue)
+    setState({ compiler: 'scalar', error: false, data: newValue })
+  }
+
+  const handleReset = () => {
+    const resetValue = Boolean(defaultValue)
+    setValue(resetValue)
+    setState({ compiler: 'scalar', error: false, data: resetValue })
+  }
+
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: '0.5rem',
-    }} className={'editor'}>
-      <input type={'checkbox'} checked={value} onChange={e => {
-        setValue(e.target.checked)
-        setState({
-          compiler: 'scalar',
-          error: false,
-          data: e.target.checked
-        })
-      }}/>
-      <span style={{
-        flexGrow: 1
-      }}>{value ? 'true' : 'false'}</span>
-      <ResetButton handleReset={() => setValue(Boolean(defaultValue))}/>
-    </div>
+    <Stack direction="row" sx={{ alignItems: 'center' }}>
+      <ToggleButtonGroup
+        exclusive
+        value={value}
+        onChange={handleChange}
+        size="small"
+      >
+        <ToggleButton value={true} sx={{ width: '3rem' }}>true</ToggleButton>
+        <ToggleButton value={false} sx={{ width: '3rem' }}>false</ToggleButton>
+      </ToggleButtonGroup>
+      <ResetButton handleReset={handleReset} />
+    </Stack>
   )
 }

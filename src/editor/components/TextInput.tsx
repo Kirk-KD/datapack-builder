@@ -1,9 +1,9 @@
-import type { ChangeEventHandler } from "react"
-import './TextInput.css'
+import { type ChangeEventHandler, forwardRef } from "react"
 import * as React from "react"
-import ResetButton from "./ResetButton.tsx";
+import ResetButton from "./ResetButton.tsx"
+import {InputAdornment, Stack, type SxProps, TextField, type TextFieldProps, type Theme} from "@mui/material"
 
-type TextInputProps = {
+type TextInputProps = Omit<TextFieldProps, 'onChange' | 'value' | 'defaultValue'> & {
   defaultValue: string
   value: string
   setValue: React.Dispatch<string>
@@ -11,10 +11,14 @@ type TextInputProps = {
   disabled?: boolean
   placeholder?: string
   hasError?: boolean
-  className?: string
+  sx?: SxProps<Theme>
+  startAdornment?: React.ReactNode
 }
 
-export default function TextInput({ defaultValue, value, setValue, onChange, disabled, placeholder, hasError, className }: TextInputProps) {
+const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
+  { defaultValue, value, setValue, onChange, disabled, hasError, sx, startAdornment, ...rest },
+  ref
+) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setValue(e.target.value)
     onChange?.(e.target.value)
@@ -26,16 +30,33 @@ export default function TextInput({ defaultValue, value, setValue, onChange, dis
   }
 
   return (
-    <div className={`inputContainer ${className || ''}`}>
-      <input
-        type='text'
-        className={`textInput ${hasError ? 'hasError' : ''}`}
+    <Stack direction="row" sx={{ ...sx, alignItems: 'center' }}>
+      <TextField
+        {...rest}
+        inputRef={ref}
         value={value}
         onChange={handleChange}
         disabled={disabled}
-        placeholder={placeholder}
+        size="small"
+        error={hasError}
+        sx={{ flex: 1 }}
+        slotProps={{
+          input: {
+            startAdornment: startAdornment ? (
+              <InputAdornment position="start" sx={{ ml: -1.5 }}>
+                {startAdornment}
+              </InputAdornment>
+            ) : undefined,
+            endAdornment: (
+              <InputAdornment position="end" sx={{ mr: -1.5 }}>
+                <ResetButton handleReset={handleReset} disabled={disabled} />
+              </InputAdornment>
+            )
+          }
+        }}
       />
-      <ResetButton handleReset={handleReset} disabled={disabled} />
-    </div>
+    </Stack>
   )
-}
+})
+
+export default TextInput

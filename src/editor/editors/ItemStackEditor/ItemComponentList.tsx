@@ -1,12 +1,13 @@
-import './ItemComponentList.css'
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "../../types.ts";
-import {type SetStateAction, useEffect, useMemo, useState} from "react";
+import {type SetStateAction, useEffect, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
 import {inferCompilerType} from "../../../compiler/compileEditorState.ts";
+import {Stack, Typography} from "@mui/material";
+import EditorButton from "../../components/EditorButton.tsx";
 
 type ItemComponentListProps = {
   itemComponents: ItemComponent[]
@@ -23,7 +24,7 @@ const applyStateAction = (prevState: AnyEditorState, nextState: SetStateAction<A
   typeof nextState === 'function' ? nextState(prevState) : nextState
 
 export default function ItemComponentList({ itemComponents, setItemComponents }: ItemComponentListProps) {
-  const [selectedComponentId, setSelectedComponentId] = useState<string>()
+  const [selectedComponentId, setSelectedComponentId] = useState<string | undefined>(undefined)
   const [componentLookup, setComponentLookup] = useState<Record<string, EditorSchema> | null>(null)
   const [components, setComponents] = useState<Record<string, ItemComponentEntry>>({})
 
@@ -44,6 +45,7 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
         }
       }
     }))
+    setSelectedComponentId(availableComponents.find(id => id !== key))
   }
 
   const removeComponent = (key: string) => {
@@ -54,15 +56,34 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
     })
   }
 
-  const availableComponents = useMemo(
-    () => Object.keys(componentLookup ?? {}).filter(id => !Object.keys(components).includes(id)),
-    [componentLookup, components]
-  )
+  const availableComponents = Object.keys(componentLookup ?? {}).filter(id => !Object.keys(components).includes(id))
 
   useEffect(() => {
     loadDataComponentSchemas().then(schemas => {
-      setComponentLookup(Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema])))
-      itemComponents.forEach(addComponent)
+      const lookup = Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema]))
+      setComponentLookup(lookup)
+
+      const initialComponents: Record<string, ItemComponentEntry> = {}
+      itemComponents.forEach(({ key, state, negate }) => {
+        initialComponents[key] = {
+          state,
+          negate,
+          setState: result => {
+            setComponents(prev => ({
+              ...prev,
+              [key]: {
+                ...prev[key],
+                state: applyStateAction(prev[key].state, result)
+              } as ItemComponentEntry
+            }))
+          }
+        }
+      })
+      setComponents(initialComponents)
+
+      const existingKeys = itemComponents.map(c => c.key)
+      const firstAvailable = Object.keys(lookup).find(id => !existingKeys.includes(id))
+      setSelectedComponentId(firstAvailable)
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -79,27 +100,31 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
   )
 
   return (
-    <div className={'itemComponentList'}>
-      <div className={'top'}>
-        <span>Add component:</span>
+    <Stack spacing={1}>
+      <Stack direction={'row'} spacing={0.5} sx={{
+        alignItems: 'center'
+      }}>
+        <Typography>Add component:</Typography>
         <DropdownInput
-          className={'itemComponentDropdown'}
           options={availableComponents}
           value={selectedComponentId}
           setValue={setSelectedComponentId}
+          sx={{
+            flex: 1
+          }}
         />
-        <button onClick={() => selectedComponentId && addComponent({
+        <EditorButton onClick={() => selectedComponentId && addComponent({
           key: selectedComponentId,
           state: {error: false, compiler: inferCompilerType(componentLookup[selectedComponentId])}
-        })}>+</button>
-        <button onClick={() => selectedComponentId && addComponent({
+        })}>+</EditorButton>
+        <EditorButton onClick={() => selectedComponentId && addComponent({
           key: selectedComponentId,
           negate: true,
           state: {error: false, compiler: inferCompilerType(componentLookup[selectedComponentId])}
-        })}>+ !</button>
-      </div>
+        })}>+ !</EditorButton>
+      </Stack>
 
-      <div className={'componentEditorsContainer'}>{
+      <Stack spacing={1}>{
         Object.entries(components).map(([key, { negate, state, setState}]) => (
           <ItemComponentContainer
             key={key}
@@ -108,7 +133,7 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
             removeComponent={removeComponent}
           />
         ))
-      }</div>
-    </div>
+      }</Stack>
+    </Stack>
   )
 }

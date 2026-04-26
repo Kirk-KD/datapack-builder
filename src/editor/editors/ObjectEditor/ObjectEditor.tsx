@@ -1,4 +1,3 @@
-import './ObjectEditor.css'
 import * as React from "react";
 import {type SetStateAction, useCallback, useEffect, useState} from "react";
 import type {
@@ -10,6 +9,7 @@ import type {
   CompilerType
 } from "../../types.ts";
 import EditorRow from "./EditorRow.tsx";
+import {Box} from "@mui/material";
 
 export type ObjectEditorEntry = {
   compiler: CompilerType
@@ -70,7 +70,11 @@ export default function ObjectEditor({ state, setState, entries }: ObjectEditorP
     })), [])
 
   return (
-    <div className='editor objectEditor'>
+    <Box sx={{
+      display: 'grid',
+      gridTemplateColumns: 'max-content 1fr',
+      gap: 1,
+    }}>
       {entries.map(entry => (
         <EditorRow
           key={entry.key}
@@ -85,6 +89,6 @@ export default function ObjectEditor({ state, setState, entries }: ObjectEditorP
           {entry.component(entryStates[entry.key], makeEntryCallback(entry.key))}
         </EditorRow>
       ))}
-    </div>
+    </Box>
   )
 }

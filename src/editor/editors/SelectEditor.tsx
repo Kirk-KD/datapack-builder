@@ -1,6 +1,7 @@
 import {useEffect} from "react";
 import ResetButton from "../components/ResetButton.tsx";
 import type {EditorBaseProps} from "../types.ts";
+import DropdownInput from "../components/DropdownInput.tsx";
 
 export type SelectEditorProps = EditorBaseProps<never, string> & {
   defaultValue?: string
@@ -15,29 +16,19 @@ export default function SelectEditor({ state, setState, defaultValue, options }:
   }, [defaultVal, setState, state]);
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      gap: '0.5rem',
-      alignItems: 'center'
-    }} className={'editor'}>
-      <select
-        style={{
-          flexGrow: 1
-        }}
-        value={state.data}
-        onChange={e => {
-          // setValue(e.target.value)
-          setState({
-            compiler: 'scalar',
-            error: false,
-            data: e.target.value
-          })
-        }}
-      >
-        {options.map(option => <option key={option}>{option}</option>)}
-      </select>
-      <ResetButton handleReset={() => setState({...state, data: defaultVal})}/>
-    </div>
+    <DropdownInput
+      options={options}
+      value={state.data}
+      setValue={newValue => setState({
+        compiler: 'scalar',
+        error: false,
+        data: newValue
+      })}
+      endAdornment={<ResetButton handleReset={() => setState({...state, data: defaultVal})}/>}
+      sx={{
+        minWidth: theme => theme.shape.editorInputMinWidth,
+        maxWidth: theme => theme.shape.editorInputMaxWidth
+      }}
+    />
   )
 }

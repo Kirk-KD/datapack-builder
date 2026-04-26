@@ -1,8 +1,10 @@
 import type {AnyEditorState, AnyEditorStateCallback, EditorBaseProps, EditorStateList} from "../../types.ts";
 import * as React from "react";
 import {type SetStateAction, useEffect, useRef, useState} from "react";
-import './ListEditor.css'
 import ResetButton from "../../components/ResetButton.tsx";
+import {Box, Stack, Typography} from "@mui/material";
+import EditorButton from "../../components/EditorButton.tsx";
+import InnerEditorContainer from "../../components/InnerEditorContainer.tsx";
 
 type ListEditorProps = EditorBaseProps<Record<string, unknown>, EditorStateList> & {
   itemEditor: (itemState: AnyEditorState, setItemState: AnyEditorStateCallback) => React.ReactElement
@@ -80,22 +82,28 @@ export default function ListEditor({ state, setState, itemEditor }: ListEditorPr
   }, [items]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className={'editor listEditor'}>
-      <div className={'listEditorHeader'}>
-        <span style={{
-          color: 'var(--colour-text-muted)',
-          flexGrow: 1
-        }}>{Object.keys(items).length ? `List [${Object.keys(items).length}]` : '[Empty]'}</span>
+    <Box>
+      <Stack direction={'row'} sx={{
+        alignItems: 'center'
+      }}>
+        <Typography color={'textSecondary'}>{Object.keys(items).length ? `List [${Object.keys(items).length}]` : '[Empty]'}</Typography>
         <ResetButton handleReset={() => setItems({})}/>
-        <button onClick={addItem}>+</button>
-      </div>
-      {Object.keys(items).length ? <div className={'listEditorList'}>{
-        Object.entries(items)
-          .map(([key, {state: itemState, setState: setItemState}]) => (
-            <ListItem editor={itemEditor(itemState, setItemState)} key={key} addItem={addItem} removeItem={() => removeItem(key)}/>
-          ))
-      }</div> : null}
-    </div>
+        <EditorButton onClick={addItem}>+</EditorButton>
+      </Stack>
+      {Object.keys(items).length ? (
+        <Stack spacing={1}>{
+          Object.entries(items)
+            .map(([key, {state: itemState, setState: setItemState}], index, arr) => (
+              <ListItem
+                editor={itemEditor(itemState, setItemState)}
+                key={key} addItem={addItem}
+                removeItem={() => removeItem(key)}
+                isLast={index === arr.length - 1}
+              />
+            ))
+        }</Stack>
+      ) : null}
+    </Box>
   )
 }
 
@@ -103,24 +111,17 @@ type ListItemProps = {
   editor: React.ReactElement
   addItem: () => void
   removeItem: () => void
+  isLast: boolean
 }
 
-function ListItem({ editor, addItem, removeItem }: ListItemProps) {
+function ListItem({ editor, addItem, removeItem, isLast }: ListItemProps) {
   return (
-    <div className={'listItem'}>
-      <div style={{
-        borderRadius: 'var(--border-radius-small)',
-        border: '1px solid var(--colour-border-muted)'
-      }}>{editor}</div>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-      }}>
-        <button onClick={removeItem}>-</button>
-        <button onClick={addItem} className={'addItemButton'}>+</button>
-      </div>
-    </div>
+    <Stack direction={'row'} spacing={0.5}>
+      <InnerEditorContainer>{editor}</InnerEditorContainer>
+      <Stack>
+        <EditorButton onClick={removeItem}>-</EditorButton>
+        {isLast && <EditorButton onClick={addItem} sx={{ mt: 'auto' }}>+</EditorButton>}
+      </Stack>
+    </Stack>
   )
 }

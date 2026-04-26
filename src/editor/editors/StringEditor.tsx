@@ -21,6 +21,10 @@ export default function StringEditor({ state, setState, defaultValue, className 
         data: value
       })}
       className={`editor ${className}`}
+      sx={{
+        minWidth: theme => theme.shape.editorInputMinWidth,
+        maxWidth: theme => theme.shape.editorInputMaxWidth
+      }}
     />
   )
 }

@@ -1,5 +1,7 @@
-import './ItemComponentContainer.css'
 import * as React from "react";
+import {Box, Stack, Typography} from "@mui/material";
+import EditorButton from "../../components/EditorButton.tsx";
+import InnerEditorContainer from "../../components/InnerEditorContainer.tsx";
 
 type ItemComponentContainerProp = {
   name: string
@@ -9,22 +11,26 @@ type ItemComponentContainerProp = {
 
 export default function ItemComponentContainer({ name, editor, removeComponent }: ItemComponentContainerProp) {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'row',
-      gap: '0.5rem'
-    }}>
-      <div className={'itemComponentContainer'}>
-        <div className={'itemComponentHeader'}>
-          <span className={'itemComponentName'}>{editor === null ? <b>!</b> : ''} {name}</span>
-        </div>
-        <div>
-          <div style={{
-            padding: 'var(--padding-small)'
-          }}>{editor}</div>
-        </div>
-      </div>
-      <div><button onClick={() => removeComponent(name)}>-</button></div>
-    </div>
+    <Stack direction={'row'} spacing={0.5}>
+      <InnerEditorContainer>
+        <Stack direction={'row'}>
+          <Stack sx={{
+            flex: 1
+          }}>
+            <Typography sx={{
+              height: '2rem',
+              alignContent: 'center',
+              fontFamily: theme => theme.typography.mono
+            }}>
+              {editor === null ? <b>!</b> : ''} {name}
+            </Typography>
+            <Box>
+              {editor}
+            </Box>
+          </Stack>
+        </Stack>
+      </InnerEditorContainer>
+      <Box><EditorButton onClick={() => removeComponent(name)}>-</EditorButton></Box>
+    </Stack>
   )
 }
