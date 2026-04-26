@@ -1,0 +1,1 @@
+export { useProjectConfigStore } from './projectConfig.ts'
