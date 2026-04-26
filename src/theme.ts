@@ -12,6 +12,13 @@ declare module '@mui/material/styles' {
     scroll?: PaletteOptions['primary'],
     inputBorder?: string
   }
+
+  interface Shape {
+    editorInputMinWidth: string
+  }
+  interface ThemeOptions {
+    shape?: Partial<Shape>
+  }
 }
 
 const theme = createTheme({
@@ -31,7 +38,8 @@ const theme = createTheme({
     inputBorder: 'rgba(255, 255, 255, 0.23)',
   },
   shape: {
-    borderRadius: 2
+    borderRadius: 2,
+    editorInputMinWidth: '15rem'
   },
   typography: {
     fontFamily: '"Inter", sans-serif',
