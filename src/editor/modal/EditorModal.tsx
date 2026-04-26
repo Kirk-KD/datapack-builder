@@ -20,6 +20,7 @@ function EditorModal() {
     <Modal open={open}>
       <Stack sx={{
         position: 'absolute',
+        outline: 'none',
         ...(maximized ? {
           width: '100%',
           height: '100%'
@@ -37,7 +38,7 @@ function EditorModal() {
           p: 1,
           pl: 2,
         }}>
-          <Typography variant={'h5'} sx={{
+          <Typography variant={'h6'} sx={{
             flex: 1,
           }}>{payload.title}</Typography>
           <MaximizeButton maximized={maximized}/>
