@@ -1,7 +1,7 @@
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "../../types.ts";
-import {type SetStateAction, useEffect, useMemo, useState} from "react";
+import {type SetStateAction, useEffect, useState} from "react";
 import {loadDataComponentSchemas} from "../../../catalog/dataComponentSchemaCatalog.ts";
 import loadFromSchema from "../../loadFromSchema.tsx";
 import type {ItemComponent} from "./ItemStackEditor.tsx";
@@ -24,7 +24,7 @@ const applyStateAction = (prevState: AnyEditorState, nextState: SetStateAction<A
   typeof nextState === 'function' ? nextState(prevState) : nextState
 
 export default function ItemComponentList({ itemComponents, setItemComponents }: ItemComponentListProps) {
-  const [selectedComponentId, setSelectedComponentId] = useState<string>()
+  const [selectedComponentId, setSelectedComponentId] = useState<string | undefined>(undefined)
   const [componentLookup, setComponentLookup] = useState<Record<string, EditorSchema> | null>(null)
   const [components, setComponents] = useState<Record<string, ItemComponentEntry>>({})
 
@@ -45,6 +45,7 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
         }
       }
     }))
+    setSelectedComponentId(availableComponents.find(id => id !== key))
   }
 
   const removeComponent = (key: string) => {
@@ -55,14 +56,13 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
     })
   }
 
-  const availableComponents = useMemo(
-    () => Object.keys(componentLookup ?? {}).filter(id => !Object.keys(components).includes(id)),
-    [componentLookup, components]
-  )
+  const availableComponents = Object.keys(componentLookup ?? {}).filter(id => !Object.keys(components).includes(id))
 
   useEffect(() => {
     loadDataComponentSchemas().then(schemas => {
-      setComponentLookup(Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema])))
+      const lookup = Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema]))
+      setComponentLookup(lookup)
+      setSelectedComponentId(Object.keys(lookup)[0])
       itemComponents.forEach(addComponent)
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
