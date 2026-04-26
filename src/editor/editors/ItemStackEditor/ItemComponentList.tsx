@@ -62,8 +62,28 @@ export default function ItemComponentList({ itemComponents, setItemComponents }:
     loadDataComponentSchemas().then(schemas => {
       const lookup = Object.fromEntries(schemas.map(schema => [schema.id, schema.value_schema]))
       setComponentLookup(lookup)
-      setSelectedComponentId(Object.keys(lookup)[0])
-      itemComponents.forEach(addComponent)
+
+      const initialComponents: Record<string, ItemComponentEntry> = {}
+      itemComponents.forEach(({ key, state, negate }) => {
+        initialComponents[key] = {
+          state,
+          negate,
+          setState: result => {
+            setComponents(prev => ({
+              ...prev,
+              [key]: {
+                ...prev[key],
+                state: applyStateAction(prev[key].state, result)
+              } as ItemComponentEntry
+            }))
+          }
+        }
+      })
+      setComponents(initialComponents)
+
+      const existingKeys = itemComponents.map(c => c.key)
+      const firstAvailable = Object.keys(lookup).find(id => !existingKeys.includes(id))
+      setSelectedComponentId(firstAvailable)
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
