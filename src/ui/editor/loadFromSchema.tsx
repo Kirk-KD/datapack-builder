@@ -7,13 +7,13 @@ import type {
   EditorStateCallback,
   EditorSchema, ListSchema,
   ObjectSchema, ReferenceSchema,
-  ScalarSchema, EditorState
+  ScalarSchema, EditorState, ItemStackEditorResult
 } from "../../core/editor";
 import NumberEditor from "./editors/NumberEditor.tsx";
 import * as React from "react";
 import {ObjectEditor} from "./editors/ObjectEditor";
 import type {ObjectEditorEntry} from "./editors/ObjectEditor";
-import {ItemStackEditor, type ItemStackEditorResult} from "./editors/ItemStackEditor";
+import {ItemStackEditor} from "./editors/ItemStackEditor";
 import StringEditor from "./editors/StringEditor.tsx";
 import BooleanEditor from "./editors/BooleanEditor.tsx";
 import SelectEditor from "./editors/SelectEditor.tsx";

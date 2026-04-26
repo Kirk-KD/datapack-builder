@@ -2,6 +2,7 @@ import type {EditorBaseProps} from "../../../core/editor";
 import {useEffect, useState} from "react";
 import ResetButton from "../components/ResetButton.tsx";
 import {Stack, ToggleButton, ToggleButtonGroup} from "@mui/material";
+import * as React from "react";
 
 export type BooleanEditorProps = EditorBaseProps<never, boolean> & {
   defaultValue?: boolean

@@ -5,7 +5,6 @@ import {useProjectConfigStore} from "../../stores";
 import {Box, Button, Checkbox, FormControlLabel, Stack} from "@mui/material"
 import useBlocklyWorkspace from "./useBlocklyWorkspace.ts";
 
-
 function WorkspacePanel() {
   const { divRef, workspaceRef } = useBlocklyWorkspace()
   const projectConfig = useProjectConfigStore((state) => state.projectConfig)

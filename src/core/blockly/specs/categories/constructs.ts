@@ -1,6 +1,6 @@
 import type { BlockSpec } from '../types'
-import type {EditorState} from "../../../editor";
-import {type ItemStackEditorResult, loadFromSchema, controller} from "../../../../ui/editor";
+import type {EditorState, ItemStackEditorResult} from "../../../editor";
+import {loadFromSchema, controller} from "../../../../ui/editor";
 import {bindExtraState, type StatefulBlock} from "../extraState.ts";
 import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
 import * as Blockly from "blockly";
