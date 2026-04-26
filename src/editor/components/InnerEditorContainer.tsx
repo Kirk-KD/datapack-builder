@@ -12,13 +12,13 @@ export default function InnerEditorContainer({ children }: InnerEditorContainerP
       p: 0.8,
       borderRadius: theme => `${theme.shape.borderRadius}px`,
       border: '1px solid',
-      borderColor: 'inputBorder'
+      borderColor: 'inputBorder',
+      width: 'fit-content',
     }}>
       <Box sx={{
         p: 1,
         backgroundColor: 'background.default',
-        width: '100%',
-        height: '100%',
+        width: 'fit-content',
         borderRadius: '8px',
       }}>
         {children}

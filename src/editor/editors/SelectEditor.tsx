@@ -26,7 +26,8 @@ export default function SelectEditor({ state, setState, defaultValue, options }:
       })}
       endAdornment={<ResetButton handleReset={() => setState({...state, data: defaultVal})}/>}
       sx={{
-        minWidth: theme => theme.shape.editorInputMinWidth
+        minWidth: theme => theme.shape.editorInputMinWidth,
+        maxWidth: theme => theme.shape.editorInputMaxWidth
       }}
     />
   )
