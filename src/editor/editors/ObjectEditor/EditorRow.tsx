@@ -1,7 +1,8 @@
 import * as React from "react"
-import './EditorRow.css'
 import EnableCheckbox from "./EnableCheckbox.tsx";
 import Tooltip from "../../components/Tooltip.tsx";
+import {Box, Typography} from "@mui/material";
+import InnerEditorContainer from "../../components/InnerEditorContainer.tsx";
 
 type EditorRowProps = {
   label: string
@@ -17,29 +18,34 @@ type EditorRowProps = {
 /**
  * A row holding the label and input for an `ObjectEditor`.
  */
-export default function EditorRow({ label, description, note, optional, children, isNested, enabled, setEnabled }: EditorRowProps ) {
+export default function EditorRow({ label, description, note, optional, children, isNested, enabled, setEnabled }: EditorRowProps) {
   return (
     <>
-      {note && <div className='editorNote'>{note}</div>}
+      {note && <Box sx={{ gridColumn: '1 / -1' }}><Typography>{note}</Typography></Box>}
 
-      <div className={`editorRowLabel ${enabled ? '' : 'disabled'}`}>
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 1,
+        alignSelf: isNested ? 'flex-start' : 'center',
+        minHeight: theme => theme.shape.editorRowHeight,
+      }}>
         <EnableCheckbox show={optional} setEnabled={setEnabled} />
         <Tooltip text={description}>
-          <span className={'editorLabelSpan'}>{label}</span>
+          <Typography variant="body2" sx={{
+            opacity: enabled ? 1 : 0.4,
+            transition: 'opacity 0.2s',
+          }}>{label}</Typography>
         </Tooltip>
-      </div>
-
-      <div
-        className={`editorRowInput ${enabled ? '' : 'disabled'}`}
-        style={isNested ? {
-          backgroundColor: `rgba(0, 0, 0, 10%)`,
-          borderRadius: 'var(--border-radius-small)',
-          border: '1px solid var(--colour-border-muted)'
-        } : {}}
-        inert={!enabled}
-      >
-        {children}
-      </div>
+      </Box>
+      <Box inert={!enabled} sx={{
+        alignSelf: isNested ? 'flex-start' : 'center',
+        minHeight: theme => theme.shape.editorRowHeight,
+        opacity: enabled ? 1 : 0.4,
+        transition: 'opacity 0.2s',
+      }}>
+        {isNested ? <InnerEditorContainer>{children}</InnerEditorContainer> : children}
+      </Box>
     </>
   )
 }

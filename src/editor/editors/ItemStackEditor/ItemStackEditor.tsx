@@ -49,14 +49,15 @@ export default function ItemStackEditor({context, state, setState}: EditorBasePr
   }, [itemState, amountState, itemComponents]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <Stack>
+    <Stack spacing={1}>
       <Stack spacing={1} direction={'row'} sx={{
         alignItems: 'center'
       }}>
         <ItemSelectorEditor context={context} state={itemState} setState={setItemState}/>
         <Typography>count:</Typography>
         <NumberEditor sx={{
-          maxWidth: '8rem'
+          maxWidth: '8rem',
+          minWidth: '2rem' // Override default
         }} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
       </Stack>
       <Box sx={{

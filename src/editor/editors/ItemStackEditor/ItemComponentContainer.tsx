@@ -11,7 +11,7 @@ type ItemComponentContainerProp = {
 
 export default function ItemComponentContainer({ name, editor, removeComponent }: ItemComponentContainerProp) {
   return (
-    <Stack direction={'row'} spacing={1}>
+    <Stack direction={'row'} spacing={0.5}>
       <InnerEditorContainer>
         <Stack direction={'row'}>
           <Stack sx={{

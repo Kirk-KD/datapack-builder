@@ -14,7 +14,8 @@ declare module '@mui/material/styles' {
   }
 
   interface Shape {
-    editorInputMinWidth: string
+    editorInputMinWidth: string,
+    editorRowHeight: string
   }
   interface ThemeOptions {
     shape?: Partial<Shape>
@@ -39,7 +40,8 @@ const theme = createTheme({
   },
   shape: {
     borderRadius: 2,
-    editorInputMinWidth: '15rem'
+    editorInputMinWidth: '15rem',
+    editorRowHeight: '2rem'
   },
   typography: {
     fontFamily: '"Inter", sans-serif',
