@@ -1,4 +1,4 @@
-import {Checkbox} from "@mui/material";
+import {Checkbox, Tooltip} from "@mui/material";
 
 type EnableCheckboxProps = {
   show?: boolean
@@ -8,11 +8,13 @@ type EnableCheckboxProps = {
 
 export default function EnableCheckbox({ show, enabled, setEnabled }: EnableCheckboxProps) {
   return (
-    <Checkbox
-      size="small"
-      checked={enabled}
-      onChange={(_, checked) => setEnabled(checked)}
-      sx={{ visibility: show ? 'visible' : 'hidden', p: 0 }}
-    />
+    <Tooltip title={enabled ? 'Disable' : 'Enable'}>
+      <Checkbox
+        size="small"
+        checked={enabled}
+        onChange={(_, checked) => setEnabled(checked)}
+        sx={{ visibility: show ? 'visible' : 'hidden', p: 0 }}
+      />
+    </Tooltip>
   )
 }

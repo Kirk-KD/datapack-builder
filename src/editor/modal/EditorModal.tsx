@@ -1,15 +1,12 @@
 import {controller, useEditorModal} from "./controller.ts";
 import {Box, Button, IconButton, Modal, Stack, Typography} from "@mui/material";
+import OpenInFullIcon from '@mui/icons-material/OpenInFull'
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen'
 
 function MaximizeButton({ maximized }: { maximized: boolean }) {
   return (
     <IconButton onClick={() => controller.setMaximized(!maximized)}>
-      <img
-        src={maximized ? '/minimize.svg' : '/maximize.svg'}
-        alt={maximized ? 'minimize button' : 'maximize button'}
-        width="20"
-        height="20"
-      />
+      {maximized ? <CloseFullscreenIcon fontSize="small" /> : <OpenInFullIcon fontSize="small" />}
     </IconButton>
   )
 }

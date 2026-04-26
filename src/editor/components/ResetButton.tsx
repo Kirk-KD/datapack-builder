@@ -1,12 +1,15 @@
-import {IconButton} from "@mui/material";
+import RestartAltIcon from '@mui/icons-material/RestartAlt'
+import {IconButton, Tooltip} from "@mui/material";
 
 export default function ResetButton({ handleReset, disabled }: {
   handleReset: () => void
   disabled?: boolean
 }) {
   return (
-    <IconButton onClick={handleReset} disabled={disabled} size={'small'}>
-      <img src={'/reset.svg'} alt={'reset button'} width={'20'} height={'20'} />
-    </IconButton>
+    <Tooltip title={'Reset'}>
+      <IconButton onClick={handleReset} disabled={disabled} size="small">
+        <RestartAltIcon fontSize="small" />
+      </IconButton>
+    </Tooltip>
   )
 }
