@@ -88,7 +88,7 @@ export default function ItemSearchList({items, onClickItem, open, searchString, 
           <Box
             ref={scrollRef}
             sx={{
-              height: '25rem',
+              maxHeight: '25rem',
               overflowY: 'auto',
               width: '100%'
             }}
