@@ -29,7 +29,7 @@ export default function EditorRow({ label, description, note, optional, children
         alignSelf: isNested ? 'flex-start' : 'center',
         minHeight: theme => theme.shape.editorRowHeight,
       }}>
-        <EnableCheckbox show={optional} setEnabled={setEnabled} />
+        <EnableCheckbox show={optional} enabled={enabled} setEnabled={setEnabled} />
         <Tooltip describeChild title={description} placement={'top-start'}>
           <Typography variant="body2" sx={{
             opacity: enabled ? 1 : 0.4,
@@ -38,13 +38,23 @@ export default function EditorRow({ label, description, note, optional, children
           }}>{label}</Typography>
         </Tooltip>
       </Box>
-      <Box inert={!enabled} sx={{
-        alignSelf: isNested ? 'flex-start' : 'center',
-        minHeight: theme => theme.shape.editorRowHeight,
-        opacity: enabled ? 1 : 0.4,
-        transition: 'opacity 0.2s',
-      }}>
-        {isNested ? <InnerEditorContainer>{children}</InnerEditorContainer> : children}
+      <Box
+        onDoubleClick={() => { if (!enabled) setEnabled(true) }}
+        sx={{
+          cursor: enabled ? undefined : 'pointer'
+        }}
+      >
+        <Box
+          inert={!enabled}
+          sx={{
+            alignSelf: isNested ? 'flex-start' : 'center',
+            minHeight: theme => theme.shape.editorRowHeight,
+            opacity: enabled ? 1 : 0.4,
+            transition: 'opacity 0.2s',
+          }}
+        >
+          {isNested ? <InnerEditorContainer>{children}</InnerEditorContainer> : children}
+        </Box>
       </Box>
     </>
   )
