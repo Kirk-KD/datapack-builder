@@ -7,7 +7,7 @@ import type {
   EditorState,
   EditorStateCallback,
   CompilerType
-} from "../../../../core/editor/types.ts";
+} from "../../../../core/editor";
 import EditorRow from "./EditorRow.tsx";
 import {Box} from "@mui/material";
 

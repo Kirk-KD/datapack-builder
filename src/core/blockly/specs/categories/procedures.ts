@@ -1,14 +1,14 @@
-import { mcfunctionGenerator } from '../../compiler/blockly/generator'
-import { snbtToString } from '../../compiler/util'
-import { getParameterNameById } from '../../compiler/workspaceRegistry'
-import type { BlockSpec } from './types'
+import { mcfunctionGenerator } from '../../../compiler'
+import { snbtToString } from '../../../compiler/snbt'
+import { getParameterNameById } from '../../../compiler/workspaceRegistry'
+import type { BlockSpec } from '../types'
 import {
   getInternalNamespace,
   getObjectiveName, getProcArgPath,
   getProcArgsStorageName,
   getProcName,
   getVarName
-} from "../../compiler/nameManager.ts";
+} from "../../../compiler/nameManager.ts";
 
 const FIELD_PARAM_NAME = 'PARAM_NAME'
 export const PROC_DEF_NAME = 'procedures_defnoreturn'

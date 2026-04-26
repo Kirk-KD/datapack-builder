@@ -1,5 +1,5 @@
-import Blockly from "blockly"
-import type {Dispatch, SetStateAction} from "react";
+import * as Blockly from "blockly"
+import {type Dispatch, type SetStateAction} from "react";
 
 // Data flow
 
@@ -91,4 +91,18 @@ export type EditorBaseProps<AdditionalContext extends Record<string, unknown>, R
   
   initialValue?: Result
   oldState?: OldState<Result>
+}
+
+// Item Stack Editor
+
+export type ItemComponent = {
+  key: string
+  state: AnyEditorState
+  negate: boolean
+}
+
+export type ItemStackEditorResult = {
+  item: EditorState<string>
+  amount: EditorState<number>
+  components: ItemComponent[]
 }

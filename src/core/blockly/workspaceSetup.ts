@@ -6,10 +6,12 @@ import {
   ContinuousFlyout,
   ContinuousMetrics,
   ContinuousToolbox,
-  registerContinuousToolbox
 } from '@blockly/continuous-toolbox'
-import {colours} from "./blockColours.ts"
+import {colours} from "./colours.ts"
 import theme from "../../theme.ts"
+import type {WorkspaceSvg} from "blockly";
+import {updateWorkspaceRegistry} from "../compiler";
+import getToolboxContents from "./getToolboxContents.ts";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -60,7 +62,40 @@ const additionalOptions = {
   }
 }
 
-function setupWorkspace(workspace: Blockly.Workspace) {
+function updateToolbox(workspace: WorkspaceSvg) {
+  updateWorkspaceRegistry(workspace)
+  workspace.updateToolbox({
+    kind: 'categoryToolbox',
+    contents: getToolboxContents(workspace)
+  })
+}
+
+function setupChangeListener(workspace: Blockly.WorkspaceSvg) {
+  workspace.addChangeListener((event) => {
+    if (
+      // Update toolbox and variable list whenever variables are modified
+      event.type === Blockly.Events.VAR_CREATE ||
+      event.type === Blockly.Events.VAR_DELETE ||
+      event.type === Blockly.Events.VAR_RENAME ||
+      // Update procedure list whenever procedures are modified
+      event.type === Blockly.Events.BLOCK_CREATE ||
+      event.type === Blockly.Events.BLOCK_DELETE ||
+      event.type === Blockly.Events.BLOCK_CHANGE
+    ) updateToolbox(workspace)
+  })
+}
+
+function injectWorkspace(workspaceDiv: HTMLDivElement) {
+  return Blockly.inject(workspaceDiv, {
+    toolbox: {
+      kind: 'categoryToolbox',
+      contents: getToolboxContents()
+    },
+    ...additionalOptions
+  })
+}
+
+function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
   // Toolbox behaviors
   Blockly.VerticalFlyout.prototype.getFlyoutScale = () => 0.8
   // Do not override width of mutator flyouts
@@ -81,6 +116,15 @@ function setupWorkspace(workspace: Blockly.Workspace) {
 
   // Enable auto shadow conversion
   workspace.addChangeListener(shadowBlockConversionChangeListener)
+
+  // Initial placeholder variable
+  workspace.getVariableMap().createVariable('myVar', 'mc_scoreboard_variable')
+  updateToolbox(workspace)
+
+  workspace.registerButtonCallback('CREATE_VARIABLE', () => {
+    Blockly.Variables.createVariableButtonHandler(workspace, undefined, 'mc_scoreboard_variable')
+  })
+  setupChangeListener(workspace)
 }
 
-export {registerContinuousToolbox, setupWorkspace, additionalOptions}
+export {setupWorkspace, injectWorkspace}

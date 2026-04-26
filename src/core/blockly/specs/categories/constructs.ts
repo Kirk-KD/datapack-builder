@@ -1,15 +1,13 @@
-import type { BlockSpec } from './types'
-import type {EditorState} from "../../editor/types.ts";
-import type {ItemStackEditorResult} from "../../../ui/editor/editors/ItemStackEditor";
-import {bindExtraState, type StatefulBlock} from "../utils/extraState.ts";
-import {ItemSpriteField} from "../fields/itemSpriteField.ts";
+import type { BlockSpec } from '../types'
+import type {EditorState} from "../../../editor";
+import {type ItemStackEditorResult, loadFromSchema, controller} from "../../../../ui/editor";
+import {bindExtraState, type StatefulBlock} from "../extraState.ts";
+import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
 import * as Blockly from "blockly";
-import compileEditorState from "../../compiler/editor/compileEditorState.ts";
-import {colours} from "../blockColours.ts";
-import {TextButton} from "../fields/textButton.ts";
-import {controller} from "../../../ui/editor/modal/controller.ts";
-import loadFromSchema from "../../../ui/editor/loadFromSchema.tsx";
-import {getMinecraftItemByName} from "../../catalog/itemCatalog.ts";
+import compileEditorState from "../../../compiler/editor/compileEditorState.ts";
+import {colours} from "../../colours.ts";
+import {TextButton} from "../../fields/textButton.ts";
+import {getMinecraftItemByName} from "../../../catalog";
 
 type ItemStackBlockState = {
   itemStackEditorState_: EditorState<ItemStackEditorResult>

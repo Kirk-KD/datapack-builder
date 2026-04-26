@@ -1,12 +1,12 @@
 import * as Blockly from 'blockly'
-import { colours } from '../blockColours'
-import { addFile } from '../../compiler/fileRegistry'
-import { mcfunctionGenerator } from '../../compiler/blockly/generator'
-import { nextId } from '../../compiler/idGenerator'
-import type { BlockSpec } from './types'
-import { setShadowState } from '../extensions/shadows.ts'
-import { getInternalNamespace } from "../../compiler/nameManager.ts"
-import { createStateDropdown } from "../utils/dynamicFields.ts";
+import { colours } from '../../colours'
+import { addFile } from '../../../compiler/fileRegistry'
+import { mcfunctionGenerator } from '../../../compiler'
+import { nextId } from '../../../compiler/idGenerator'
+import type { BlockSpec } from '../types'
+import { setShadowState } from '../../extensions/shadows.ts'
+import { getInternalNamespace } from "../../../compiler/nameManager.ts"
+import { createStateDropdown } from "../dynamicFields.ts";
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'

@@ -1,22 +1,15 @@
-import type {AnyEditorState, EditorBaseProps, EditorState} from "../../../../core/editor/types.ts";
+import type {
+  EditorBaseProps,
+  EditorState,
+  ItemComponent,
+  ItemStackEditorResult
+} from "../../../../core/editor";
 import {ItemSelectorEditor} from "../ItemSelectorEditor";
 import {useEffect, useState} from "react";
 import NumberEditor from "../NumberEditor.tsx";
 
 import ItemComponentList from "./ItemComponentList.tsx";
 import {Box, Stack, Typography} from "@mui/material";
-
-export type ItemComponent = {
-  key: string
-  state: AnyEditorState
-  negate: boolean
-}
-
-export type ItemStackEditorResult = {
-  item: EditorState<string>
-  amount: EditorState<number>
-  components: ItemComponent[]
-}
 
 export default function ItemStackEditor({context, state, setState}: EditorBaseProps<Record<string, unknown>, ItemStackEditorResult>) {
   const [itemState, setItemState] = useState<EditorState<string>>(state.data?.item ?? { compiler: 'item_stack', error: false })

@@ -1,13 +1,13 @@
 import * as Blockly from 'blockly'
-import { commandBlockSpecs } from './commands'
-import { constructBlockSpecs } from './constructs'
-import { controlBlockSpecs } from './control'
-import { eventBlockSpecs } from './events'
-import { executeBlockSpecs } from './execute'
-import { literalBlockSpecs } from './literals'
-import { procedureBlockSpecs } from './procedures'
-import { selectorBlockSpecs, targetSelectorRootType } from './selectors'
-import { variableBlockSpecs } from './variable'
+import { commandBlockSpecs } from './categories/commands'
+import { constructBlockSpecs } from './categories/constructs'
+import { controlBlockSpecs } from './categories/control'
+import { eventBlockSpecs } from './categories/events'
+import { executeBlockSpecs } from './categories/execute'
+import { literalBlockSpecs } from './categories/literals'
+import { procedureBlockSpecs } from './categories/procedures'
+import { selectorBlockSpecs, targetSelectorRootType } from './categories/selectors'
+import { variableBlockSpecs } from './categories/variable'
 import type { BlockGeneratorFunction, BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
 import {shadowInputBlockSpecs} from "./shadowInputs.ts";
 
@@ -57,7 +57,7 @@ export function getBlockJsonByCategory(category: BlockSpecCategory): BlockJsonDe
 }
 
 /**
- * Returns the extension name used to attach a spec's shadow setup hook.
+ * Returns the extension name used to attach a spec's shadow toolboxSetup hook.
  */
 function getShadowExtensionName(type: string) {
   return `shadows_${type}`

@@ -8,7 +8,7 @@ import type {
   EditorSchema, ListSchema,
   ObjectSchema, ReferenceSchema,
   ScalarSchema, EditorState
-} from "../../core/editor/types.ts";
+} from "../../core/editor";
 import NumberEditor from "./editors/NumberEditor.tsx";
 import * as React from "react";
 import {ObjectEditor} from "./editors/ObjectEditor";

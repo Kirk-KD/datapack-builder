@@ -1,6 +1,6 @@
-import type { BlockSpec } from './types'
-import { mcfunctionGenerator } from '../../compiler/blockly/generator'
-import {setShadowState} from "../extensions/shadows.ts";
+import type { BlockSpec } from '../types'
+import { mcfunctionGenerator } from '../../../compiler'
+import {setShadowState} from "../../extensions/shadows.ts";
 
 const FIELD_VALUE = 'VALUE'
 

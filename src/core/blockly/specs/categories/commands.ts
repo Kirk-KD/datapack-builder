@@ -1,10 +1,10 @@
-import { mcfunctionGenerator } from '../../compiler/blockly/generator'
-import type { BlockSpec } from './types'
-import {setShadowState} from "../extensions/shadows.ts";
+import { mcfunctionGenerator } from '../../../compiler'
+import type { BlockSpec } from '../types'
+import {setShadowState} from "../../extensions/shadows.ts";
 import * as Blockly from "blockly"
-import {colours} from "../blockColours.ts";
-import { createStateCheckbox, createStateDropdown } from "../utils/dynamicFields.ts";
-import { bindExtraState } from "../utils/extraState.ts";
+import {colours} from "../../colours.ts";
+import { createStateCheckbox, createStateDropdown } from "../dynamicFields.ts";
+import { bindExtraState } from "../extraState.ts";
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 

@@ -1,10 +1,12 @@
+import './index.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import * as Blockly from 'blockly'
 import App from './App.tsx'
-import './index.css'
+import {bootstrapBlockly} from './core/blockly'
+import {bootstrapCompiler} from './core/compiler'
 
-Blockly.Msg['PROCEDURES_DEFNORETURN_TITLE'] = 'define'
+bootstrapBlockly()
+bootstrapCompiler()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

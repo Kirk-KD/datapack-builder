@@ -1,6 +1,6 @@
 import TextInput from "../components/TextInput.tsx";
 import {useCallback, useEffect, useState} from "react";
-import type {EditorBaseProps} from "../../../core/editor/types.ts";
+import type {EditorBaseProps} from "../../../core/editor";
 import type {SxProps, Theme} from "@mui/material";
 
 export type NumberEditorProps = EditorBaseProps<never, number> & {

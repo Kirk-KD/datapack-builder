@@ -1,4 +1,4 @@
-import type { BlockSpec } from './types'
+import type { BlockSpec } from '../types'
 
 export const eventBlockSpecs: BlockSpec[] = [
   {

@@ -1,6 +1,6 @@
 import {useEffect} from "react";
 import ResetButton from "../components/ResetButton.tsx";
-import type {EditorBaseProps} from "../../../core/editor/types.ts";
+import type {EditorBaseProps} from "../../../core/editor";
 import DropdownInput from "../components/DropdownInput.tsx";
 
 export type SelectEditorProps = EditorBaseProps<never, string> & {

@@ -1,5 +1,5 @@
 import { createCatalog } from './createCatalog'
-import type {EditorSchema} from "../editor/types.ts";
+import type {EditorSchema} from "../editor";
 
 export type DataComponentSchemaEntry = {
   id: string

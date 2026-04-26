@@ -2,8 +2,8 @@ import {
   getMinecraftItemByName,
   loadMinecraftItemCatalog,
   type MinecraftItemEntry
-} from '../../../../core/catalog/itemCatalog.ts'
-import type { EditorBaseProps } from '../../../../core/editor/types.ts'
+} from '../../../../core/catalog'
+import type { EditorBaseProps } from '../../../../core/editor'
 import {useState, useEffect, useRef} from 'react'
 import ItemSprite from '../../components/ItemSprite.tsx'
 import ItemSearchList from './ItemSearchList.tsx'

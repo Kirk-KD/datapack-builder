@@ -1,10 +1,10 @@
 import * as Blockly from 'blockly'
-import { addFile } from '../../compiler/fileRegistry'
-import { mcfunctionGenerator } from '../../compiler/blockly/generator'
-import { nextId } from '../../compiler/idGenerator'
-import type { BlockSpec } from './types'
-import { setShadowState } from '../extensions/shadows.ts'
-import {getInternalNamespace, getObjectiveName, getTempVarName, getVarName} from "../../compiler/nameManager.ts";
+import { addFile } from '../../../compiler/fileRegistry'
+import { mcfunctionGenerator } from '../../../compiler'
+import { nextId } from '../../../compiler/idGenerator'
+import type { BlockSpec } from '../types'
+import { setShadowState } from '../../extensions/shadows.ts'
+import {getInternalNamespace, getObjectiveName, getTempVarName, getVarName} from "../../../compiler/nameManager.ts";
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'

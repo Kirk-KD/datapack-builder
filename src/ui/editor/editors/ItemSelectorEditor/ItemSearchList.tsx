@@ -1,5 +1,5 @@
 import ItemSprite from "../../components/ItemSprite.tsx";
-import type {MinecraftItemEntry} from "../../../../core/catalog/itemCatalog.ts";
+import type {MinecraftItemEntry} from "../../../../core/catalog";
 import {memo, useMemo, useRef, useEffect} from "react";
 import { useVirtualizer } from '@tanstack/react-virtual'
 import {Box, Popper, Paper, Stack, Typography, ButtonBase} from "@mui/material";

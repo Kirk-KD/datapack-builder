@@ -5,10 +5,9 @@ import type {
   EditorSchema,
   EditorState,
   EditorStateList,
-  EditorStateMap,
-} from '../../editor/types.ts'
-import { type SNBT, snbtToString } from '../util.ts'
-import type { ItemStackEditorResult } from '../../../ui/editor/editors/ItemStackEditor'
+  EditorStateMap, ItemStackEditorResult,
+} from '../../editor'
+import { type SNBT, snbtToString } from '../snbt.ts'
 
 export function inferCompilerType(schema: EditorSchema): CompilerType {
   return schema.kind === 'reference' ? schema.ref : schema.kind

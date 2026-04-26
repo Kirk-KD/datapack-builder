@@ -1,6 +1,6 @@
 import TextInput from "../components/TextInput.tsx";
 import {useEffect} from "react";
-import type {EditorBaseProps} from "../../../core/editor/types.ts";
+import type {EditorBaseProps} from "../../../core/editor";
 
 export type StringEditorProps = EditorBaseProps<never, string> & {
   defaultValue?: string

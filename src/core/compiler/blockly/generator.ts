@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import {PROC_DEF_NAME} from "../../blockly/specs/procedures.ts";
+import {PROC_DEF_NAME} from "../../blockly/specs/categories/procedures.ts";
 import type {IProcedureBlock} from "@blockly/block-shareable-procedures";
 
 export const mcfunctionGenerator = new Blockly.CodeGenerator('mcfunction')

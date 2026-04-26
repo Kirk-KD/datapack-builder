@@ -1,4 +1,4 @@
-import {useProjectConfigStore} from "../../stores/projectConfig.ts";
+import {useProjectConfigStore} from "../../stores";
 
 export function getInternalNamespace(): string {
   const {projectConfig} = useProjectConfigStore.getState()

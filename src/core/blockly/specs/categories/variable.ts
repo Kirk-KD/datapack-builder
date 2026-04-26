@@ -1,8 +1,8 @@
-import { mcfunctionGenerator } from '../../compiler/blockly/generator'
+import { mcfunctionGenerator } from '../../../compiler'
 import { getConditionSetup } from './control'
-import type { BlockSpec } from './types'
-import { setShadowState } from '../extensions/shadows.ts'
-import {getObjectiveName, getTempVarName, getVarName} from "../../compiler/nameManager.ts";
+import type { BlockSpec } from '../types'
+import { setShadowState } from '../../extensions/shadows.ts'
+import {getObjectiveName, getTempVarName, getVarName} from "../../../compiler/nameManager.ts";
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'

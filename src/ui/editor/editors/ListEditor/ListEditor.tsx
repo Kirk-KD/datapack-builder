@@ -1,4 +1,4 @@
-import type {AnyEditorState, AnyEditorStateCallback, EditorBaseProps, EditorStateList} from "../../../../core/editor/types.ts";
+import type {AnyEditorState, AnyEditorStateCallback, EditorBaseProps, EditorStateList} from "../../../../core/editor";
 import * as React from "react";
 import {type SetStateAction, useEffect, useRef, useState} from "react";
 import ResetButton from "../../components/ResetButton.tsx";

@@ -1,4 +1,4 @@
-import type {EditorBaseProps} from "../../../core/editor/types.ts";
+import type {EditorBaseProps} from "../../../core/editor";
 import {useEffect, useState} from "react";
 import ResetButton from "../components/ResetButton.tsx";
 import {Stack, ToggleButton, ToggleButtonGroup} from "@mui/material";
