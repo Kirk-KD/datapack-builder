@@ -34,6 +34,7 @@ export default function EditorRow({ label, description, note, optional, children
           <Typography variant="body2" sx={{
             opacity: enabled ? 1 : 0.4,
             transition: 'opacity 0.2s',
+            fontFamily: theme => theme.typography.mono
           }}>{label}</Typography>
         </Tooltip>
       </Box>

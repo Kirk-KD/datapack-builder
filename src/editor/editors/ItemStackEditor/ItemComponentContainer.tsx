@@ -19,7 +19,8 @@ export default function ItemComponentContainer({ name, editor, removeComponent }
           }}>
             <Typography sx={{
               height: '2rem',
-              alignContent: 'center'
+              alignContent: 'center',
+              fontFamily: theme => theme.typography.mono
             }}>
               {editor === null ? <b>!</b> : ''} {name}
             </Typography>

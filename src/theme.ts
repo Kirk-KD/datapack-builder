@@ -20,6 +20,13 @@ declare module '@mui/material/styles' {
   interface ThemeOptions {
     shape?: Partial<Shape>
   }
+
+  interface TypographyVariants {
+    mono: string
+  }
+  interface TypographyVariantsOptions {
+    mono?: string
+  }
 }
 
 const theme = createTheme({
@@ -46,7 +53,8 @@ const theme = createTheme({
   typography: {
     fontFamily: '"Inter", sans-serif',
     fontWeightMedium: 600,
-    fontSize: 12
+    fontSize: 12,
+    mono: '"JetBrains Mono", monospace'
   },
   shadows: Array(25).fill('none') as Theme['shadows'],
   components: {
