@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Box, Divider, Stack, Typography, Icon} from "@mui/material";
 
-type PanelProps =
+export type PanelProps =
   | {
   children: React.ReactNode,
   width?: string
@@ -21,16 +21,18 @@ type PanelProps =
 
 export function Panel({ children, width, minWidth, dominant, icon, title }: PanelProps) {
   return (
-    <Stack sx={{
-      flexGrow: dominant ? 1 : 0,
+    <Box sx={{
       width: width,
       minWidth: minWidth,
       borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius,
-      overflow: 'hidden'
+      overflow: 'hidden',
+      height: '100%',
+      flex: 1
     }}>
       {dominant ? children : (
         <Stack sx={{
-          flex: 1
+          height: '100%',
+          width: '100%'
         }}>
           <Stack direction={'row'} spacing={1} sx={{
             width: '100%',
@@ -54,6 +56,6 @@ export function Panel({ children, width, minWidth, dominant, icon, title }: Pane
           </Box>
         </Stack>
       )}
-    </Stack>
+    </Box>
   )
 }

@@ -7,12 +7,43 @@ export default function useBlocklyWorkspace() {
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null)
 
   useEffect(() => {
-    if (!divRef.current) return
+    const workspaceDiv = divRef.current
+    if (!workspaceDiv) return
 
-    workspaceRef.current = injectWorkspace(divRef.current)
-    setupWorkspace(workspaceRef.current)
+    const workspace = injectWorkspace(workspaceDiv)
+    workspaceRef.current = workspace
+    setupWorkspace(workspace)
 
-    return () => workspaceRef.current?.dispose()
+    let frameId: number | null = null
+    const resizeWorkspace = () => {
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+
+      frameId = requestAnimationFrame(() => {
+        Blockly.svgResize(workspace)
+        frameId = null
+      })
+    }
+
+    resizeWorkspace()
+
+    const resizeObserver = new ResizeObserver(() => {
+      resizeWorkspace()
+    })
+
+    resizeObserver.observe(workspaceDiv)
+    window.addEventListener('resize', resizeWorkspace)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', resizeWorkspace)
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+      workspace.dispose()
+      workspaceRef.current = null
+    }
   }, [])
 
   return { blocklyDivRef: divRef, blocklyWorkspaceRef: workspaceRef }
