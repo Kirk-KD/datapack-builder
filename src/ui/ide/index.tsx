@@ -1,4 +1,4 @@
-import {MenuBar} from "./MenuBar.tsx";
+import {MenuBar} from "./MenuBar";
 import {WorkspacePanel} from "../workspace";
 import {EditorModal} from "../editor";
 import {IDEProvider} from "./context/IDEProvider.tsx";

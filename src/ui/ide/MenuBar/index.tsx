@@ -1,8 +1,8 @@
 import {AppBar, Box, Stack, Toolbar} from "@mui/material";
 import {MenuButton} from "./MenuButton.tsx";
-import {loadProject, saveProject} from "../../core/save";
+import {loadProject, saveProject} from "../../../core/save";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
-import {useIDEContext} from "./context/useIDEContext.ts";
+import {useIDEContext} from "../context/useIDEContext.ts";
 import {ActionButtons} from "./ActionButtons.tsx";
 
 export function MenuBar() {

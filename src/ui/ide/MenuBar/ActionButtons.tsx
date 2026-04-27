@@ -1,12 +1,12 @@
 import HardwareIcon from '@mui/icons-material/Hardware';
 import CodeIcon from '@mui/icons-material/Code';
 import SettingsIcon from '@mui/icons-material/Settings';
-import {IconsPill} from "../components/IconsPill.tsx";
-import {controller, ProjectConfigEditor} from "../editor";
-import {IconsPillDivider} from "../components/IconsPillDivider.tsx";
+import {IconsPill} from "../../components/IconsPill.tsx";
+import {controller, ProjectConfigEditor} from "../../editor";
+import {IconsPillDivider} from "../../components/IconsPillDivider.tsx";
 import {IconButton, Tooltip} from "@mui/material";
-import {useIDEContext} from "./context/useIDEContext.ts";
-import {emit} from "../../core/compiler";
+import {useIDEContext} from "../context/useIDEContext.ts";
+import {emit} from "../../../core/compiler";
 
 export function ActionButtons() {
   const {blocklyWorkspaceRef} = useIDEContext()

@@ -1,10 +1,10 @@
 import {CircularProgress, Stack, Typography} from "@mui/material";
-import {useProjectConfigStore} from "../../stores";
+import {useProjectConfigStore} from "../../../stores";
 import {useEffect, useState} from "react";
 import SaveIcon from '@mui/icons-material/Save';
-import {useIDEContext} from "./context/useIDEContext.ts";
-import {IconsPill} from "../components/IconsPill.tsx";
-import {Icon} from "../components/Icon.tsx";
+import {useIDEContext} from "../context/useIDEContext.ts";
+import {IconsPill} from "../../components/IconsPill.tsx";
+import {Icon} from "../../components/Icon.tsx";
 
 export function ProjectNameDisplay() {
   const [namespace, setNamespace] = useState<string>(useProjectConfigStore.getState().projectConfig.namespace)
