@@ -1,8 +1,10 @@
 import './WorkspacePanel.css'
 import {Box} from "@mui/material"
-import * as React from "react";
+import {useIDEContext} from "../ide/context/useIDEContext.ts";
 
-function WorkspacePanel({ blocklyDivRef }: { blocklyDivRef: React.RefObject<HTMLDivElement | null> }) {
+function WorkspacePanel() {
+  const {blocklyDivRef} = useIDEContext()
+
   // // Debug
   // function handleInspect() {
   //   if (!workspaceRef.current) return

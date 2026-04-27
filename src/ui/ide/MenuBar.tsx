@@ -1,25 +1,26 @@
 import {AppBar, Stack, Toolbar} from "@mui/material";
 import {MenuButton} from "./MenuButton.tsx";
 import {loadProject, saveProject} from "../../core/save";
-import * as React from "react";
-import type {WorkspaceSvg} from "blockly";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
+import {useIDEContext} from "./context/useIDEContext.ts";
 
-export function MenuBar({ blocklyWorkspaceRef, hasUnsavedChanges }: { blocklyWorkspaceRef: React.RefObject<WorkspaceSvg | null>, hasUnsavedChanges: boolean }) {
+export function MenuBar() {
+  const {blocklyWorkspaceRef} = useIDEContext()
+
   return (
     <AppBar color={'secondary'} position={'relative'}>
       <Toolbar variant={'dense'}>
-        <ProjectNameDisplay hasUnsavedChanges={hasUnsavedChanges}/>
+        <ProjectNameDisplay />
 
         <Stack direction={'row'}>
           <MenuButton text={'File'} items={[
             {
               text: 'Save',
-              onClick: () => saveProject({ workspace: blocklyWorkspaceRef.current! })
+              onClick: () => blocklyWorkspaceRef.current && saveProject({workspace: blocklyWorkspaceRef.current})
             },
             {
               text: 'Load',
-              onClick: () => loadProject({ workspace: blocklyWorkspaceRef.current! })
+              onClick: () => blocklyWorkspaceRef.current && loadProject({workspace: blocklyWorkspaceRef.current})
             },
             {
               text: 'New',

@@ -4,9 +4,11 @@ import {useEffect, useState} from "react";
 import {controller, ProjectConfigEditor} from "../editor";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from '@mui/icons-material/Save';
+import {useIDEContext} from "./context/useIDEContext.ts";
 
-export function ProjectNameDisplay({ hasUnsavedChanges }: { hasUnsavedChanges: boolean }) {
+export function ProjectNameDisplay() {
   const [namespace, setNamespace] = useState<string>(useProjectConfigStore.getState().projectConfig.namespace)
+  const {hasUnsavedChanges} = useIDEContext()
 
   useEffect(() => {
     return useProjectConfigStore.subscribe(store => {
