@@ -15,5 +15,5 @@ export default function useBlocklyWorkspace() {
     return () => workspaceRef.current?.dispose()
   }, [])
 
-  return { divRef, workspaceRef }
+  return { blocklyDivRef: divRef, blocklyWorkspaceRef: workspaceRef }
 }
