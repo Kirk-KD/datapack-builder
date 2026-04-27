@@ -44,35 +44,23 @@ function WorkspacePanel() {
     })
   }
 
-  // Debug
-  function handleSave() {
-    if (!workspaceRef.current) return
-    saveProject({ workspace: workspaceRef.current })
-  }
-
-  // Debug
-  function handleOpen() {
-    if (!workspaceRef.current) return
-    loadProject({ workspace: workspaceRef.current })
-  }
-
-  // Debug
-  function handleConfig() {
-    controller.openEditorModal({
-      title: 'Project Configuration',
-      editor: <ProjectConfigEditor/>
-    })
-  }
-
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
       {/* Temporary debug top bar */}
       <Stack direction="row" spacing={1} sx={{ p: 1, backgroundColor: 'background.default' }}>
         <Button variant="outlined" size="small" onClick={handleInspect}>Inspect</Button>
         <Button variant="outlined" size="small" onClick={handleDownload}>Download</Button>
-        <Button variant="outlined" size="small" onClick={handleSave}>Save</Button>
-        <Button variant="outlined" size="small" onClick={handleOpen}>Open</Button>
-        <Button variant="outlined" size="small" onClick={handleConfig}>Project Config</Button>
+        <Button variant="outlined" size="small" onClick={() =>
+          workspaceRef.current && saveProject({ workspace: workspaceRef.current })}>Save</Button>
+        <Button variant="outlined" size="small" onClick={() =>
+          workspaceRef.current && loadProject({ workspace: workspaceRef.current })}>Open</Button>
+        <Button variant="outlined" size="small" onClick={() =>
+          controller.openEditorModal({
+            title: 'Project Configuration',
+            editor: <ProjectConfigEditor/>
+          })
+        }>Project Config</Button>
+        <Button variant="outlined" size="small" onClick={() => localStorage.clear()}>Clear LS</Button>
       </Stack>
       <Box ref={divRef} sx={{ flex: 1 }} />
     </Box>
