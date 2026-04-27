@@ -1,1 +1,1 @@
-export { useProjectConfigStore } from './projectConfig.ts'
+export { useProjectConfigStore, type ProjectConfig } from './projectConfig.ts'

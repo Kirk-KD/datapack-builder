@@ -4,9 +4,13 @@ import { compile } from '../../core/compiler'
 import {useProjectConfigStore} from "../../stores";
 import {Box, Button, Checkbox, FormControlLabel, Stack} from "@mui/material"
 import useBlocklyWorkspace from "./useBlocklyWorkspace.ts";
+import {useAutosave} from "./useAutosave.ts";
+import {loadProject, saveProject} from "../../core/save";
 
 function WorkspacePanel() {
   const { divRef, workspaceRef } = useBlocklyWorkspace()
+  useAutosave(workspaceRef)
+
   const projectConfig = useProjectConfigStore((state) => state.projectConfig)
   const updateConfig = useProjectConfigStore((state) => state.updateConfig)
 
@@ -43,6 +47,18 @@ function WorkspacePanel() {
   }
 
   // Debug
+  function handleSave() {
+    if (!workspaceRef.current) return
+    saveProject({ workspace: workspaceRef.current })
+  }
+
+  // Debug
+  function handleOpen() {
+    if (!workspaceRef.current) return
+    loadProject({ workspace: workspaceRef.current })
+  }
+
+  // Debug
   function toggleNoNameMangling() {
     updateConfig({ noNameMangling: !projectConfig.noNameMangling })
   }
@@ -53,6 +69,8 @@ function WorkspacePanel() {
       <Stack direction="row" spacing={1} sx={{ p: 1, backgroundColor: 'background.default' }}>
         <Button variant="outlined" size="small" onClick={handleInspect}>Inspect</Button>
         <Button variant="outlined" size="small" onClick={handleDownload}>Download</Button>
+        <Button variant="outlined" size="small" onClick={handleSave}>Save</Button>
+        <Button variant="outlined" size="small" onClick={handleOpen}>Open</Button>
         <FormControlLabel
           control={
             <Checkbox
