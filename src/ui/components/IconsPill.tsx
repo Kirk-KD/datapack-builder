@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Stack, type SxProps} from "@mui/material";
 
-export function ToolbarPill({ children, sx }: { children: React.ReactNode, sx?: SxProps }) {
+export function IconsPill({ children, sx }: { children: React.ReactNode, sx?: SxProps }) {
   return (
     <Stack direction={'row'} sx={{
       pl: 2,
