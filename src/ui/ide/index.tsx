@@ -1,9 +1,9 @@
 import {MenuBar} from "./MenuBar";
-import {WorkspacePanel} from "../workspace";
 import {EditorModal} from "../editor";
 import {IDEProvider} from "./context/IDEProvider.tsx";
 import {Stack} from "@mui/material";
 import {Panel, SplitLayout} from "./SplitLayout";
+import {WorkspacePanel} from "./WorkspacePanel";
 
 export function IDE() {
   return (

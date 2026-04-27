@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as Blockly from "blockly";
 import {useCallback, useEffect, useRef} from "react";
-import {deserialize, serialize} from "../../core/save/serialization.ts";
-import {useProjectConfigStore} from "../../stores";
+import {deserialize, serialize} from "../../../core/save/serialization.ts";
+import {useProjectConfigStore} from "../../../stores";
 
 const AUTOSAVE_KEY = 'dpb_autosave'
 const AUTOSAVE_INTERVAL_MS = 2000

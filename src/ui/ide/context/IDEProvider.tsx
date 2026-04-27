@@ -1,6 +1,6 @@
 import {useMemo, useState} from "react";
-import {useAutosave} from "../../workspace/useAutosave.ts";
-import useBlocklyWorkspace from "../../workspace/useBlocklyWorkspace.ts";
+import {useAutosave} from "../WorkspacePanel/useAutosave.ts";
+import useBlocklyWorkspace from "../WorkspacePanel/useBlocklyWorkspace.ts";
 import {IDEContext} from "./IDEContext.tsx";
 import * as React from "react";
 

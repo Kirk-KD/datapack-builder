@@ -1,8 +1,8 @@
-import './WorkspacePanel.css'
+import './index.css'
 import {Box} from "@mui/material"
-import {useIDEContext} from "../ide/context/useIDEContext.ts";
+import {useIDEContext} from "../context/useIDEContext.ts";
 
-function WorkspacePanel() {
+export function WorkspacePanel() {
   const {blocklyDivRef} = useIDEContext()
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -10,5 +10,3 @@ function WorkspacePanel() {
     </Box>
   )
 }
-
-export default WorkspacePanel
