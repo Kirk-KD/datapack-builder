@@ -16,6 +16,8 @@ declare module '@mui/material/styles' {
   interface Shape {
     editorInputMinWidth: string,
     editorInputMaxWidth: string,
+    editorMultilineStringInputMinWidth: string,
+    editorMultilineStringInputMaxWidth: string,
     editorRowHeight: string
   }
   interface ThemeOptions {
@@ -50,6 +52,8 @@ const theme = createTheme({
     borderRadius: 2,
     editorInputMinWidth: '10rem',
     editorInputMaxWidth: '20rem',
+    editorMultilineStringInputMinWidth: '20rem',
+    editorMultilineStringInputMaxWidth: '30rem',
     editorRowHeight: '2rem'
   },
   typography: {

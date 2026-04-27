@@ -22,10 +22,10 @@ export default function StringEditor({ state, setState, defaultValue, multiline 
         error: false,
         data: value
       })}
-      sx={{
-        minWidth: theme => theme.shape.editorInputMinWidth,
-        maxWidth: theme => theme.shape.editorInputMaxWidth
-      }}
+      sx={multiline ? {
+        minWidth: theme => theme.shape.editorMultilineStringInputMinWidth,
+        maxWidth: theme => theme.shape.editorMultilineStringInputMaxWidth
+      } : undefined}
     />
   )
 }
