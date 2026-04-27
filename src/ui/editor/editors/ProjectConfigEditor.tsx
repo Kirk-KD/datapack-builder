@@ -32,27 +32,21 @@ export function ProjectConfigEditor() {
   const [descriptionState, setDescriptionState] = useConfigEntry('description')
   const [noNameManglingState, setNoNameManglingState] = useConfigEntry('noNameMangling')
 
-  return <ObjectEditor state={{ error: false, compiler: 'object' }} setState={() => {}} entries={[
+  return <ObjectEditor stateless entries={[
     {
       key: 'Project namespace',
       compiler: 'scalar',
-      component: () => (
-        <StringEditor state={namespaceState} setState={setNamespaceState}/>
-      ),
+      component: () => <StringEditor state={namespaceState} setState={setNamespaceState}/>
     },
-    { // TODO multiline textfield
+    {
       key: 'Description',
       compiler: 'scalar',
-      component: () => (
-        <StringEditor state={descriptionState} setState={setDescriptionState}/>
-      ),
+      component: () => <StringEditor multiline state={descriptionState} setState={setDescriptionState}/>
     },
     {
       key: 'No name-mangling',
       compiler: 'scalar',
-      component: () => (
-        <BooleanEditor state={noNameManglingState} setState={setNoNameManglingState}/>
-      ),
+      component: () => <BooleanEditor state={noNameManglingState} setState={setNoNameManglingState}/>
     },
   ]}/>
 }

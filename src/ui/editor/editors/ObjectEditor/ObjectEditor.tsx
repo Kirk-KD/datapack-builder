@@ -21,18 +21,26 @@ export type ObjectEditorEntry = {
   component: (fieldState: AnyEditorState, setFieldState: AnyEditorStateCallback) => React.ReactElement
 }
 
-type ObjectEditorProps = {
+type ObjectEditorProps =
+  | {
+  stateless: true
+  state?: EditorState<EditorStateMap>
+  setState?: EditorStateCallback<EditorStateMap>
+  entries: ObjectEditorEntry[]
+}
+  | {
+  stateless?: false
   state: EditorState<EditorStateMap>
   setState: EditorStateCallback<EditorStateMap>
   entries: ObjectEditorEntry[]
 }
 
-export function ObjectEditor({ state, setState, entries }: ObjectEditorProps) {
+export function ObjectEditor({ stateless, state, setState, entries }: ObjectEditorProps) {
   const [entryStates, setEntryStates] = useState<EditorStateMap>(() =>
     Object.fromEntries(
       entries.map(entry => [
         entry.key,
-        (state.data !== undefined && state.data[entry.key] !== undefined) ? state.data[entry.key] : ({
+        (state?.data !== undefined && state.data[entry.key] !== undefined) ? state.data[entry.key] : ({
           compiler: entry.compiler,
           enabled: entry.optional !== true,
           error: false
@@ -44,12 +52,14 @@ export function ObjectEditor({ state, setState, entries }: ObjectEditorProps) {
   useEffect(() => {
     const enabledEntries = entries.filter(({ key }) => entryStates[key].enabled)
 
-    if (enabledEntries.some(({ key }) => entryStates[key].error)) setState({ ...state, error: true })
-    else setState({
-      compiler: 'object',
-      error: false,
-      data: Object.fromEntries(enabledEntries.map(({ key }) => [key, entryStates[key]]))
-    })
+    if (!stateless) {
+      if (enabledEntries.some(({key}) => entryStates[key].error)) setState({...state, error: true})
+      else setState({
+        compiler: 'object',
+        error: false,
+        data: Object.fromEntries(enabledEntries.map(({key}) => [key, entryStates[key]]))
+      })
+    }
   }, [entryStates]) // eslint-disable-line react-hooks/exhaustive-deps
   // ^Including `callback` and `entries` in the useEffect dependencies causes infinite updates.
 
