@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Box, Stack} from "@mui/material";
+import {Box} from "@mui/material";
 import {Panel} from './Panel.tsx'
 
 type SplitLayoutProps = {
@@ -14,14 +14,18 @@ export function SplitLayout({ children }: SplitLayoutProps) {
       p: 1,
       pt: 0,
     }}>
-      <Stack direction={'row'} spacing={1} sx={{
+      <Box sx={{
         width: '100%',
         height: '100%',
         overflow: 'hidden',
-        borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius
+        alignItems: 'stretch',
+        borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius,
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 1
       }}>
         {children}
-      </Stack>
+      </Box>
     </Box>
   )
 }
