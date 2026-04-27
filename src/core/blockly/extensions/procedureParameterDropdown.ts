@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { getParametersForProcedure } from '../../compiler/workspaceRegistry'
+import { getParametersForProcedure } from '../workspaceRegistry'
 
 function getContainingProcedureName(block: Blockly.Block | null): string | null {
   let current = block

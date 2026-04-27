@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { WorkspaceSvg} from "blockly";
+import {WorkspaceSvg} from "blockly";
 
 let variables: Blockly.IVariableModel<Blockly.IVariableState>[] = []
 let procedures: Blockly.Procedures.IProcedureModel[] = []

@@ -1,6 +1,6 @@
 import { mcfunctionGenerator } from '../../../compiler'
-import { snbtToString } from '../../../compiler/snbt'
-import { getParameterNameById } from '../../../compiler/workspaceRegistry'
+import { snbtToString } from '../../../compiler'
+import { getParameterNameById } from '../../workspaceRegistry'
 import type { BlockSpec } from '../types'
 import {
   getInternalNamespace,

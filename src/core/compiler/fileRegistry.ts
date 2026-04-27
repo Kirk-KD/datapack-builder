@@ -15,7 +15,7 @@ export function appendToFile(path: string, line: string): void {
 }
 
 export function getFiles(): Map<string, string> {
-  return files
+  return new Map(files)
 }
 
 export function resetFiles(): void {

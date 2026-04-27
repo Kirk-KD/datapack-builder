@@ -1,5 +1,4 @@
 export { mcfunctionGenerator } from './blockly/generator.ts'
 export { bootstrapCompiler } from './bootstrap.ts'
 export { compile } from './compile.ts'
-export { updateWorkspaceRegistry } from './workspaceRegistry.ts'
 export * from './snbt.ts'

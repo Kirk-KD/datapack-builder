@@ -1,4 +1,4 @@
-import { getParameters, getVariables } from "../../compiler/workspaceRegistry"
+import { getParameters, getVariables } from "../workspaceRegistry"
 import type Blockly from 'blockly'
 
 export default function getVariablesCategory() {

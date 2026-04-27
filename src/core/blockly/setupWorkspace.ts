@@ -10,8 +10,8 @@ import {
 import {colours} from "./colours.ts"
 import theme from "../../theme.ts"
 import type {WorkspaceSvg} from "blockly";
-import {updateWorkspaceRegistry} from "../compiler";
 import getToolboxContents from "./getToolboxContents.ts";
+import {updateWorkspaceRegistry} from "./workspaceRegistry.ts";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,

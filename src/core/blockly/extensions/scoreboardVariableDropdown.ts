@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly'
-import { getVariables } from '../../compiler/workspaceRegistry'
+import { getVariables } from '../workspaceRegistry'
 
 Blockly.Extensions.register('mc_scoreboard_variable_dropdown', function() {
   // All blockly using this extension must have a dropdown field named 'VAR_NAME'.
