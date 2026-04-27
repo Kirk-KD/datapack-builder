@@ -9,7 +9,7 @@ import {useIDEContext} from "../context/useIDEContext.ts";
 import {emit} from "../../../core/compiler";
 
 export function ActionButtons() {
-  const {blocklyWorkspaceRef} = useIDEContext()
+  const {blocklyWorkspaceRef, setOutputViewerOpen} = useIDEContext()
 
   return (
     <IconsPill>
@@ -34,7 +34,7 @@ export function ActionButtons() {
 
       <Tooltip title={'Preview datapack'}>
         <IconButton onClick={() => {
-
+          setOutputViewerOpen(true)
         }}><CodeIcon color={'success'}/></IconButton>
       </Tooltip>
     </IconsPill>

@@ -4,13 +4,18 @@ import {getResizedPairSizes} from "./resize.ts";
 
 type UseSplitLayoutArgs = {
   panels: PanelElement[]
+  panelLayoutKey: string
 }
 
-export function useSplitLayout({panels}: UseSplitLayoutArgs) {
+export function useSplitLayout({panels, panelLayoutKey}: UseSplitLayoutArgs) {
   const containerRef = React.useRef<HTMLDivElement | null>(null)
   const panelRefs = React.useRef<Array<HTMLDivElement | null>>([])
   const [sizes, setSizes] = React.useState<number[] | null>(null)
   const [isDragging, setIsDragging] = React.useState(false)
+
+  React.useEffect(() => {
+    setSizes(null)
+  }, [panelLayoutKey])
 
   React.useLayoutEffect(() => {
     const container = containerRef.current

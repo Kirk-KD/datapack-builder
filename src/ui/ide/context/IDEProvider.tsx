@@ -8,14 +8,18 @@ export function IDEProvider({children}: { children: React.ReactNode }) {
   const {blocklyDivRef, blocklyWorkspaceRef} = useBlocklyWorkspace()
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
+  const [outputViewerOpen, setOutputViewerOpen] = useState(false)
+
   useAutosave(blocklyWorkspaceRef, setHasUnsavedChanges)
 
   const value = useMemo(() => ({
     blocklyDivRef,
     blocklyWorkspaceRef,
     hasUnsavedChanges,
-    setHasUnsavedChanges
-  }), [blocklyDivRef, blocklyWorkspaceRef, hasUnsavedChanges])
+    setHasUnsavedChanges,
+    outputViewerOpen,
+    setOutputViewerOpen,
+  }), [blocklyDivRef, blocklyWorkspaceRef, hasUnsavedChanges, outputViewerOpen])
 
   return (
     <IDEContext.Provider value={value}>

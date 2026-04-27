@@ -1,5 +1,6 @@
 import * as React from "react";
-import {Box, Divider, Stack, Typography, Icon} from "@mui/material";
+import {Box, Divider, Stack, Typography, Icon, IconButton} from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 
 export type PanelProps =
   | {
@@ -9,6 +10,8 @@ export type PanelProps =
   dominant: true
   icon?: never
   title?: never
+  open?: never
+  setOpen?: never
 }
   | {
   children: React.ReactNode
@@ -17,9 +20,11 @@ export type PanelProps =
   dominant?: false
   icon?: React.ReactElement<typeof Icon>
   title: string
+  open: boolean
+  setOpen?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function Panel({ children, width, minWidth, dominant, icon, title }: PanelProps) {
+export function Panel({ children, width, minWidth, dominant, icon, title, setOpen }: PanelProps) {
   return (
     <Box sx={{
       width: width,
@@ -43,7 +48,10 @@ export function Panel({ children, width, minWidth, dominant, icon, title }: Pane
             alignItems: 'center'
           }}>
             {icon}
-            <Typography>{title}</Typography>
+            <Typography sx={{ flex: 1 }}>{title}</Typography>
+            <IconButton onClick={() => setOpen!(false)}>
+              <CloseIcon fontSize={'small'} sx={{ color: 'grey' }}/>
+            </IconButton>
           </Stack>
           <Divider sx={{
             backgroundColor: theme => theme.lighten(theme.palette.background.default, 0.01)

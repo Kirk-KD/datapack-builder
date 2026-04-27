@@ -10,10 +10,17 @@ type SplitLayoutProps = {
 
 export function SplitLayout({ children }: SplitLayoutProps) {
   const panels = React.useMemo(
-    () => React.Children.toArray(children) as PanelElement[],
+    () => (React.Children.toArray(children) as PanelElement[])
+      .filter((panel) => panel.props.dominant || panel.props.open),
     [children]
   )
-  const {containerRef, panelRefs, sizes, startResize} = useSplitLayout({panels})
+  const panelLayoutKey = React.useMemo(
+    () => panels
+      .map((panel, index) => String(panel.key ?? index))
+      .join('|'),
+    [panels]
+  )
+  const {containerRef, panelRefs, sizes, startResize} = useSplitLayout({panels, panelLayoutKey})
 
   return (
     <Box sx={{

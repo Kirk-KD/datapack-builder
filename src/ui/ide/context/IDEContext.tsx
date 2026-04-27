@@ -6,6 +6,9 @@ export type IDEContextValue = {
   blocklyWorkspaceRef: React.RefObject<WorkspaceSvg | null>
   hasUnsavedChanges: boolean
   setHasUnsavedChanges: React.Dispatch<React.SetStateAction<boolean>>
+
+  outputViewerOpen: boolean
+  setOutputViewerOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export const IDEContext = React.createContext<IDEContextValue | null>(null)
