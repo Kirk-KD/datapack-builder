@@ -13,10 +13,10 @@ function useConfigEntry<K extends keyof ProjectConfig>(key: K): [EditorState<Pro
   })
 
   useEffect(() => {
-    if (state.data !== undefined) {
+    if (!state.error && state.data !== undefined) {
       useProjectConfigStore.getState().updateConfig({ [key]: state.data } as Partial<ProjectConfig>)
     }
-  }, [key, state.data])
+  }, [key, state.data, state.error])
 
   useEffect(() => {
     return useProjectConfigStore.subscribe(store => {
@@ -36,7 +36,7 @@ export function ProjectConfigEditor() {
     {
       key: 'Project namespace',
       compiler: 'scalar',
-      component: () => <StringEditor state={namespaceState} setState={setNamespaceState}/>
+      component: () => <StringEditor state={namespaceState} setState={setNamespaceState} validate={value => /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)}/>
     },
     {
       key: 'Description',

@@ -37,6 +37,7 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
       ...sx
     }}>
       <TextField
+        spellCheck={false}
         {...rest}
         multiline={multiline}
         inputRef={ref}
