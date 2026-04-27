@@ -9,8 +9,10 @@ export function MenuBar() {
   const {blocklyWorkspaceRef} = useIDEContext()
 
   return (
-    <AppBar color={'secondary'} position={'relative'}>
-      <Toolbar variant={'dense'}>
+    <AppBar position={'relative'}>
+      <Toolbar variant={'dense'} sx={{
+        backgroundColor: 'background.menuBar',
+      }}>
         <Box sx={{
           minWidth: '22rem'
         }}>
@@ -36,7 +38,8 @@ export function MenuBar() {
 
         <Stack direction={'row-reverse'} sx={{
           flex: 1,
-          height: '100%'
+          height: '100%',
+          alignItems: 'center'
         }}>
           <ActionButtons />
         </Stack>
