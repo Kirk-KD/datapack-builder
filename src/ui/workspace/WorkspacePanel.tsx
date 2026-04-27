@@ -1,18 +1,16 @@
 import './WorkspacePanel.css'
 import JSZip from 'jszip'
 import { compile } from '../../core/compiler'
-import {useProjectConfigStore} from "../../stores";
-import {Box, Button, Checkbox, FormControlLabel, Stack} from "@mui/material"
+import {Box, Button, Stack} from "@mui/material"
 import useBlocklyWorkspace from "./useBlocklyWorkspace.ts";
 import {useAutosave} from "./useAutosave.ts";
 import {loadProject, saveProject} from "../../core/save";
+import {controller} from "../editor";
+import {ProjectConfigEditor} from "../editor";
 
 function WorkspacePanel() {
   const { divRef, workspaceRef } = useBlocklyWorkspace()
   useAutosave(workspaceRef)
-
-  const projectConfig = useProjectConfigStore((state) => state.projectConfig)
-  const updateConfig = useProjectConfigStore((state) => state.updateConfig)
 
   // Debug
   function handleInspect() {
@@ -59,8 +57,11 @@ function WorkspacePanel() {
   }
 
   // Debug
-  function toggleNoNameMangling() {
-    updateConfig({ noNameMangling: !projectConfig.noNameMangling })
+  function handleConfig() {
+    controller.openEditorModal({
+      title: 'Project Configuration',
+      editor: <ProjectConfigEditor/>
+    })
   }
 
   return (
@@ -71,16 +72,7 @@ function WorkspacePanel() {
         <Button variant="outlined" size="small" onClick={handleDownload}>Download</Button>
         <Button variant="outlined" size="small" onClick={handleSave}>Save</Button>
         <Button variant="outlined" size="small" onClick={handleOpen}>Open</Button>
-        <FormControlLabel
-          control={
-            <Checkbox
-              size="small"
-              checked={projectConfig.noNameMangling}
-              onChange={toggleNoNameMangling}
-            />
-          }
-          label="No name mangling"
-        />
+        <Button variant="outlined" size="small" onClick={handleConfig}>Project Config</Button>
       </Stack>
       <Box ref={divRef} sx={{ flex: 1 }} />
     </Box>

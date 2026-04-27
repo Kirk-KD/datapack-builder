@@ -27,7 +27,7 @@ type BaseProps = {
   setState: AnyEditorStateCallback
 }
 
-export default function loadFromSchema(schema: EditorSchema, props: BaseProps): React.ReactElement {
+export function loadFromSchema(schema: EditorSchema, props: BaseProps): React.ReactElement {
   switch (schema.kind) {
     case 'scalar': return makeScalar(schema as ScalarSchema, props)
     case 'object': return makeObject(schema as ObjectSchema, props)

@@ -11,7 +11,7 @@ function MaximizeButton({ maximized }: { maximized: boolean }) {
   )
 }
 
-function EditorModal() {
+export function EditorModal() {
   const { open, maximized, payload } = useEditorModal()
 
   if (!open || !payload) return null
@@ -68,5 +68,3 @@ function EditorModal() {
     </Modal>
   )
 }
-
-export default EditorModal
