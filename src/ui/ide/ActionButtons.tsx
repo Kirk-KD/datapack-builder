@@ -5,8 +5,12 @@ import {IconsPill} from "../components/IconsPill.tsx";
 import {controller, ProjectConfigEditor} from "../editor";
 import {IconsPillDivider} from "../components/IconsPillDivider.tsx";
 import {IconButton, Tooltip} from "@mui/material";
+import {useIDEContext} from "./context/useIDEContext.ts";
+import {emit} from "../../core/compiler";
 
 export function ActionButtons() {
+  const {blocklyWorkspaceRef} = useIDEContext()
+
   return (
     <IconsPill>
       <Tooltip title={'Configure project'}>
@@ -23,9 +27,9 @@ export function ActionButtons() {
       <IconsPillDivider/>
 
       <Tooltip title={'Build datapack'}>
-        <IconButton onClick={() => {
-
-        }}><HardwareIcon color={'success'}/></IconButton>
+        <IconButton onClick={() => blocklyWorkspaceRef.current && emit(blocklyWorkspaceRef.current)}>
+          <HardwareIcon color={'success'}/>
+        </IconButton>
       </Tooltip>
 
       <Tooltip title={'Preview datapack'}>
