@@ -17,11 +17,11 @@ export function ProjectNameDisplay() {
   }, [])
 
   return (
-    <Stack direction={'row'} spacing={0} sx={{
-      mr: 6,
+    <Stack direction={'row'} sx={{
+      mr: 1,
       alignItems: 'center'
     }}>
-      <Typography variant={'h5'}><b>{namespace}</b></Typography>
+      <Typography variant={'h6'}><b>{namespace}</b></Typography>
       <Tooltip title={'Configure project'}>
         <IconButton onClick={() => {
           controller.openEditorModal({

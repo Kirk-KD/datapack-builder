@@ -24,7 +24,7 @@ export function MenuButton({ text, items }: { text: string, items: MenuItemDef[]
       }}>{text}</Button>
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
         {items.map(({ text, onClick }) => (
-          <MenuItem onClick={() => {
+          <MenuItem key={text} onClick={() => {
             onClick()
             handleClose()
           }}>{text}</MenuItem>
