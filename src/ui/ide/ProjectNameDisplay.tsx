@@ -5,6 +5,7 @@ import {controller, ProjectConfigEditor} from "../editor";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SaveIcon from '@mui/icons-material/Save';
 import {useIDEContext} from "./context/useIDEContext.ts";
+import {ToolbarPill} from "./ToolbarPill.tsx";
 
 export function ProjectNameDisplay() {
   const [namespace, setNamespace] = useState<string>(useProjectConfigStore.getState().projectConfig.namespace)
@@ -17,26 +18,26 @@ export function ProjectNameDisplay() {
   }, [])
 
   return (
-    <Stack direction={'row'} sx={{
-      mr: 1,
+    <Stack direction={'row'} spacing={1} sx={{
       alignItems: 'center'
     }}>
-      <Typography variant={'h6'}><b>{namespace}</b></Typography>
-      <Tooltip title={'Configure project'}>
-        <IconButton onClick={() => {
-          controller.openEditorModal({
-            title: 'Project Configuration',
-            editor: <ProjectConfigEditor/>
-          })
-        }}>
-          <SettingsIcon />
-        </IconButton>
-      </Tooltip>
+      <ToolbarPill>
+        <Typography variant={'h6'} sx={{ pl: 1 }}><b>{namespace}</b></Typography>
+        <Tooltip title={'Configure project'}>
+          <IconButton onClick={() => {
+            controller.openEditorModal({
+              title: 'Project Configuration',
+              editor: <ProjectConfigEditor/>
+            })
+          }}>
+            <SettingsIcon />
+          </IconButton>
+        </Tooltip>
+      </ToolbarPill>
       <Stack direction={'row'} spacing={0.5} sx={{
         alignItems: 'center',
         visibility: hasUnsavedChanges ? 'visible' : 'hidden'
       }}>
-        {/*<Typography color={'primary'}>Autosaving</Typography>*/}
         <SaveIcon color={'primary'}/>
         <CircularProgress size={'1rem'}/>
       </Stack>

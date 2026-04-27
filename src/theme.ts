@@ -18,7 +18,8 @@ declare module '@mui/material/styles' {
     editorInputMaxWidth: string,
     editorMultilineStringInputMinWidth: string,
     editorMultilineStringInputMaxWidth: string,
-    editorRowHeight: string
+    editorRowHeight: string,
+    iconButtonSize: string
   }
   interface ThemeOptions {
     shape?: Partial<Shape>
@@ -54,7 +55,8 @@ const theme = createTheme({
     editorInputMaxWidth: '20rem',
     editorMultilineStringInputMinWidth: '20rem',
     editorMultilineStringInputMaxWidth: '30rem',
-    editorRowHeight: '2rem'
+    editorRowHeight: '2rem',
+    iconButtonSize: '2rem'
   },
   typography: {
     fontFamily: '"Inter", sans-serif',
@@ -71,10 +73,11 @@ const theme = createTheme({
     },
     MuiIconButton: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           borderRadius: 2,
-          height: 'fit-content',
-        },
+          height: theme.shape.iconButtonSize,
+          width: theme.shape.iconButtonSize
+        }),
       },
     },
     MuiInputBase: {
