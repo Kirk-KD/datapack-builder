@@ -10,6 +10,7 @@ export interface ProjectConfig {
 interface ProjectConfigStore {
   projectConfig: ProjectConfig
   updateConfig: (partial: Partial<ProjectConfig>) => void
+  replaceConfig: (config: ProjectConfig) => void
 }
 
 export const useProjectConfigStore = create<ProjectConfigStore>((set) => ({
@@ -21,4 +22,6 @@ export const useProjectConfigStore = create<ProjectConfigStore>((set) => ({
   },
   updateConfig: (partial) =>
     set((state) => ({ projectConfig: { ...state.projectConfig, ...partial } })),
+  replaceConfig: (config) =>
+    set({ projectConfig: config }),
 }))

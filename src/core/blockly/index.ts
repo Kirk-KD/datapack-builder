@@ -4,4 +4,4 @@ import './renderer.ts'
 
 export {bootstrapBlockly} from './bootstrap.ts'
 export {setupToolbox} from './setupToolbox.ts'
-export {setupWorkspace, injectWorkspace} from './workspaceSetup.ts'
+export {setupWorkspace, injectWorkspace} from './setupWorkspace.ts'
