@@ -97,7 +97,7 @@ function injectWorkspace(workspaceDiv: HTMLDivElement) {
 
 function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
   // Toolbox behaviors
-  Blockly.VerticalFlyout.prototype.getFlyoutScale = () => 0.8
+  Blockly.VerticalFlyout.prototype.getFlyoutScale = () => 0.7
   // Do not override width of mutator flyouts
   const originalGetWidth = Blockly.VerticalFlyout.prototype.getWidth
   Blockly.VerticalFlyout.prototype.getWidth = function() {

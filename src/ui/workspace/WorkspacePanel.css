@@ -1,15 +1,15 @@
 .blocklyToolboxCategoryContainer {
-    margin: 2.5pt;
+    margin: 0.2rem;
 }
 
 .blocklyToolboxCategoryLabel {
-    font-size: var(--font-size-small) !important;
+    font-size: 9pt !important;
 }
 
 .blocklyToolboxFlyout {
     /* Note: these two values are arbitrary; they do not correspond to values defined in `setupWorkspace.ts`. */
-    --flyout-width: 420px;
-    --flyout-blur-width: 100px;
+    --flyout-width: 490px;
+    --flyout-blur-width: 50px;
 }
 
 .blocklyToolboxFlyout .blocklyBlock {
