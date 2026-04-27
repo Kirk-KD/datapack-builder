@@ -46,6 +46,7 @@ export function ProjectConfigEditor() {
     {
       key: 'No name-mangling',
       compiler: 'scalar',
+      note: 'By default, names such as scoreboard objectives and mcfunction files are compiled with special prefixes to avoid ID collisions. Turn this on if you want more readable output for debugging.',
       component: () => <BooleanEditor state={noNameManglingState} setState={setNoNameManglingState}/>
     },
   ]}/>

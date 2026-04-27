@@ -27,8 +27,8 @@ export default function EditorRow({ label, description, note, optional, children
       {note && (<Box sx={{
         gridColumn: '1 / -1',
         backgroundColor: 'background.paper',
-        width: 'fit-content',
-        maxWidth: '100%',
+        width: '100%',
+        maxWidth: '30rem',
         p: 1,
         mt: 1,
         borderRadius: theme => theme.shape.borderRadius
