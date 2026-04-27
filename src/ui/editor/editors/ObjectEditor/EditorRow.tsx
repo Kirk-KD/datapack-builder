@@ -2,6 +2,7 @@ import * as React from "react"
 import EnableCheckbox from "./EnableCheckbox.tsx";
 import {Box, Tooltip, Typography} from "@mui/material";
 import InnerEditorContainer from "../../components/InnerEditorContainer.tsx";
+import StringEditor, {type StringEditorProps} from "../StringEditor.tsx";
 
 type EditorRowProps = {
   label: string
@@ -18,13 +19,16 @@ type EditorRowProps = {
  * A row holding the label and input for an `ObjectEditor`.
  */
 export default function EditorRow({ label, description, note, optional, children, isNested, enabled, setEnabled }: EditorRowProps) {
+  const isMultilineStringInput = React.isValidElement(children)
+    && children.type === StringEditor && (children.props as StringEditorProps).multiline
+
   return (
     <>
       {note && (<Box sx={{
         gridColumn: '1 / -1',
         backgroundColor: 'background.paper',
-        width: 'fit-content',
-        maxWidth: '100%',
+        width: '100%',
+        maxWidth: '30rem',
         p: 1,
         mt: 1,
         borderRadius: theme => theme.shape.borderRadius
@@ -36,7 +40,7 @@ export default function EditorRow({ label, description, note, optional, children
         display: 'flex',
         alignItems: 'center',
         gap: 1,
-        alignSelf: isNested ? 'flex-start' : 'center',
+        alignSelf: isNested || isMultilineStringInput ? 'flex-start' : 'center',
         minHeight: theme => theme.shape.editorRowHeight,
       }}>
         <EnableCheckbox show={optional} enabled={enabled} setEnabled={setEnabled} />
@@ -57,7 +61,7 @@ export default function EditorRow({ label, description, note, optional, children
         <Box
           inert={!enabled}
           sx={{
-            alignSelf: isNested ? 'flex-start' : 'center',
+            alignSelf: isNested || isMultilineStringInput ? 'flex-start' : 'center',
             minHeight: theme => theme.shape.editorRowHeight,
             opacity: enabled ? 1 : 0.4,
             transition: 'opacity 0.2s',

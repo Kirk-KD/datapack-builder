@@ -73,5 +73,5 @@ function compileItemStack(state: AnyEditorState, opt: CompilerOptions): string {
 }
 
 function assertState(state: AnyEditorState): void {
-  if (state.data === undefined || state.error) throw new Error('Error or no data while compiling editor state')
+  if (state.compiler === undefined || state.data === undefined || state.error) throw new Error('Error or no data while compiling editor state')
 }

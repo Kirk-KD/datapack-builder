@@ -13,10 +13,11 @@ type TextInputProps = Omit<TextFieldProps, 'onChange' | 'value' | 'defaultValue'
   hasError?: boolean
   sx?: SxProps<Theme>
   startAdornment?: React.ReactNode
+  multiline?: boolean
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
-  { defaultValue, value, setValue, onChange, disabled, hasError, sx, startAdornment, ...rest },
+  { defaultValue, value, setValue, onChange, disabled, hasError, sx, startAdornment, multiline, ...rest },
   ref
 ) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -30,9 +31,15 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
   }
 
   return (
-    <Stack direction="row" sx={{ ...sx, alignItems: 'center' }}>
+    <Stack direction={'row'} sx={{
+      minWidth: theme => theme.shape.editorInputMinWidth,
+      maxWidth: theme => theme.shape.editorInputMaxWidth,
+      ...sx
+    }}>
       <TextField
+        spellCheck={false}
         {...rest}
+        multiline={multiline}
         inputRef={ref}
         value={value}
         onChange={handleChange}

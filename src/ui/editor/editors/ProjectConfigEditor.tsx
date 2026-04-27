@@ -1,0 +1,53 @@
+import type {EditorState, EditorStateCallback} from "../../../core/editor";
+import {type ProjectConfig, useProjectConfigStore} from "../../../stores";
+import {useEffect, useState} from "react";
+import {ObjectEditor} from "./ObjectEditor";
+import StringEditor from "./StringEditor.tsx";
+import BooleanEditor from "./BooleanEditor.tsx";
+
+function useConfigEntry<K extends keyof ProjectConfig>(key: K): [EditorState<ProjectConfig[K]>, EditorStateCallback<ProjectConfig[K]>] {
+  const [state, setState] = useState<EditorState<ProjectConfig[K]>>({
+    error: false,
+    compiler: 'scalar',
+    data: useProjectConfigStore.getState().projectConfig[key]
+  })
+
+  useEffect(() => {
+    if (!state.error && state.data !== undefined) {
+      useProjectConfigStore.getState().updateConfig({ [key]: state.data } as Partial<ProjectConfig>)
+    }
+  }, [key, state.data, state.error])
+
+  useEffect(() => {
+    return useProjectConfigStore.subscribe(store => {
+      setState(prev => ({ ...prev, data: store.projectConfig[key] }))
+    })
+  }, [key])
+
+  return [state, setState]
+}
+
+export function ProjectConfigEditor() {
+  const [namespaceState, setNamespaceState] = useConfigEntry('namespace')
+  const [descriptionState, setDescriptionState] = useConfigEntry('description')
+  const [noNameManglingState, setNoNameManglingState] = useConfigEntry('noNameMangling')
+
+  return <ObjectEditor stateless entries={[
+    {
+      key: 'Project namespace',
+      compiler: 'scalar',
+      component: () => <StringEditor state={namespaceState} setState={setNamespaceState} validate={value => /^[a-zA-Z_][a-zA-Z0-9_]*$/.test(value)}/>
+    },
+    {
+      key: 'Description',
+      compiler: 'scalar',
+      component: () => <StringEditor multiline state={descriptionState} setState={setDescriptionState}/>
+    },
+    {
+      key: 'No name-mangling',
+      compiler: 'scalar',
+      note: 'By default, names such as scoreboard objectives and mcfunction files are compiled with special prefixes to avoid ID collisions. Turn this on if you want more readable output for debugging.',
+      component: () => <BooleanEditor state={noNameManglingState} setState={setNoNameManglingState}/>
+    },
+  ]}/>
+}
