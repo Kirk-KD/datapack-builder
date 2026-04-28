@@ -36,9 +36,11 @@ export function useAutosave(
     const workspace = workspaceRef.current
     if (!workspace) return
 
-    const listener = workspace.addChangeListener(() => {
-      setDirty(true)
-      setFileDirty(true)
+    const listener = workspace.addChangeListener((e: Blockly.Events.Abstract) => {
+      if (!e.isUiEvent) {
+        setDirty(true)
+        setFileDirty(true)
+      }
     })
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
