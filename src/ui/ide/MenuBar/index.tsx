@@ -1,12 +1,12 @@
 import {AppBar, Box, Stack, Toolbar} from "@mui/material";
 import {MenuButton} from "./MenuButton.tsx";
-import {loadProject, saveProject} from "../../../core/save";
+import {loadProject, newProject, saveProject} from "../../../core/save";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
 import {useIDEContext} from "../context/useIDEContext.ts";
 import {ActionButtons} from "./ActionButtons.tsx";
 
 export function MenuBar() {
-  const {blocklyWorkspaceRef} = useIDEContext()
+  const {blocklyWorkspaceRef, setHasUnsavedFileChanges} = useIDEContext()
 
   return (
     <AppBar position={'relative'}>
@@ -33,15 +33,33 @@ export function MenuBar() {
           <MenuButton text={'File'} items={[
             {
               text: 'Save',
-              onClick: () => blocklyWorkspaceRef.current && saveProject({workspace: blocklyWorkspaceRef.current})
+              onClick: () => {
+                if (!blocklyWorkspaceRef.current) return
+                saveProject({workspace: blocklyWorkspaceRef.current})
+                setHasUnsavedFileChanges(false)
+              }
             },
             {
               text: 'Load',
-              onClick: () => blocklyWorkspaceRef.current && loadProject({workspace: blocklyWorkspaceRef.current})
+              onClick: () => {
+                if (!blocklyWorkspaceRef.current) return
+                // TODO proper dialogue
+                if (confirm('Unsaved changes will be lost when another project is opened. Proceed?')) {
+                  loadProject({workspace: blocklyWorkspaceRef.current})
+                  setHasUnsavedFileChanges(false)
+                }
+              }
             },
             {
               text: 'New',
-              onClick: () => alert('WIP') // TODO new project
+              onClick: () => {
+                if (!blocklyWorkspaceRef.current) return
+                // TODO proper dialogue
+                if (confirm('Unsaved changes will be lost when another project is created. Proceed?')) {
+                  newProject(blocklyWorkspaceRef.current)
+                  setHasUnsavedFileChanges(true) // A new project is not yet saved to computer.
+                }
+              }
             }
           ]}/>
         </Stack>

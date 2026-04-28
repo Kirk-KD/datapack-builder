@@ -1,22 +1,29 @@
 import * as React from "react";
 import * as Blockly from "blockly";
 import {useCallback, useEffect, useRef} from "react";
-import {deserialize, serialize} from "../../../core/save/serialization.ts";
-import {useProjectConfigStore} from "../../../stores";
+import {deserialize, serialize} from "../../core/save/serialization.ts";
+import {useProjectConfigStore} from "../../stores";
 
 const AUTOSAVE_KEY = 'dpb_autosave'
 const AUTOSAVE_INTERVAL_MS = 2000
 
 export function useAutosave(
   workspaceRef: React.RefObject<Blockly.WorkspaceSvg | null>,
-  setHasUnsavedChanges: (dirty: boolean) => void
+  setHasUnsavedChanges: (dirty: boolean) => void,
+  setHasUnsavedFileChanges: (dirty: boolean) => void
 ) {
   const isDirtyRef = useRef(false)
+  const isFileDirtyRef = useRef(false)
 
   const setDirty = useCallback((dirty: boolean) => {
     isDirtyRef.current = dirty
     setHasUnsavedChanges(dirty)
   }, [setHasUnsavedChanges])
+
+  const setFileDirty = useCallback((dirty: boolean) => {
+    isFileDirtyRef.current = dirty
+    setHasUnsavedFileChanges(dirty)
+  }, [setHasUnsavedFileChanges])
 
   useEffect(() => {
     const saved = localStorage.getItem(AUTOSAVE_KEY)
@@ -31,6 +38,7 @@ export function useAutosave(
 
     const listener = workspace.addChangeListener(() => {
       setDirty(true)
+      setFileDirty(true)
     })
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -56,7 +64,8 @@ export function useAutosave(
   useEffect(() => {
     const unsubscribe = useProjectConfigStore.subscribe(() => {
       setDirty(true)
+      setFileDirty(true)
     })
     return () => unsubscribe()
-  }, [setDirty])
+  }, [setDirty, setFileDirty])
 }

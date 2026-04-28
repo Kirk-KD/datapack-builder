@@ -1,1 +1,1 @@
-export { useProjectConfigStore, type ProjectConfig } from './projectConfig.ts'
+export { useProjectConfigStore, DEFAULT_CONFIG, type ProjectConfig } from './projectConfig.ts'

@@ -1,4 +1,4 @@
-import {CircularProgress, Stack, Typography} from "@mui/material";
+import {CircularProgress, Stack, Tooltip, Typography} from "@mui/material";
 import {useProjectConfigStore} from "../../../stores";
 import {useEffect, useState} from "react";
 import SaveIcon from '@mui/icons-material/Save';
@@ -8,7 +8,7 @@ import {Icon} from "../../components/Icon.tsx";
 
 export function ProjectNameDisplay() {
   const [namespace, setNamespace] = useState<string>(useProjectConfigStore.getState().projectConfig.namespace)
-  const {hasUnsavedChanges} = useIDEContext()
+  const {hasUnsavedChanges, hasUnsavedFileChanges} = useIDEContext()
 
   useEffect(() => {
     return useProjectConfigStore.subscribe(store => {
@@ -23,14 +23,21 @@ export function ProjectNameDisplay() {
       <IconsPill>
         <Typography variant={'h6'} sx={{ pl: 1 }}><b>{namespace}</b></Typography>
         <Icon>
-          {hasUnsavedChanges ?
-            <CircularProgress size={'1rem'} sx={{
-              color: 'grey',
-            }}/> :
-            <SaveIcon sx={{
-              color: 'grey'
-            }}/>
-          }
+          {hasUnsavedFileChanges ? (
+            hasUnsavedChanges ? (
+              <Tooltip title={'Autosaving...'}>
+                <CircularProgress size={'1rem'} sx={{ color: 'grey' }}/>
+              </Tooltip>
+            ) : (
+              <Tooltip title={'Saved to browser'}>
+                <SaveIcon sx={{ color: 'grey' }}/>
+              </Tooltip>
+            )
+          ) : (
+            <Tooltip title={'Saved to computer'}>
+              <SaveIcon color={'success'}/>
+            </Tooltip>
+          )}
         </Icon>
       </IconsPill>
     </Stack>
