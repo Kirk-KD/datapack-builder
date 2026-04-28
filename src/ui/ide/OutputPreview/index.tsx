@@ -24,7 +24,8 @@ export function OutputPreview() {
       backgroundColor: 'background.default'
     }}>
       <Stack direction={'row'} sx={{
-        flex: 1
+        flex: 1,
+        minHeight: 0
       }}>
         <FolderPanel activePath={activePath} setActivePath={setActivePath}/>
         <FileViewer activePath={activePath}/>

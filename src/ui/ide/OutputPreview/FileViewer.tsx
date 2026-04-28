@@ -57,9 +57,17 @@ export function FileViewer({ activePath }: FileViewerProps) {
               fontFamily: theme.typography.mono,
               fontSize: theme.typography.fontSize,
             },
-            '.cm-editor': {
-              height: '100%',
-            }
+                '.cm-editor': {
+                  height: '100%',
+                  maxHeight: '100%',
+                  minHeight: 0,
+                },
+                // CodeMirror's internal scroller should handle overflowing content
+                '.cm-scroller': {
+                  height: '100%',
+                  overflow: 'auto',
+                  minHeight: 0,
+                }
           })
         ]
       }),
@@ -70,15 +78,19 @@ export function FileViewer({ activePath }: FileViewerProps) {
       viewRef.current?.destroy()
       viewRef.current = null
     }
-  }, [contents])
+  }, [contents, theme.palette.background.default, theme.typography.fontSize, theme.typography.mono])
 
   if (!activePath || !compiledOutput || contents === undefined) return null
 
   return (
     <Box ref={containerRef} sx={{
       flex: 1,
+      minHeight: 0,
+      minWidth: 0,
       height: '100%',
-      overflow: 'auto'
+      maxHeight: '100%',
+      overflow: 'hidden',
+      display: 'flex',
     }}/>
   )
 }

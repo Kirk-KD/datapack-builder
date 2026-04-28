@@ -25,6 +25,8 @@ export function SplitLayout({ children }: SplitLayoutProps) {
   return (
     <Box sx={{
       flex: 1,
+      minHeight: 0,
+      minWidth: 0,
       backgroundColor: 'background.menuBar',
       p: 1,
       pt: 0,
@@ -32,6 +34,7 @@ export function SplitLayout({ children }: SplitLayoutProps) {
       <Box ref={containerRef} sx={{
         width: '100%',
         height: '100%',
+        minHeight: 0,
         overflow: 'hidden',
         alignItems: 'stretch',
         borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius,
