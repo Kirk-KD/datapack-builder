@@ -6,9 +6,11 @@ import {WorkspacePanel} from "./WorkspacePanel";
 import {OutputViewer} from "./OutputViewer";
 import CodeIcon from '@mui/icons-material/Code';
 import {useIDEContext} from "./context/useIDEContext.ts";
+import {useKeyboardShortcuts} from "./useKeyboardShortcuts.ts";
 
 export function IDE() {
   const { outputViewerOpen, setOutputViewerOpen } = useIDEContext()
+  useKeyboardShortcuts()
 
   return (
     <Stack sx={{ width: '100%', height: '100%' }}>
