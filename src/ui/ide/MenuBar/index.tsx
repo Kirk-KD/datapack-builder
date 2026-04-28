@@ -18,7 +18,7 @@ export function MenuBar() {
           alignContent: 'center',
           p: 0.5
         }}>
-          <img src={'/logo.svg'} width={52} alt={'logo'}/>
+          <img src={'/favicon.svg'} width={52} alt={'logo'}/>
         </Box>
 
         <Box sx={{
