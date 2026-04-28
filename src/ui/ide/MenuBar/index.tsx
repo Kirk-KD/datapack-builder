@@ -14,7 +14,16 @@ export function MenuBar() {
         backgroundColor: 'background.menuBar',
       }}>
         <Box sx={{
+          display: 'flex',
+          alignContent: 'center',
+          p: 0.5
+        }}>
+          <img src={'/logo.svg'} width={52} alt={'logo'}/>
+        </Box>
+
+        <Box sx={{
           minWidth: '12rem',
+          ml: 1,
           mr: 2
         }}>
           <ProjectNameDisplay />
