@@ -20,3 +20,8 @@
     /*-webkit-mask-repeat: no-repeat;*/
     /*mask-repeat: no-repeat;*/
 }
+
+.blocklyMainBackground {
+    /* Disable blockly workspace border */
+    stroke: none !important;
+}
