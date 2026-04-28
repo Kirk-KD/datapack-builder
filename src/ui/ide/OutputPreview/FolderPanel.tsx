@@ -19,15 +19,28 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
   if (!compiledOutput) return null
 
   function renderFolderContents(folder: OutputFolder) {
-    return folder.content.map(item => (
-      <FolderItem
-        key={item.path!.join('/')}
-        icon={item.type === 'folder' ? <FolderIcon color='primary'/> : <CodeIcon/>}
-        name={item.path![item.path!.length - 1]}
-        selected={Boolean(activePath && item.path!.join('/') === activePath.join('/'))}
-        onClick={() => setActivePath(item.path)}
-      />
-    ))
+    return [
+      activePath ? (
+        <FolderItem
+          key={'..'}
+          icon={<FolderIcon sx={{ color: 'grey' }}/>}
+          name={'..'}
+          onClick={() => {
+            const back = activePath.slice(0, -1)
+            setActivePath(back.length === 0 ? null : back)
+          }}
+        />
+      ) : null,
+      ...folder.content.map(item => (
+        <FolderItem
+          key={item.path!.join('/')}
+          icon={item.type === 'folder' ? <FolderIcon color='primary'/> : <CodeIcon/>}
+          name={item.path![item.path!.length - 1]}
+          selected={Boolean(activePath && item.path!.join('/') === activePath.join('/'))}
+          onClick={() => setActivePath(item.path)}
+        />
+      ))
+    ]
   }
 
   function getActiveFolderPath(): Path {

@@ -7,6 +7,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import {Stack} from "@mui/material";
 import {useProjectConfigStore} from "../../../stores";
 import {PathItem} from "./PathItem.tsx";
+import {useIDEContext} from "../context/useIDEContext.ts";
 
 type PathBarProps = {
   activePath: Path
@@ -15,6 +16,7 @@ type PathBarProps = {
 
 export function PathBar({ activePath, setActivePath }: PathBarProps) {
   const namespace = useProjectConfigStore.getState().projectConfig.namespace
+  const {compiledOutput} = useIDEContext()
 
   return (
     <Stack direction={'row'} sx={{
@@ -30,7 +32,7 @@ export function PathBar({ activePath, setActivePath }: PathBarProps) {
       {activePath && activePath.map((name, index) => (
         <React.Fragment key={index}>
           <ChevronRightIcon fontSize={'small'}/>
-          {index === activePath.length - 1 ? (
+          {index === activePath.length - 1 && compiledOutput?.getItem(activePath)?.type === 'file' ? (
             <PathItem
               icon={<CodeIcon/>}
               name={name}
