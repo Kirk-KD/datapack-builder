@@ -1,11 +1,12 @@
 import type {OutputFolder, Path} from '../../../core/output-preview'
 import * as React from 'react'
-import {Stack, Typography} from '@mui/material'
+import {Box, Divider, Stack, Typography} from '@mui/material'
 import FolderIcon from '@mui/icons-material/Folder'
 import CodeIcon from '@mui/icons-material/Code'
 import {useIDEContext} from '../context/useIDEContext.ts'
 import {FolderItem} from './FolderItem.tsx'
 import {useProjectConfigStore} from '../../../stores'
+import {CompileTime} from "./CompileTime.tsx";
 
 type FolderPanelProps = {
   activePath: Path
@@ -58,17 +59,23 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
     <Stack sx={{
       backgroundColor: 'background.paper',
       height: '100%',
-      p: 1,
       minWidth: '10rem',
       maxWidth: '20rem'
     }}>
-      <Typography sx={{mb: 0.5}} noWrap>
-        <b>{folderPath ? folderPath[folderPath.length - 1] : namespace}</b>
-      </Typography>
-
-      <Stack sx={{flex: 1}}>
-        {folder && renderFolderContents(folder as OutputFolder)}
+      <Stack sx={{p: 1, flex: 1}}>
+        <Typography sx={{mb: 0.5}} noWrap>
+          <b>{folderPath ? folderPath[folderPath.length - 1] : namespace}</b>
+        </Typography>
+        <Stack sx={{flex: 1}}>
+          {folder && renderFolderContents(folder as OutputFolder)}
+        </Stack>
       </Stack>
+
+      <Divider/>
+
+      <Box sx={{p: 1}}>
+        <CompileTime/>
+      </Box>
     </Stack>
   )
 }
