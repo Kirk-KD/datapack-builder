@@ -14,7 +14,8 @@ export function MenuBar() {
         backgroundColor: 'background.menuBar',
       }}>
         <Box sx={{
-          minWidth: '22rem'
+          minWidth: '12rem',
+          mr: 2
         }}>
           <ProjectNameDisplay />
         </Box>
