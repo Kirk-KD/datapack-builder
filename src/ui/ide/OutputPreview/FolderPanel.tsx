@@ -19,8 +19,9 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
   if (!compiledOutput) return null
 
   function renderFolderContents(folder: OutputFolder) {
+    const activeFolder = compiledOutput?.getItem(getActiveFolderPath())
     return [
-      activePath ? (
+      (activePath && activeFolder?.type === 'folder' && activeFolder.path !== null) ? (
         <FolderItem
           key={'..'}
           icon={<FolderIcon sx={{ color: 'grey' }}/>}

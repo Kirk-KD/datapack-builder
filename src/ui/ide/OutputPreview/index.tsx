@@ -4,6 +4,7 @@ import type {Path} from "../../../core/output-preview";
 import {PathBar} from "./PathBar.tsx";
 import {FolderPanel} from "./FolderPanel.tsx";
 import {useIDEContext} from "../context/useIDEContext.ts";
+import {FileViewer} from "./FileViewer.tsx";
 
 export function OutputPreview() {
   const {compiledOutput} = useIDEContext()
@@ -26,6 +27,7 @@ export function OutputPreview() {
         flex: 1
       }}>
         <FolderPanel activePath={activePath} setActivePath={setActivePath}/>
+        <FileViewer activePath={activePath}/>
       </Stack>
       <Divider/>
       <PathBar activePath={activePath} setActivePath={setActivePath}/>

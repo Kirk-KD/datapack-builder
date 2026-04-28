@@ -19,7 +19,7 @@ export function IDE() {
         <Panel dominant minWidth={'50rem'}>
           <WorkspacePanel />
         </Panel>
-        <Panel width={'30%'} minWidth={'20rem'} icon={<CodeIcon/>} title={'output preview'} open={outputViewerOpen} setOpen={setOutputViewerOpen}>
+        <Panel width={'40%'} minWidth={'20rem'} icon={<CodeIcon/>} title={'output preview'} open={outputViewerOpen} setOpen={setOutputViewerOpen}>
           <OutputPreview/>
         </Panel>
       </SplitLayout>
