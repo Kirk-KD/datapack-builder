@@ -3,7 +3,7 @@ import {EditorModal} from "../editor";
 import {Stack} from "@mui/material";
 import {Panel, SplitLayout} from "./SplitLayout";
 import {WorkspacePanel} from "./WorkspacePanel";
-import {OutputViewer} from "./OutputViewer";
+import {OutputPreview} from "./OutputPreview";
 import CodeIcon from '@mui/icons-material/Code';
 import {useIDEContext} from "./context/useIDEContext.ts";
 import {useKeyboardShortcuts} from "./useKeyboardShortcuts.ts";
@@ -20,7 +20,7 @@ export function IDE() {
           <WorkspacePanel />
         </Panel>
         <Panel width={'30%'} minWidth={'20rem'} icon={<CodeIcon/>} title={'output preview'} open={outputViewerOpen} setOpen={setOutputViewerOpen}>
-          <OutputViewer/>
+          <OutputPreview/>
         </Panel>
       </SplitLayout>
       <EditorModal />
