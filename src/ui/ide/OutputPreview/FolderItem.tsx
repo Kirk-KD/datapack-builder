@@ -26,7 +26,7 @@ export function FolderItem({ icon, name, selected, onClick }: FolderItemProps) {
           color: 'white'
         },
         flex: 1
-      }}>{name}</Typography>
+      }} noWrap>{name}</Typography>
     </Stack>
   )
 }

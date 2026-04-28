@@ -55,8 +55,14 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
   const folder = compiledOutput.getItem(folderPath)
 
   return (
-    <Stack sx={{backgroundColor: 'background.paper', height: '100%', p: 1}}>
-      <Typography sx={{mb: 0.5}}>
+    <Stack sx={{
+      backgroundColor: 'background.paper',
+      height: '100%',
+      p: 1,
+      minWidth: '10rem',
+      maxWidth: '20rem'
+    }}>
+      <Typography sx={{mb: 0.5}} noWrap>
         <b>{folderPath ? folderPath[folderPath.length - 1] : namespace}</b>
       </Typography>
 

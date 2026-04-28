@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Chip} from "@mui/material";
+import {Chip, Typography} from "@mui/material";
 
 type PathItemProp = {
   icon: React.ReactElement
@@ -9,6 +9,19 @@ type PathItemProp = {
 
 export function PathItem({ icon, name, onClick }: PathItemProp) {
   return (
-    <Chip icon={icon} label={name} onClick={onClick} variant={'outlined'} size={'small'} />
+    <Chip
+      icon={icon}
+      label={(
+        <Typography
+          noWrap
+          sx={{maxWidth: '10rem'}}
+          variant={'subtitle2'}
+          color={'textSecondary'}
+        >{name}</Typography>
+      )}
+      onClick={onClick}
+      variant={'outlined'}
+      size={'small'}
+    />
   )
 }
