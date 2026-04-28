@@ -2,7 +2,8 @@ import {createTheme, type Theme} from "@mui/material/styles"
 
 declare module '@mui/material/styles' {
   interface TypeBackground {
-    input: string
+    input: string,
+    menuBar: string
   }
   interface Palette {
     scroll: Palette['primary'],
@@ -18,7 +19,9 @@ declare module '@mui/material/styles' {
     editorInputMaxWidth: string,
     editorMultilineStringInputMinWidth: string,
     editorMultilineStringInputMaxWidth: string,
-    editorRowHeight: string
+    editorRowHeight: string,
+    iconButtonSize: string,
+    splitLayoutPanelBorderRadius: string
   }
   interface ThemeOptions {
     shape?: Partial<Shape>
@@ -32,7 +35,7 @@ declare module '@mui/material/styles' {
   }
 }
 
-const theme = createTheme({
+let theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
@@ -41,7 +44,7 @@ const theme = createTheme({
     background: {
       default: '#333130',
       paper: '#44413C',
-      input: '#2D2927'
+      input: '#2D2927',
     },
     scroll: {
       main: '#605d54'
@@ -54,7 +57,9 @@ const theme = createTheme({
     editorInputMaxWidth: '20rem',
     editorMultilineStringInputMinWidth: '20rem',
     editorMultilineStringInputMaxWidth: '30rem',
-    editorRowHeight: '2rem'
+    editorRowHeight: '2rem',
+    iconButtonSize: '2rem',
+    splitLayoutPanelBorderRadius: '12px'
   },
   typography: {
     fontFamily: '"Inter", sans-serif',
@@ -71,10 +76,11 @@ const theme = createTheme({
     },
     MuiIconButton: {
       styleOverrides: {
-        root: {
+        root: ({ theme }) => ({
           borderRadius: 2,
-          height: 'fit-content',
-        },
+          height: theme.shape.iconButtonSize,
+          width: theme.shape.iconButtonSize
+        }),
       },
     },
     MuiInputBase: {
@@ -85,6 +91,14 @@ const theme = createTheme({
       },
     },
   },
+})
+
+theme = createTheme(theme, {
+  palette: {
+    background: {
+      menuBar: theme.lighten(theme.palette.background.paper, 0.1)
+    }
+  }
 })
 
 export default theme
