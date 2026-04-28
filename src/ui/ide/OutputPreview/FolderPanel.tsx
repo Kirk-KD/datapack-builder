@@ -28,7 +28,7 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
           icon={<FolderIcon sx={{ color: 'grey' }}/>}
           name={'..'}
           onClick={() => {
-            const back = activePath.slice(0, -1)
+            const back = activeFolder.path!.slice(0, -1)
             setActivePath(back.length === 0 ? null : back)
           }}
         />
