@@ -8,7 +8,7 @@ import {Icon} from "../../components/Icon.tsx";
 
 export function ProjectNameDisplay() {
   const [namespace, setNamespace] = useState<string>(useProjectConfigStore.getState().projectConfig.namespace)
-  const {hasUnsavedChanges} = useIDEContext()
+  const {hasUnsavedChanges, hasUnsavedFileChanges} = useIDEContext()
 
   useEffect(() => {
     return useProjectConfigStore.subscribe(store => {
@@ -23,14 +23,11 @@ export function ProjectNameDisplay() {
       <IconsPill>
         <Typography variant={'h6'} sx={{ pl: 1 }}><b>{namespace}</b></Typography>
         <Icon>
-          {hasUnsavedChanges ?
-            <CircularProgress size={'1rem'} sx={{
-              color: 'grey',
-            }}/> :
-            <SaveIcon sx={{
-              color: 'grey'
-            }}/>
-          }
+          {hasUnsavedFileChanges ? (
+            hasUnsavedChanges ?
+              <CircularProgress size={'1rem'} sx={{ color: 'grey' }}/> :
+              <SaveIcon sx={{ color: 'grey' }}/>
+          ) : <SaveIcon color={'success'}/>}
         </Icon>
       </IconsPill>
     </Stack>
