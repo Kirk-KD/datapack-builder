@@ -3,6 +3,7 @@ import { colours } from '../../colours'
 import { ToggleImageField } from '../../fields/toggleImage'
 import { mcfunctionGenerator } from '../../../compiler'
 import type {BlockShadowStatesFunction, BlockSpec} from '../types'
+import { mutateExtraState } from '../extraState.ts'
 import { setShadowState } from '../../extensions/shadows.ts'
 
 const INPUT_FILTER_STACK = 'FILTER_STACK'
@@ -85,7 +86,9 @@ export const selectorBlockSpecs: BlockSpec[] = [
           expandedAlt: 'with filters',
           initialExpanded: block.showFilters_,
           onToggle: (expanded) => {
-            block.showFilters_ = expanded
+            mutateExtraState(block, () => {
+              block.showFilters_ = expanded
+            })
             block.updateShape_()
           },
         }), 'SHOW_FILTERS_TOGGLE')

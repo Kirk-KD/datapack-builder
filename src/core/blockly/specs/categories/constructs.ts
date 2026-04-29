@@ -1,7 +1,7 @@
 import type { BlockSpec } from '../types'
 import type {EditorState, ItemStackEditorResult} from "../../../editor";
 import {loadFromSchema, controller} from "../../../../ui/editor";
-import {bindExtraState, type StatefulBlock} from "../extraState.ts";
+import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
 import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
 import * as Blockly from "blockly";
 import compileEditorState from "../../../compiler/editor/compileEditorState.ts";
@@ -14,6 +14,16 @@ type ItemStackBlockState = {
   itemSpriteSrc_: string | null
 }
 type ItemStackBlock = StatefulBlock & ItemStackBlockState
+
+const ITEM_SPRITE_FIELD_NAME = 'sprite'
+const ITEM_STACK_EDITOR_FIELD_NAME = 'item_stack_editor'
+
+function getItemStackButtonText(block: ItemStackBlock) {
+  const itemName = block.itemStackEditorState_.data?.item.data
+  const itemAmt = block.itemStackEditorState_.data?.amount.data
+  if (!itemName || !itemAmt) return 'edit item stack'
+  return `${itemName}${block.itemStackEditorState_.data?.components.length ? '[...]' : ''} ${itemAmt === 1 ? '' : '×' + itemAmt}`
+}
 
 export const constructBlockSpecs: BlockSpec[] = [
   {
@@ -39,6 +49,15 @@ export const constructBlockSpecs: BlockSpec[] = [
         this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
         const openEditor = () => {
+          if (this.isShadow()) {
+            const parentConnection = this.outputConnection.targetConnection
+            if (parentConnection) {
+              parentConnection.disconnect()
+              parentConnection.connect(this.outputConnection)
+            }
+            this.setShadow(false)
+          }
+
           controller.openEditorModal({
             title: 'Item Stack',
             editor: loadFromSchema({
@@ -48,14 +67,35 @@ export const constructBlockSpecs: BlockSpec[] = [
               context: {},
               state: this.itemStackEditorState_,
               setState: next => {
-                this.itemStackEditorState_ = (typeof next === 'function' ? next(block.itemStackEditorState_) : next) as
-                  EditorState<ItemStackEditorResult>
+                mutateExtraState(this, () => {
+                  this.itemStackEditorState_ = (typeof next === 'function' ? next(block.itemStackEditorState_) : next) as
+                    EditorState<ItemStackEditorResult>
+                })
+
+                const textField = this.getField(ITEM_STACK_EDITOR_FIELD_NAME)
+                if (textField) {
+                  textField.setValue(getItemStackButtonText(this))
+                }
 
                 const itemName = this.itemStackEditorState_.data?.item.data
                 if (itemName) getMinecraftItemByName(itemName).then(result => {
-                  this.itemSpriteSrc_ = result?.spriteFileName || null
-                  if (this.updateShape_) this.updateShape_()
+                  mutateExtraState(this, () => {
+                    this.itemSpriteSrc_ = result?.spriteFileName || null
+                  })
+                  const spriteField = this.getField(ITEM_SPRITE_FIELD_NAME)
+                  if (spriteField) {
+                    spriteField.setValue(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined)
+                  }
                 })
+                else {
+                  mutateExtraState(this, () => {
+                    this.itemSpriteSrc_ = null
+                  })
+                  const spriteField = this.getField(ITEM_SPRITE_FIELD_NAME)
+                  if (spriteField) {
+                    spriteField.setValue(undefined)
+                  }
+                }
 
                 if (this.itemStackEditorState_.error) this.setWarningText('This item stack has an error.')
                 else this.setWarningText(null)
@@ -65,14 +105,9 @@ export const constructBlockSpecs: BlockSpec[] = [
         }
 
         this.appendDummyInput('input')
-          .appendField(new ItemSpriteField(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined), 'sprite')
+          .appendField(new ItemSpriteField(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined), ITEM_SPRITE_FIELD_NAME)
           .appendField(new TextButton(
-            (() => {
-              const itemName = this.itemStackEditorState_.data?.item.data
-              const itemAmt = this.itemStackEditorState_.data?.amount.data
-              if (!itemName || !itemAmt) return 'edit item stack'
-              return `${itemName}${this.itemStackEditorState_.data?.components.length ? '[...]' : ''} ${itemAmt === 1 ? '' : '×' + itemAmt}`
-            })(), openEditor), 'item_stack_editor')
+            getItemStackButtonText(this), openEditor), ITEM_STACK_EDITOR_FIELD_NAME)
       }
 
       block.updateShape_()
