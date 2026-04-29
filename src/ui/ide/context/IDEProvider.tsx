@@ -3,6 +3,7 @@ import {useAutosave} from "../useAutosave.ts";
 import useBlocklyWorkspace from "../WorkspacePanel/useBlocklyWorkspace.ts";
 import {IDEContext} from "./IDEContext.tsx";
 import * as React from "react";
+import type {OutputZip} from "../../../core/output-preview";
 
 export function IDEProvider({children}: { children: React.ReactNode }) {
   const {blocklyDivRef, blocklyWorkspaceRef} = useBlocklyWorkspace()
@@ -11,6 +12,8 @@ export function IDEProvider({children}: { children: React.ReactNode }) {
   const [hasUnsavedFileChanges, setHasUnsavedFileChanges] = useState(false)
 
   const [outputViewerOpen, setOutputViewerOpen] = useState(false)
+
+  const [compiledOutput, setCompiledOutput] = useState<OutputZip | null>(null)
 
   useAutosave(blocklyWorkspaceRef, setHasUnsavedChanges, setHasUnsavedFileChanges)
 
@@ -23,7 +26,9 @@ export function IDEProvider({children}: { children: React.ReactNode }) {
     setHasUnsavedFileChanges,
     outputViewerOpen,
     setOutputViewerOpen,
-  }), [blocklyDivRef, blocklyWorkspaceRef, hasUnsavedChanges, hasUnsavedFileChanges, outputViewerOpen])
+    compiledOutput,
+    setCompiledOutput
+  }), [blocklyDivRef, blocklyWorkspaceRef, hasUnsavedChanges, hasUnsavedFileChanges, outputViewerOpen, compiledOutput])
 
   return (
     <IDEContext.Provider value={value}>

@@ -6,10 +6,11 @@ import {controller, ProjectConfigEditor} from "../../editor";
 import {IconsPillDivider} from "../../components/IconsPillDivider.tsx";
 import {IconButton, Tooltip} from "@mui/material";
 import {useIDEContext} from "../context/useIDEContext.ts";
-import {emit} from "../../../core/compiler";
+import {compile, emit} from "../../../core/compiler";
+import {mapToOutputZip} from "../../../core/output-preview";
 
 export function ActionButtons() {
-  const {blocklyWorkspaceRef, setOutputViewerOpen} = useIDEContext()
+  const {blocklyWorkspaceRef, setOutputViewerOpen, setCompiledOutput} = useIDEContext()
 
   return (
     <IconsPill>
@@ -34,6 +35,8 @@ export function ActionButtons() {
 
       <Tooltip title={'Preview datapack'}>
         <IconButton onClick={() => {
+          if (!blocklyWorkspaceRef.current) return
+          setCompiledOutput(mapToOutputZip(compile(blocklyWorkspaceRef.current), new Date()))
           setOutputViewerOpen(true)
         }}><CodeIcon color={'success'}/></IconButton>
       </Tooltip>

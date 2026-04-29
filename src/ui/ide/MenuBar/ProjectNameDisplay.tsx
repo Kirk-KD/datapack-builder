@@ -21,7 +21,7 @@ export function ProjectNameDisplay() {
       alignItems: 'center'
     }}>
       <IconsPill>
-        <Typography variant={'h6'} sx={{ pl: 1 }}><b>{namespace}</b></Typography>
+        <Typography variant={'h6'} sx={{ pl: 1, maxWidth: '20rem' }} noWrap><b>{namespace}</b></Typography>
         <Icon>
           {hasUnsavedFileChanges ? (
             hasUnsavedChanges ? (

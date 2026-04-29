@@ -32,6 +32,7 @@ export function Panel({ children, width, minWidth, dominant, icon, title, setOpe
       borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius,
       overflow: 'hidden',
       height: '100%',
+      minHeight: 0,
       flex: 1
     }}>
       {dominant ? children : (
@@ -56,10 +57,12 @@ export function Panel({ children, width, minWidth, dominant, icon, title, setOpe
           <Divider sx={{
             backgroundColor: theme => theme.lighten(theme.palette.background.default, 0.01)
           }}/>
-          <Box sx={{
-            backgroundColor: 'background.default',
-            flex: 1,
-          }}>
+           <Box sx={{
+             backgroundColor: 'background.default',
+             flex: 1,
+             minHeight: 0,
+             minWidth: 0,
+           }}>
             {children}
           </Box>
         </Stack>

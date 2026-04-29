@@ -14,6 +14,8 @@
     "@blockly/continuous-toolbox": "^7.0.8",
     "@blockly/shadow-block-converter": "^7.0.9",
     "@blockly/theme-dark": "^8.0.3",
+    "@codemirror/state": "^6.6.0",
+    "@codemirror/view": "^6.41.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.0.0",
