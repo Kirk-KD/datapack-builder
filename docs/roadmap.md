@@ -257,11 +257,13 @@ For any block type accepted as an argument of a procedure, all inputs accepting 
 
 ## Subsystem Status
 
-### Main IDE Workspace `Not started`
+### Main IDE Workspace `Complete`
 
 ### Code Editor (Blockly workspace) UX `In progress`
 
-### File Output Preview UX `Not started`
+### File Output Preview UX `Complete`
+- Consider adding syntax highlighting in the future.
+- Consider adding jumping to source Block, but will require refactor of the Blockly compiler system.
 
 ### Block Definition System `In progress`
 
@@ -292,11 +294,13 @@ Incomplete:
 - Zip file output
 - Compile output optimization
 
-### Project Configuration `Not started`
+### Project Configuration `In progress`
+- Separate datapack configuration (namespace, display name, description, etc.) from project configuration (name mangling, optimization level, etc.)
 
 ### Asset Import/Referencing `Not started`
 
-### Project Create/Save/Load `Not started`
+### Project Create/Save/Load `Complete`
+- Add better save versioning later
 
 ### Documentation `Not started`
 
@@ -315,20 +319,13 @@ Complete:
 - Basic code generation
 - Nested execute code context
 - Modifier subcommands
+- Conditional subcommands
 
 Incomplete:
-- Conditional subcommands
 - Store subcommands
 
 ### Target Selector Helper `In progress`
-
-Complete:
-- Basic code generation
-- Filter arguments
-
-Incomplete:
-- Filter argument blocks input validation
-- Some argument blocks are only useful with certain base selectors
+- Currently Block-based, but should switch to Editor-based under `constructs` category.
 
 ### NBT Helper `Not started`
 
