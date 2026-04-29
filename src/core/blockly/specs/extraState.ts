@@ -10,6 +10,27 @@ type BindExtraStateConfig = {
   loadDefaults?: Record<string, unknown>
 }
 
+function serializeExtraState(block: StatefulBlock) {
+  const state = block.saveExtraState?.()
+  return state ? JSON.stringify(state) : ''
+}
+
+export function mutateExtraState(block: StatefulBlock, mutate: () => void) {
+  const oldState = serializeExtraState(block)
+  mutate()
+  const newState = serializeExtraState(block)
+
+  if (oldState === newState) return
+
+  Blockly.Events.fire(new Blockly.Events.BlockChange(
+    block,
+    'mutation',
+    null,
+    oldState,
+    newState,
+  ))
+}
+
 export function bindExtraState<
   TBlock extends StatefulBlock,
   TState extends Record<string, unknown>,
