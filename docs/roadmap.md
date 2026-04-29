@@ -193,6 +193,45 @@ Regardless of the format an Editor's result is in, it should be able to load bac
 For example, an Item Stack Editor should be able to accept its own result data and populate itself and its inner Editors.
 As such, consumers of an Editor intending to save and load its data must keep the whole Editor State instead of only `data`, in most cases.
 
+## Blockly Workspace Registry System
+The Blockly Workspace Registry system is the source-of-truth for variables, procedures/functions, and parameters,
+each of which will have one `Registry`.
+
+A `Registry` holds an array of `RegistryEntries`. The `RegistryEntry` can be any type.
+
+The `Registry` should provide methods to list, filter, or find an entry/entries.
+
+### Variables
+Variables will have strict types. This is because different value types require different methods of representation at runtime.
+
+#### Integer
+Integers are stored as a scoreboard "player". E.g. `scoreboard players set int_var VARIABLES 1` sets `int_var` to `1` under the `VARIABLES` objective.
+
+#### Float
+Floats can be stored in the scoreboard using fixed-point arithmetic, but would require additional supporting operations before and after the intended operation.
+
+#### Boolean
+Booleans are the same as integers.
+
+#### String
+> Deferred for now
+
+### Procedures
+Procedures have no return types. Procedures have typed parameters that act similarly to variables but are immutable.
+Procedures always produce a mcfunction file. Inside the file, lines of commands referencing a parameter must start with `$`.
+
+### Parameters
+Parameters are stored under each Procedure `RegistryEntry` object.
+A parameter is basically a scoped variable local to a specific procedure.
+
+### Functions
+> Deferred for now
+
+### Data Flow
+UI action → register in registry → fire Blockly event → consumers of the registry listen for events and update accordingly
+
+E.g.: User creates a new variable via a variable creation Editor → new variable entry registered in the variable registry → `VariableCreatedEvent` fires → `mc_var_get` and other variable blocks listens for the event → the blocks update their dropdown lists to show the new variable
+
 ## Data Registry
 Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
 A catalogue system will be used to asynchronously load chosen JSON files.
@@ -251,6 +290,8 @@ Complex:
     - Reusable structured predicate definition
 
 ## Procedures
+> Pending rework
+
 Procedures are currently modeled as no-return reusable command chains.
 Each procedure definition compiles to its own generated internal mcfunction file, and each call site emits a `function` call to that file.
 Parameters are represented as explicit `mc_param` references inside the procedure body, and arguments at the call site are passed either inline for simple literal-like values or through temporary storage setup when indirection is needed.
