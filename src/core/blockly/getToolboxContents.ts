@@ -1,10 +1,8 @@
-import * as Blockly from 'blockly'
-import getControlCategory from './categories/control'
 import {colours} from './colours'
 import { getBlockTypesByCategory } from './specs/blockRegistry'
 import getVariablesCategory from "./categories/variables.ts"
 
-export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
+export default function getToolboxContents() {
   return [
     {
       kind: 'category',
@@ -16,7 +14,7 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Control',
       colour: colours.control,
-      contents: getControlCategory(workspace)
+      contents: getBlockTypesByCategory('control').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',

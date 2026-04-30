@@ -67,7 +67,7 @@ function updateToolbox(workspace: WorkspaceSvg) {
   updateWorkspaceRegistry(workspace)
   workspace.updateToolbox({
     kind: 'categoryToolbox',
-    contents: getToolboxContents(workspace)
+    contents: getToolboxContents()
   })
 }
 

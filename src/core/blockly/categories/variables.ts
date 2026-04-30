@@ -1,8 +1,7 @@
-import { getParameters, getVariables } from "../workspaceRegistry"
+import { getParameters } from "../workspaceRegistry"
 import type Blockly from 'blockly'
 
 export default function getVariablesCategory() {
-  const vars = getVariables().filter(v => v.getType() === 'mc_scoreboard_variable')
   const procedureParameters = getParameters()
   const hasAnyProcedureParams = procedureParameters.some(([, params]) => params.length > 0)
 
@@ -11,8 +10,6 @@ export default function getVariablesCategory() {
     text: 'Create variable',
     callbackKey: 'CREATE_VARIABLE'
   }
-
-  if (vars.length === 0) return [createButton]
 
   const blocks: Blockly.utils.toolbox.FlyoutItemInfo[] = [
     createButton,
