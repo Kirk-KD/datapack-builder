@@ -43,9 +43,9 @@ export const controlBlockSpecs: BlockSpec[] = [
       message0: '%1 matches %2',
       args0: [
         {
-          type: 'field_dropdown',
+          type: 'input_value',
           name: FIELD_VAR_NAME,
-          options: [['x', 'X']],
+          check: ['mc_var_get']
         },
         {
           type: 'input_value',
@@ -55,15 +55,15 @@ export const controlBlockSpecs: BlockSpec[] = [
       ],
       inputsInline: true,
       output: 'MCCondition',
-      extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
-      const varName = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const varName = mcfunctionGenerator.valueToCode(block, FIELD_VAR_NAME, 0)
       const obj = getObjectiveName()
       const range = mcfunctionGenerator.valueToCode(block, 'RANGE', 0) || ''
       return [`score ${varName} ${obj} matches ${range}`, 0]
     },
     setShadowBlocks(this) {
+      setShadowState(this, FIELD_VAR_NAME, { type: 'mc_var_get' })
       setShadowState(this, 'RANGE', { type: 'mc_range' })
     },
   },
@@ -75,9 +75,9 @@ export const controlBlockSpecs: BlockSpec[] = [
       message0: '%1 %2 %3',
       args0: [
         {
-          type: 'field_dropdown',
+          type: 'input_value',
           name: FIELD_VAR_NAME,
-          options: [['x', 'X']],
+          check: ['mc_var_get']
         },
         {
           type: 'field_dropdown',
@@ -98,10 +98,9 @@ export const controlBlockSpecs: BlockSpec[] = [
       ],
       inputsInline: true,
       output: 'MCCondition',
-      extensions: ['mc_scoreboard_variable_dropdown'],
     },
     generator(block) {
-      const varA = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const varA = mcfunctionGenerator.valueToCode(block, FIELD_VAR_NAME, 0)
       const obj = getObjectiveName()
       const op = opMap[block.getFieldValue(FIELD_OP)]
       const valueBBlock = block.getInputTargetBlock(INPUT_VAR_B)!
@@ -111,6 +110,9 @@ export const controlBlockSpecs: BlockSpec[] = [
       if (valueBBlock.type === 'mc_int') {
         const tempName = getTempVarName()
         fragment = `score ${varA} ${obj} ${op} ${tempName} ${obj}`
+      } else if (valueBBlock.type === 'mc_var_get') {
+        const varB = mcfunctionGenerator.valueToCode(block, INPUT_VAR_B, 0)
+        fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
       } else {
         const varB = getVarName(valueBBlock.getField(FIELD_VAR_NAME)!.getText())
         fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
@@ -119,6 +121,9 @@ export const controlBlockSpecs: BlockSpec[] = [
       return [fragment, 0]
     },
     setShadowBlocks(this) {
+      setShadowState(this, FIELD_VAR_NAME, {
+        type: 'mc_var_get'
+      })
       setShadowState(this, INPUT_VAR_B, {
         type: 'mc_int',
         fields: { VALUE: 0 },
