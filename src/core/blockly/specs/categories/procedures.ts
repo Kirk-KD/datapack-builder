@@ -164,6 +164,10 @@ const procDefBlockSpec: BlockSpec = {
     })
 
     block.updateShape_()
+  },
+  generator() {
+    // TODO pending a generator/compiler refactor
+    return ''
   }
 }
 
@@ -207,6 +211,10 @@ const procCallBlockSpec: BlockSpec = {
     })
 
     block.updateShape_()
+  },
+  generator() {
+    // TODO pending a generator/compiler refactor
+    return ''
   }
 }
 
@@ -243,6 +251,10 @@ const procParamBlockSpec: BlockSpec = {
     })
 
     block.updateShape_()
+  },
+  generator() {
+    // TODO pending a generator/compiler refactor
+    return ''
   }
 }
 

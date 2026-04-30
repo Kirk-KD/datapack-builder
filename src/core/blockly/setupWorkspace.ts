@@ -87,14 +87,13 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
 
   // TODO proper variable dialogue/editor
   workspace.registerButtonCallback('CREATE_VARIABLE', () => {
-    variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'integer'))
+    variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'int'))
   })
 
+  // TODO proper procedure dialogue/editor
   workspace.registerButtonCallback('CREATE_PROCEDURE', () => {
-    procedureRegistry.addProcedure(prompt('Proc name?') || 'proc', [
-      procedureRegistry.createParameter('x', 'integer'),
-      procedureRegistry.createParameter('y', 'integer')
-    ])
+    const [procName, ...paramNames] = (prompt('Proc name & param names?') || 'proc').split(' ')
+    procedureRegistry.addProcedure(procName, paramNames.map(paramName => procedureRegistry.createParameter(paramName, 'int')))
   })
 
   const unsubProcListeners = subscribeListeners(workspace)

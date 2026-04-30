@@ -1,4 +1,4 @@
-export type VariableValueType = 'integer'
+export type VariableValueType = 'int'
 
 export interface VariableRegistryEntry {
   id: string
