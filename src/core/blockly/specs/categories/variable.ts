@@ -3,42 +3,51 @@ import { getConditionSetup } from './control'
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
 import {getObjectiveName, getTempVarName, getVarName} from "../../../compiler/nameManager.ts";
+import * as Blockly from "blockly";
+import {FieldDropdown} from "blockly";
+import {colours} from "../../colours.ts";
+import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
+import {variableRegistry, type VariableRegistryEntry} from "../../registry";
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
 const INPUT_VALUE = 'VALUE'
-const scoreboardVarSetChecks = ['mc_int', 'MCCondition', 'mc_var_get', 'mc_param']
+const VAR_SET_CHECKS = ['mc_int', 'MCCondition', 'mc_var_get', 'mc_param']
 
 function isConditionBlock(type: string): boolean {
   return type.startsWith('mc_comp_')
 }
 
+type VarBlockStates = {
+  variable?: VariableRegistryEntry
+}
+type VarBlock = StatefulBlock & VarBlockStates
+
 export const variableBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_var_set',
     category: 'variable',
-    tags: ['trimChainTail'],
     json: {
       type: 'mc_var_set',
       message0: 'set %1 to %2',
       args0: [
         {
-          type: 'field_dropdown',
+          type: 'input_value',
           name: FIELD_VAR_NAME,
-          options: [['x', 'X']],
+          check: ['mc_var_get']
         },
         {
           type: 'input_value',
           name: INPUT_VALUE,
-          check: scoreboardVarSetChecks,
+          check: VAR_SET_CHECKS,
         },
       ],
       previousStatement: null,
       nextStatement: null,
-      extensions: ['mc_scoreboard_variable_dropdown'],
+      inputsInline: true,
     },
     generator(block) {
-      const varName = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const varName = mcfunctionGenerator.valueToCode(block, FIELD_VAR_NAME, 0)
       const obj = getObjectiveName()
       const valueBlock = block.getInputTargetBlock(INPUT_VALUE)!
 
@@ -67,20 +76,22 @@ export const variableBlockSpecs: BlockSpec[] = [
         type: 'mc_int',
         fields: { VALUE: 0 },
       })
+      setShadowState(this, FIELD_VAR_NAME, {
+        type: 'mc_var_get'
+      })
     },
   },
   {
     type: 'mc_var_change',
     category: 'variable',
-    tags: ['trimChainTail'],
     json: {
       type: 'mc_var_change',
       message0: 'change %1 %2 by %3',
       args0: [
         {
-          type: 'field_dropdown',
+          type: 'input_value',
           name: FIELD_VAR_NAME,
-          options: [['x', 'X']],
+          check: ['mc_var_get']
         },
         {
           type: 'field_dropdown',
@@ -101,10 +112,10 @@ export const variableBlockSpecs: BlockSpec[] = [
       ],
       previousStatement: null,
       nextStatement: null,
-      extensions: ['mc_scoreboard_variable_dropdown'],
+      inputsInline: true
     },
     generator(block) {
-      const varName = getVarName(block.getField(FIELD_VAR_NAME)!.getText())
+      const varName = mcfunctionGenerator.valueToCode(block, FIELD_VAR_NAME, 0)
       const obj = getObjectiveName()
       const opType = block.getFieldValue(FIELD_OP)
       const valueBlock = block.getInputTargetBlock(INPUT_VALUE)!
@@ -133,29 +144,66 @@ export const variableBlockSpecs: BlockSpec[] = [
         type: 'mc_int',
         fields: { VALUE: 1 },
       })
+      setShadowState(this, FIELD_VAR_NAME, {
+        type: 'mc_var_get'
+      })
     },
   },
   {
     type: 'mc_var_get',
     category: 'variable',
-    tags: ['scoreboardVarSet', 'procArg'],
-    json: {
-      type: 'mc_var_get',
-      tooltip: '',
-      helpUrl: '',
-      message0: '%1',
-      args0: [
-        {
-          type: 'field_dropdown',
-          name: FIELD_VAR_NAME,
-          options: [['x', 'X']],
-        },
-      ],
-      output: 'mc_var_get',
-      extensions: ['mc_scoreboard_variable_dropdown'],
+    init(this: Blockly.Block) {
+      const block = this as VarBlock
+      bindExtraState<VarBlock, VarBlockStates>(block, {
+        variable: variableRegistry.list()[0]
+      })
+
+      block.updateShape_ = function(this: VarBlock) {
+        this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
+
+        const variableList = variableRegistry.list()
+
+        if (variableList.length === 0 || !this.variable) {
+          this.appendDummyInput('input').appendField('No variables')
+          this.setWarningText('No variables to choose from')
+        } else {
+          const dropdown = new FieldDropdown(
+            variableList.map(({name, id}) => [name, id]),
+            newVariableId => {
+              this.variable = variableRegistry.findById(newVariableId)
+              return newVariableId
+            }
+          )
+          dropdown.setValue(this.variable.id)
+
+          this.appendDummyInput('input')
+            .appendField(dropdown, FIELD_VAR_NAME)
+
+          this.setWarningText(null)
+        }
+      }
+
+      variableRegistry.subscribe(() => {
+        mutateExtraState(block, () => {
+          const entries = variableRegistry.list()
+          if (entries.length === 0) block.variable = undefined
+          else if (block.variable === undefined || entries.indexOf(block.variable) === -1) {
+            block.variable = entries[0]
+          }
+        })
+        if (!block.disposed && block.updateShape_) block.updateShape_()
+      })
+
+      block.setColour(colours.variable)
+      block.setTooltip('')
+      block.setHelpUrl('')
+      block.setInputsInline(true)
+      block.setOutput(true, 'mc_var_get')
+
+      block.updateShape_()
     },
     generator(block) {
-      const name = block.getField(FIELD_VAR_NAME)!.getText()
+      const name = (block as VarBlock).variable!.name
       return [getVarName(name), 0]
     },
   },

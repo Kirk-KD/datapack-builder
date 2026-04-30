@@ -12,6 +12,7 @@ import theme from "../../theme.ts"
 import type {WorkspaceSvg} from "blockly";
 import getToolboxContents from "./getToolboxContents.ts";
 import {updateWorkspaceRegistry} from "./workspaceRegistry.ts";
+import {variableRegistry} from "./registry";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -122,7 +123,7 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
   updateToolbox(workspace)
 
   workspace.registerButtonCallback('CREATE_VARIABLE', () => {
-    Blockly.Variables.createVariableButtonHandler(workspace, undefined, 'mc_scoreboard_variable')
+    variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'integer'))
   })
   setupChangeListener(workspace)
 }
