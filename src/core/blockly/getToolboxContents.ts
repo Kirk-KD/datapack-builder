@@ -1,6 +1,5 @@
 import {colours} from './colours'
 import { getBlockTypesByCategory } from './specs/blockRegistry'
-import getVariablesCategory from "./categories/variables.ts"
 
 export default function getToolboxContents() {
   return [
@@ -38,13 +37,17 @@ export default function getToolboxContents() {
       kind: 'category',
       name: 'Variables',
       colour: colours.variable,
-      contents: getVariablesCategory()
+      contents: [{
+        kind: 'button',
+        text: 'Create variable',
+        callbackKey: 'CREATE_VARIABLE'
+      }, ...getBlockTypesByCategory('variable').map(type => ({ kind: 'block', type }))]
     },
     {
       kind: "category",
       name: "Procedures",
-      custom: "PROCEDURE",
-      colour: colours.procedures
+      colour: colours.procedures,
+      contents: getBlockTypesByCategory('procedures').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',

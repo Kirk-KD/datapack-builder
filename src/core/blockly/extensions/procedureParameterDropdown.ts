@@ -1,5 +1,6 @@
+// TODO remove
+/*
 import * as Blockly from 'blockly'
-import { getParametersForProcedure } from '../workspaceRegistry'
 
 function getContainingProcedureName(block: Blockly.Block | null): string | null {
   let current = block
@@ -76,3 +77,4 @@ Blockly.Extensions.register('mc_procedure_parameter_dropdown', function() {
     } else this.setWarningText('Parameter can only be used inside a procedure')
   })
 })
+*/

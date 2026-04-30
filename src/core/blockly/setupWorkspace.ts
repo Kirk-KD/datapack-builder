@@ -1,5 +1,4 @@
 import * as Blockly from 'blockly'
-import {blocks as procedureBlocks, unregisterProcedureBlocks} from '@blockly/block-shareable-procedures'
 import {shadowBlockConversionChangeListener} from '@blockly/shadow-block-converter'
 import DarkTheme from "@blockly/theme-dark";
 import {
@@ -9,9 +8,7 @@ import {
 } from '@blockly/continuous-toolbox'
 import {colours} from "./colours.ts"
 import theme from "../../theme.ts"
-import type {WorkspaceSvg} from "blockly";
 import getToolboxContents from "./getToolboxContents.ts";
-import {updateWorkspaceRegistry} from "./workspaceRegistry.ts";
 import {variableRegistry} from "./registry";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
@@ -63,29 +60,6 @@ const additionalOptions = {
   }
 }
 
-function updateToolbox(workspace: WorkspaceSvg) {
-  updateWorkspaceRegistry(workspace)
-  workspace.updateToolbox({
-    kind: 'categoryToolbox',
-    contents: getToolboxContents()
-  })
-}
-
-function setupChangeListener(workspace: Blockly.WorkspaceSvg) {
-  workspace.addChangeListener((event) => {
-    if (
-      // Update toolbox and variable list whenever variables are modified
-      event.type === Blockly.Events.VAR_CREATE ||
-      event.type === Blockly.Events.VAR_DELETE ||
-      event.type === Blockly.Events.VAR_RENAME ||
-      // Update procedure list whenever procedures are modified
-      event.type === Blockly.Events.BLOCK_CREATE ||
-      event.type === Blockly.Events.BLOCK_DELETE ||
-      event.type === Blockly.Events.BLOCK_CHANGE
-    ) updateToolbox(workspace)
-  })
-}
-
 function injectWorkspace(workspaceDiv: HTMLDivElement) {
   return Blockly.inject(workspaceDiv, {
     toolbox: {
@@ -107,25 +81,13 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
     return targetWorkspace?.internalIsMutator ? originalGetWidth.call(this) : 300
   }
 
-  // Load built-in procedure blockly
-  unregisterProcedureBlocks()
-  Blockly.common.defineBlocks(procedureBlocks)
-  // Remove unwanted loaded procedure blockly
-  delete Blockly.Blocks['procedures_callreturn']
-  delete Blockly.Blocks['procedures_defreturn']
-  delete Blockly.Blocks['procedures_ifreturn']
-
   // Enable auto shadow conversion
   workspace.addChangeListener(shadowBlockConversionChangeListener)
 
-  // Initial placeholder variable
-  workspace.getVariableMap().createVariable('myVar', 'mc_scoreboard_variable')
-  updateToolbox(workspace)
-
+  // TODO proper variable dialogue/editor
   workspace.registerButtonCallback('CREATE_VARIABLE', () => {
     variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'integer'))
   })
-  setupChangeListener(workspace)
 }
 
 export {setupWorkspace, injectWorkspace}
