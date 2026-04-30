@@ -199,7 +199,7 @@ each of which will have one `Registry`.
 
 A `Registry` holds an array of `RegistryEntries`. The `RegistryEntry` can be any type.
 
-The `Registry` should provide methods to list, filter, or find an entry/entries.
+The `Registry` should provide methods to add, remove, list, filter, or find an entry/entries.
 
 ### Variables
 Variables will have strict types. This is because different value types require different methods of representation at runtime.
@@ -228,9 +228,9 @@ A parameter is basically a scoped variable local to a specific procedure.
 > Deferred for now
 
 ### Data Flow
-UI action → register in registry → fire Blockly event → consumers of the registry listen for events and update accordingly
+UI action → register in registry → registry triggers listeners subscribed to it → consumers of the registry listen for events and update accordingly
 
-E.g.: User creates a new variable via a variable creation Editor → new variable entry registered in the variable registry → `VariableCreatedEvent` fires → `mc_var_get` and other variable blocks listens for the event → the blocks update their dropdown lists to show the new variable
+E.g.: User creates a new variable via a variable creation Editor → new variable entry registered in the variable registry → Variable Registry calls all subscribed listeners → `mc_var_get` and other variable blocks listens for the event → the blocks update their dropdown lists to show the new variable
 
 ## Data Registry
 Static Minecraft data will be obtained via a local clone of [misode/mcmeta](https://github.com/misode/mcmeta/tree/registries).
