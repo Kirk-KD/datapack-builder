@@ -3,14 +3,15 @@ import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraStat
 import {procedureRegistry, type ProcedureRegistryEntry} from "../../registry";
 import * as Blockly from "blockly";
 import {colours} from "../../colours.ts";
+import getToolboxContents from "../../getToolboxContents.ts";
 
-type ProcDefBlockStates = {
+type ProcBlockState = {
   procedure: ProcedureRegistryEntry | null
 }
-type ProcDefBlock = StatefulBlock & ProcDefBlockStates
+type ProcDefBlock = StatefulBlock & ProcBlockState
 
 function syncProcedureState(block: ProcDefBlock | ProcCallBlock) {
-  if (block.isInFlyout || !block.procedure) return
+  if (block.isDeadOrDying() || block.isInFlyout || !block.procedure) return
 
   const currentProcedure = procedureRegistry.findById(block.procedure.id)
   if (!currentProcedure) {
@@ -32,7 +33,7 @@ const procDefBlockSpec: BlockSpec = {
   category: 'procedures',
   init(this: Blockly.Block) {
     const block = this as ProcDefBlock
-    bindExtraState<ProcDefBlock, ProcDefBlockStates>(block, {
+    bindExtraState<ProcDefBlock, ProcBlockState>(block, {
       procedure: null
     })
 
@@ -70,16 +71,13 @@ const procDefBlockSpec: BlockSpec = {
   }
 }
 
-type ProcCallBlockStates = {
-  procedure: ProcedureRegistryEntry | null
-}
-type ProcCallBlock = StatefulBlock & ProcCallBlockStates
+type ProcCallBlock = StatefulBlock & ProcBlockState
 const procCallBlockSpec: BlockSpec = {
   type: 'mc_proc_call',
   category: 'procedures',
   init(this: Blockly.Block) {
     const block = this as ProcCallBlock
-    bindExtraState<ProcCallBlock, ProcCallBlockStates>(block, {
+    bindExtraState<ProcCallBlock, ProcBlockState>(block, {
       procedure: null
     })
 
@@ -122,27 +120,6 @@ export const procedureBlockSpecs: BlockSpec[] = [
   procCallBlockSpec
 ]
 
-export function getNewProcListener(workspace: Blockly.WorkspaceSvg) {
-  return procedureRegistry.subscribe(({type, changedEntries}) => {
-    if (type === 'add') {
-      changedEntries.forEach(proc => {
-        const block = workspace.newBlock('mc_proc_def') as ProcDefBlock
-        mutateExtraState(block, () => {
-          block.procedure = proc
-        })
-
-        const workspaceCoordinates = workspace.getMetricsManager().getViewMetrics(true)
-        const x = workspaceCoordinates.left + workspaceCoordinates.width / 2
-        const y = workspaceCoordinates.top + workspaceCoordinates.height / 2
-
-        block.initSvg()
-        block.render()
-        block.moveTo(new Blockly.utils.Coordinate(x, y))
-      })
-    }
-  })
-}
-
 export function getProcCallBlocks() {
   return procedureRegistry.list().map(procedure => ({
     kind: 'block',
@@ -151,4 +128,47 @@ export function getProcCallBlocks() {
       procedure,
     },
   }))
+}
+
+export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
+  const unsubscribes = [
+    procedureRegistry.subscribe(({type, changedEntries}) => {
+      if (type === 'add') {
+        changedEntries.forEach(proc => {
+          const block = workspace.newBlock('mc_proc_def') as ProcDefBlock
+          mutateExtraState(block, () => {
+            block.procedure = proc
+          })
+
+          const workspaceCoordinates = workspace.getMetricsManager().getViewMetrics(true)
+          const x = workspaceCoordinates.left + workspaceCoordinates.width / 2
+          const y = workspaceCoordinates.top + workspaceCoordinates.height / 2
+
+          block.initSvg()
+          block.render()
+          block.moveTo(new Blockly.utils.Coordinate(x, y))
+        })
+      }
+    }),
+    procedureRegistry.subscribe(() => {
+      workspace.updateToolbox({
+        kind: 'categoryToolbox',
+        contents: getToolboxContents()
+      })
+    })
+  ]
+
+  workspace.addChangeListener((e: Blockly.Events.Abstract)=> {
+    if (e.type === 'delete') {
+      const blockDeleteEvent = e as Blockly.Events.BlockDelete
+      const blockData = blockDeleteEvent.oldJson
+
+      if (blockData && blockData.type === 'mc_proc_def') {
+        const procedure = (blockData.extraState as ProcBlockState).procedure
+        if (procedure) procedureRegistry.remove(procedure.id)
+      }
+    }
+  })
+
+  return () => unsubscribes.forEach(f => f())
 }

@@ -10,7 +10,7 @@ import {colours} from "./colours.ts"
 import theme from "../../theme.ts"
 import getToolboxContents from "./getToolboxContents.ts";
 import {procedureRegistry, variableRegistry} from "./registry";
-import {getNewProcListener} from "./specs/categories/procedures.ts";
+import {subscribeListeners} from "./specs/categories/procedures.ts";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -61,16 +61,12 @@ const additionalOptions = {
   }
 }
 
-function getToolboxDefinition() {
-  return {
-    kind: 'categoryToolbox',
-    contents: getToolboxContents()
-  }
-}
-
 function injectWorkspace(workspaceDiv: HTMLDivElement) {
   return Blockly.inject(workspaceDiv, {
-    toolbox: getToolboxDefinition(),
+    toolbox: {
+      kind: 'categoryToolbox',
+      contents: getToolboxContents()
+    },
     ...additionalOptions
   })
 }
@@ -101,14 +97,10 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
     ])
   })
 
-  const unsubNewProcListener = getNewProcListener(workspace)
-  const unsubProcListener = procedureRegistry.subscribe(() => {
-    workspace.updateToolbox(getToolboxDefinition())
-  })
+  const unsubProcListeners = subscribeListeners(workspace)
 
   return () => {
-    unsubNewProcListener()
-    unsubProcListener()
+    unsubProcListeners()
   }
 }
 
