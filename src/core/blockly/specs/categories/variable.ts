@@ -23,6 +23,10 @@ type VarBlockStates = {
 }
 type VarBlock = StatefulBlock & VarBlockStates
 
+function getVariableDropdownOptions(): [string, string][] {
+  return variableRegistry.list().map(({name, id}) => [name, id])
+}
+
 export const variableBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_var_set',
@@ -168,7 +172,7 @@ export const variableBlockSpecs: BlockSpec[] = [
           this.setWarningText('No variables to choose from')
         } else {
           const dropdown = new FieldDropdown(
-            variableList.map(({name, id}) => [name, id]),
+            getVariableDropdownOptions,
             newVariableId => {
               this.variable = variableRegistry.findById(newVariableId)
               return newVariableId
