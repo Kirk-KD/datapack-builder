@@ -9,7 +9,8 @@ import {
 import {colours} from "./colours.ts"
 import theme from "../../theme.ts"
 import getToolboxContents from "./getToolboxContents.ts";
-import {variableRegistry} from "./registry";
+import {procedureRegistry, variableRegistry} from "./registry";
+import {getNewProcListener} from "./specs/categories/procedures.ts";
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -60,12 +61,16 @@ const additionalOptions = {
   }
 }
 
+function getToolboxDefinition() {
+  return {
+    kind: 'categoryToolbox',
+    contents: getToolboxContents()
+  }
+}
+
 function injectWorkspace(workspaceDiv: HTMLDivElement) {
   return Blockly.inject(workspaceDiv, {
-    toolbox: {
-      kind: 'categoryToolbox',
-      contents: getToolboxContents()
-    },
+    toolbox: getToolboxDefinition(),
     ...additionalOptions
   })
 }
@@ -88,6 +93,23 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
   workspace.registerButtonCallback('CREATE_VARIABLE', () => {
     variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'integer'))
   })
+
+  workspace.registerButtonCallback('CREATE_PROCEDURE', () => {
+    procedureRegistry.addProcedure(prompt('Proc name?') || 'proc', [
+      procedureRegistry.createParameter('x', 'integer'),
+      procedureRegistry.createParameter('y', 'integer')
+    ])
+  })
+
+  const unsubNewProcListener = getNewProcListener(workspace)
+  const unsubProcListener = procedureRegistry.subscribe(() => {
+    workspace.updateToolbox(getToolboxDefinition())
+  })
+
+  return () => {
+    unsubNewProcListener()
+    unsubProcListener()
+  }
 }
 
 export {setupWorkspace, injectWorkspace}

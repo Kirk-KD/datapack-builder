@@ -12,7 +12,7 @@ export default function useBlocklyWorkspace() {
 
     const workspace = injectWorkspace(workspaceDiv)
     workspaceRef.current = workspace
-    setupWorkspace(workspace)
+    const deinitWorkspace = setupWorkspace(workspace)
 
     let frameId: number | null = null
     const resizeWorkspace = () => {
@@ -41,6 +41,7 @@ export default function useBlocklyWorkspace() {
       if (frameId !== null) {
         cancelAnimationFrame(frameId)
       }
+      deinitWorkspace()
       workspace.dispose()
       workspaceRef.current = null
     }

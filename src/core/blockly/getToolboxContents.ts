@@ -1,5 +1,6 @@
 import {colours} from './colours'
 import { getBlockTypesByCategory } from './specs/blockRegistry'
+import {getProcCallBlocks} from "./specs/categories/procedures.ts";
 
 export default function getToolboxContents() {
   return [
@@ -47,7 +48,14 @@ export default function getToolboxContents() {
       kind: "category",
       name: "Procedures",
       colour: colours.procedures,
-      contents: getBlockTypesByCategory('procedures').map(type => ({ kind: 'block', type }))
+      contents: [
+        {
+          kind: 'button',
+          text: 'Create procedure',
+          callbackKey: 'CREATE_PROCEDURE'
+        },
+        ...getProcCallBlocks()
+      ]
     },
     {
       kind: 'category',
