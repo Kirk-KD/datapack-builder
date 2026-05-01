@@ -29,7 +29,7 @@ export function Panel({ children, width, minWidth, dominant, icon, title, setOpe
     <Box sx={{
       width: width,
       minWidth: minWidth,
-      borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius,
+      borderRadius: theme => theme.shape.surfaceBorderRadius,
       overflow: 'hidden',
       height: '100%',
       minHeight: 0,
@@ -42,9 +42,9 @@ export function Panel({ children, width, minWidth, dominant, icon, title, setOpe
         }}>
           <Stack direction={'row'} spacing={1} sx={{
             width: '100%',
-            p: theme => theme.shape.splitLayoutPanelBorderRadius,
-            pt: theme => theme.shape.splitLayoutPanelBorderRadius,
-            pl: theme => theme.shape.splitLayoutPanelBorderRadius,
+            p: theme => theme.shape.surfaceBorderRadius,
+            pt: theme => theme.shape.surfaceBorderRadius,
+            pl: theme => theme.shape.surfaceBorderRadius,
             backgroundColor: 'background.default',
             alignItems: 'center'
           }}>

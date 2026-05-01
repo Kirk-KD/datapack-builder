@@ -10,8 +10,8 @@ export default function InnerEditorContainer({ children }: InnerEditorContainerP
     <Box sx={{
       backgroundColor: 'background.input',
       p: 0.8,
-      borderRadius: theme => `${theme.shape.borderRadius}px`,
-      border: '1px solid',
+      borderRadius: theme => theme.shape.borderRadius,
+      border: '1px solid', // Should this have a border?
       borderColor: 'inputBorder',
       width: 'fit-content',
     }}>
@@ -19,7 +19,7 @@ export default function InnerEditorContainer({ children }: InnerEditorContainerP
         p: 1,
         backgroundColor: 'background.default',
         width: 'fit-content',
-        borderRadius: '8px',
+        borderRadius: theme => theme.shape.borderRadius,
       }}>
         {children}
       </Box>

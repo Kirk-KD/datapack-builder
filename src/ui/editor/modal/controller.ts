@@ -3,10 +3,19 @@ import * as React from "react";
 
 type Listener = () => void
 
-type EditorModalPayload = {
+type EditorModalPayloadBase = {
   title: string
   editor: React.ReactNode
 }
+
+type EditorModalPayload =
+  | (EditorModalPayloadBase & {
+    mode?: 'done'
+  })
+  | (EditorModalPayloadBase & {
+    mode: 'confirm'
+    onConfirm: () => void
+  })
 
 let state: {
   open: boolean
