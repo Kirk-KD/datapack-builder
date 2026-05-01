@@ -1,0 +1,62 @@
+# `compiler`
+The compiler system transforms a user's Blockly workspace and editor configurations into a
+deployable Minecraft datapack. It is organized into five sequential stages, each with a strict, single responsibility.
+
+Workspace → Generators → IR → Passes → Emitter → Output
+
+---
+
+## `generator`
+
+A per-source function responsible for reading a single Block's configuration and
+recursively visiting its children, returning an IR node or array of IR nodes. Each
+Block type (and Editor type) has exactly one registered generator.
+
+Generators are the only stage with direct knowledge of the Blockly workspace. They
+know what a block looks like and what its children are. They have no responsibility
+over output syntax, file structure, or inter-block relationships.
+
+## `ir`
+
+The intermediate representation (IR) is the structured data tree produced by running all generators. It represents
+the complete semantics of the user's project — functions, procedures, variables,
+commands, tags, and control flow — independent of both how it was authored and how
+it will be stored.
+
+The IR is the only construct that crosses the boundary between the authoring stage
+(Blockly, editors) and the output stage (emitter). Every stage after generators reads
+from or writes to the IR exclusively.
+
+## `pass`
+
+A pass is a function that walks the IR with a single responsibility. A pass is either:
+- **Read-only (validation):** inspects the IR and produces errors or warnings without
+  modifying it. Example: a *link pass* verifies that every function call resolves to
+  a defined function; a *scope pass* detects variables that are read before being set.
+- **Transforming (optimization):** consumes the IR and produces a modified IR.
+  Example: an *inline pass* replaces single-command if-bodies with direct
+  `execute if ... run ...` commands instead of generating a helper function call.
+
+Passes run in a defined order after all generators have completed, ensuring the full
+IR is available before any validation or transformation is applied.
+
+## `emitter`
+
+The emitter walks the final IR and produces the output file map: a representation of
+the zip archive as a collection of file paths and their contents. It is responsible
+for mcfunction syntax, datapack folder structure, and JSON formats (tags, pack.mcmeta,
+etc.).
+
+The emitter has no knowledge of Blockly, blocks, or IR semantics. It treats the IR as
+its specification and serializes it faithfully. Any decision about *what* to emit was
+made upstream; the emitter only decides *how* to write it.
+
+## `orchestrator`
+
+The orchestrator is the single top-level function that owns the pipeline sequence. It:
+1. Runs generators over all top-level blocks in the workspace
+2. Runs each pass over the IR in order
+3. Hands the final IR to the emitter
+
+The orchestrator owns no logic of its own beyond sequencing. It is the authoritative
+definition of what "compiling a project" means.
