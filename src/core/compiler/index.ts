@@ -1,5 +1,2 @@
-export { mcfunctionGenerator } from './blockly/generator.ts'
-export { bootstrapCompiler } from './bootstrap.ts'
-export { compile } from './compile.ts'
-export { emit } from './emit.ts'
 export * from './snbt.ts'
+export type {IrGeneratorFunction} from './ir'

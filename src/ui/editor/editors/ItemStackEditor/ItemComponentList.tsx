@@ -4,7 +4,7 @@ import type {AnyEditorState, AnyEditorStateCallback, EditorSchema, ItemComponent
 import {type SetStateAction, useEffect, useState} from "react";
 import {loadDataComponentSchemas} from "../../../../core/catalog";
 import {loadFromSchema} from "../../loadFromSchema.tsx";
-import {inferCompilerType} from "../../../../core/compiler/editor/compileEditorState.ts";
+import {inferCompilerType} from "../../../../core/compiler/emitter/emitEditorState.ts";
 import {Stack, Typography} from "@mui/material";
 import EditorButton from "../../components/EditorButton.tsx";
 

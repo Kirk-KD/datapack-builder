@@ -1,5 +1,5 @@
 import type {IrVisitor} from "./visitor.ts";
-import type {OrParameter, TopLevelNode, VariableOpType} from "./types.ts";
+import type {OrParameter, TopLevelNode, VariableCompareOpType, VariableOpType} from "./types.ts";
 import type {
   ProcedureParameterRegistryEntry,
   ProcedureRegistryEntry,
@@ -165,11 +165,13 @@ export class VariableMatchesNode extends BooleanNode {
 
 export class VariableCompareNode extends BooleanNode {
   readonly variableNode: VariableNode
+  readonly op: VariableCompareOpType
   readonly rightNode: OrParameter<VariableNode | LiteralIntNode>
 
-  constructor(variableNode: VariableNode, rightNode: OrParameter<VariableNode | LiteralIntNode>, sourceBlockId?: string | null) {
+  constructor(variableNode: VariableNode, op: VariableCompareOpType, rightNode: OrParameter<VariableNode | LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.variableNode = variableNode
+    this.op = op
     this.rightNode = rightNode
   }
 

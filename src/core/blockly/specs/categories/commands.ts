@@ -1,4 +1,3 @@
-import { mcfunctionGenerator } from '../../../compiler'
 import type { BlockSpec } from '../types'
 import {setShadowState} from "../../extensions/shadows.ts";
 import * as Blockly from "blockly"

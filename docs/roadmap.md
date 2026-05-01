@@ -304,7 +304,7 @@ For any block type accepted as an argument of a procedure, all inputs accepting 
 
 ### Code Editor (Blockly workspace) UX `In progress`
 
-### File Output Preview UX `Complete`
+### File OutputFiles Preview UX `Complete`
 - Consider adding syntax highlighting in the future.
 - Consider adding jumping to source Block, but will require refactor of the Blockly compiler system.
 

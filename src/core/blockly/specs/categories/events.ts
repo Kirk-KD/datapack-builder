@@ -1,4 +1,6 @@
 import type { BlockSpec } from '../types'
+import {OnLoadNode, OnTickNode} from '../../../compiler/ir'
+import {nextBlocksToIr} from '../../../compiler/generator'
 
 export const eventBlockSpecs: BlockSpec[] = [
   {
@@ -10,8 +12,11 @@ export const eventBlockSpecs: BlockSpec[] = [
       args0: [],
       nextStatement: null,
     },
-    generator() {
-      return ''
+    generator(block) {
+      return new OnLoadNode(
+        nextBlocksToIr(block),
+        block.id
+      )
     },
   },
   {
@@ -23,8 +28,11 @@ export const eventBlockSpecs: BlockSpec[] = [
       args0: [],
       nextStatement: null,
     },
-    generator() {
-      return ''
-    },
+    generator(block) {
+      return new OnTickNode(
+        nextBlocksToIr(block),
+        block.id
+      )
+    }
   },
 ]

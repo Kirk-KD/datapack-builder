@@ -6,8 +6,9 @@ import {controller, ProjectConfigEditor} from "../../editor";
 import {IconsPillDivider} from "../../components/IconsPillDivider.tsx";
 import {IconButton, Tooltip} from "@mui/material";
 import {useIDEContext} from "../context/useIDEContext.ts";
-import {compile, emit} from "../../../core/compiler";
 import {mapToOutputZip} from "../../../core/output-preview";
+import {orchestrate} from '../../../core/compiler/orchestrator.ts'
+import {useProjectConfigStore} from '../../../stores'
 
 export function ActionButtons() {
   const {blocklyWorkspaceRef, setOutputViewerOpen, setCompiledOutput} = useIDEContext()
@@ -28,7 +29,7 @@ export function ActionButtons() {
       <IconsPillDivider/>
 
       <Tooltip title={'Build datapack'}>
-        <IconButton onClick={() => blocklyWorkspaceRef.current && emit(blocklyWorkspaceRef.current)}>
+        <IconButton onClick={() => {}}>
           <HardwareIcon color={'success'}/>
         </IconButton>
       </Tooltip>
@@ -36,7 +37,7 @@ export function ActionButtons() {
       <Tooltip title={'Preview datapack'}>
         <IconButton onClick={() => {
           if (!blocklyWorkspaceRef.current) return
-          setCompiledOutput(mapToOutputZip(compile(blocklyWorkspaceRef.current), new Date()))
+          setCompiledOutput(mapToOutputZip(orchestrate(blocklyWorkspaceRef.current, useProjectConfigStore.getState().projectConfig).toStringMap(), new Date()))
           setOutputViewerOpen(true)
         }}><CodeIcon color={'success'}/></IconButton>
       </Tooltip>

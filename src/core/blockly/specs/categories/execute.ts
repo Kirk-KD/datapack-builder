@@ -1,12 +1,9 @@
 import * as Blockly from 'blockly'
 import { colours } from '../../colours'
-import { addFile } from '../../../compiler/fileRegistry'
-import { mcfunctionGenerator } from '../../../compiler'
-import { nextId } from '../../../compiler/idGenerator'
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
-import { getInternalNamespace } from "../../../compiler/nameManager.ts"
 import { createStateDropdown } from "../dynamicFields.ts";
+import {valueToIr} from '../../../compiler/generator'
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'
@@ -160,7 +157,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
     ],
     partialGenerator(block) {
       return [
-        mcfunctionGenerator.valueToCode(block, 'POS', 0),
+        valueToIr(block, 'POS'),
         block.getFieldValue('BIOME')
       ].join(' ')
     },

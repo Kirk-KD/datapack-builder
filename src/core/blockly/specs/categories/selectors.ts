@@ -1,7 +1,6 @@
 import * as Blockly from 'blockly'
 import { colours } from '../../colours'
 import { ToggleImageField } from '../../fields/toggleImage'
-import { mcfunctionGenerator } from '../../../compiler'
 import type {BlockShadowStatesFunction, BlockSpec} from '../types'
 import { mutateExtraState } from '../extraState.ts'
 import { setShadowState } from '../../extensions/shadows.ts'

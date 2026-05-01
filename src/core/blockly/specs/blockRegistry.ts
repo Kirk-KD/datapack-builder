@@ -8,8 +8,9 @@ import { literalBlockSpecs } from './categories/literals'
 import { procedureBlockSpecs } from './categories/procedures'
 import { selectorBlockSpecs, targetSelectorRootType } from './categories/selectors'
 import { variableBlockSpecs } from './categories/variable'
-import type { BlockGeneratorFunction, BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
+import type { BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
 import {shadowInputBlockSpecs} from "./shadowInputs.ts";
+import {registerBlockIrGenerator} from '../../compiler/generator'
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
@@ -91,17 +92,9 @@ export function registerBlockSpecs() {
     if (spec.setShadowBlocks) {
       Blockly.Extensions.register(getShadowExtensionName(spec.type), spec.setShadowBlocks)
     }
+
+    registerBlockIrGenerator(spec)
   }
 }
 
-export function registerBlockSpecGenerators(
-  registerGenerator: (type: string, generator: BlockGeneratorFunction) => void,
-) {
-  for (const spec of allBlockSpecs) {
-    if (spec.generator) {
-      registerGenerator(spec.type, spec.generator)
-    }
-  }
-}
-
-export { targetSelectorRootType }
+export { targetSelectorRootType } // TODO what?

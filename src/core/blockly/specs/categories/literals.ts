@@ -1,5 +1,4 @@
 import type { BlockSpec } from '../types'
-import { mcfunctionGenerator } from '../../../compiler'
 import {setShadowState} from "../../extensions/shadows.ts";
 
 const FIELD_VALUE = 'VALUE'

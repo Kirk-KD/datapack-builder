@@ -1,8 +1,6 @@
-import { mcfunctionGenerator } from '../../../compiler'
 import { getConditionSetup } from './control'
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
-import {getObjectiveName, getTempVarName, getVarName} from "../../../compiler/nameManager.ts";
 import * as Blockly from "blockly";
 import {FieldDropdown} from "blockly";
 import {colours} from "../../colours.ts";

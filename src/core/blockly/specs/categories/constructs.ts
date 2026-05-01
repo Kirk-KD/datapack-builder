@@ -4,7 +4,6 @@ import {loadFromSchema, controller} from "../../../../ui/editor";
 import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
 import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
 import * as Blockly from "blockly";
-import compileEditorState from "../../../compiler/editor/compileEditorState.ts";
 import {colours} from "../../colours.ts";
 import {TextButton} from "../../fields/textButton.ts";
 import {getMinecraftItemByName} from "../../../catalog";

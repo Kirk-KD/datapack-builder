@@ -2,7 +2,7 @@
 The compiler system transforms a user's Blockly workspace and editor configurations into a
 deployable Minecraft datapack. It is organized into five sequential stages, each with a strict, single responsibility.
 
-Workspace → Generators → IR → Passes → Emitter → Output
+Workspace → Generators → IR → Passes → Emitter → OutputFiles
 
 ---
 
@@ -51,7 +51,7 @@ The emitter has no knowledge of Blockly, blocks, or IR semantics. It treats the 
 its specification and serializes it faithfully. Any decision about *what* to emit was
 made upstream; the emitter only decides *how* to write it.
 
-## `orchestrator`
+## `orchestrator.ts`
 
 The orchestrator is the single top-level function that owns the pipeline sequence. It:
 1. Runs generators over all top-level blocks in the workspace
@@ -60,3 +60,7 @@ The orchestrator is the single top-level function that owns the pipeline sequenc
 
 The orchestrator owns no logic of its own beyond sequencing. It is the authoritative
 definition of what "compiling a project" means.
+
+## `outputFiles.ts`
+
+The output zip file structure of the compiler pipeline. 
