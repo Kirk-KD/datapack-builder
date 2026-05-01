@@ -3,6 +3,7 @@ import * as Blockly from "blockly";
 import {useCallback, useEffect, useRef} from "react";
 import {deserialize, serialize} from "../../core/save/serialization.ts";
 import {useProjectConfigStore} from "../../stores";
+import {procedureRegistry, variableRegistry} from "../../core/blockly/registry";
 
 const AUTOSAVE_KEY = 'dpb_autosave'
 const AUTOSAVE_INTERVAL_MS = 2000
@@ -36,11 +37,20 @@ export function useAutosave(
     const workspace = workspaceRef.current
     if (!workspace) return
 
-    const listener = workspace.addChangeListener((e: Blockly.Events.Abstract) => {
+    workspace.addChangeListener((e: Blockly.Events.Abstract) => {
       if (!e.isUiEvent) {
         setDirty(true)
         setFileDirty(true)
       }
+    })
+
+    const unsubVarRegListener = variableRegistry.subscribe(() => {
+      setDirty(true)
+      setFileDirty(true)
+    })
+    const unsubProcRegListener = procedureRegistry.subscribe(() => {
+      setDirty(true)
+      setFileDirty(true)
     })
 
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -57,9 +67,10 @@ export function useAutosave(
     }, AUTOSAVE_INTERVAL_MS)
 
     return () => {
-      workspace.removeChangeListener(listener)
       clearInterval(interval)
       window.removeEventListener('beforeunload', handleBeforeUnload)
+      unsubVarRegListener()
+      unsubProcRegListener()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

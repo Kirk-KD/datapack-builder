@@ -1,10 +1,8 @@
-import * as Blockly from 'blockly'
-import getControlCategory from './categories/control'
 import {colours} from './colours'
-import { getBlockTypesByCategory } from './specs/registry'
-import getVariablesCategory from "./categories/variables.ts"
+import { getBlockTypesByCategory } from './specs/blockRegistry'
+import {getProcCallBlocks} from "./specs/categories/procedures.ts";
 
-export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
+export default function getToolboxContents() {
   return [
     {
       kind: 'category',
@@ -16,7 +14,7 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Control',
       colour: colours.control,
-      contents: getControlCategory(workspace)
+      contents: getBlockTypesByCategory('control').map(type => ({ kind: 'block', type }))
     },
     {
       kind: 'category',
@@ -40,13 +38,24 @@ export default function getToolboxContents(workspace?: Blockly.WorkspaceSvg) {
       kind: 'category',
       name: 'Variables',
       colour: colours.variable,
-      contents: getVariablesCategory()
+      contents: [{
+        kind: 'button',
+        text: 'Create variable',
+        callbackKey: 'CREATE_VARIABLE'
+      }, ...getBlockTypesByCategory('variable').map(type => ({ kind: 'block', type }))]
     },
     {
       kind: "category",
       name: "Procedures",
-      custom: "PROCEDURE",
-      colour: colours.procedures
+      colour: colours.procedures,
+      contents: [
+        {
+          kind: 'button',
+          text: 'Create procedure',
+          callbackKey: 'CREATE_PROCEDURE'
+        },
+        ...getProcCallBlocks()
+      ]
     },
     {
       kind: 'category',

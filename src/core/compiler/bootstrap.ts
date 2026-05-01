@@ -1,5 +1,5 @@
 import { mcfunctionGenerator } from './blockly/generator.ts'
-import { registerBlockSpecGenerators } from '../blockly/specs/registry.ts'
+import { registerBlockSpecGenerators } from '../blockly/specs/blockRegistry.ts'
 
 const COMPILER_BOOTSTRAP_FLAG = '__mcDatapackBuilderCompilerInitialized__'
 

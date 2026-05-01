@@ -1,4 +1,4 @@
-import {getBlockJsonByCategory} from "./specs/registry.ts";
+import {getBlockJsonByCategory} from "./specs/blockRegistry.ts";
 import type {BlockSpecCategory} from "./specs/types.ts";
 
 const colours: Record<string, string> = {
