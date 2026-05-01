@@ -20,8 +20,8 @@ export function serialize({ workspace }: SerializationOptions): ProjectSave {
 }
 
 export function deserialize({ save, workspace }: SerializationOptions & { save: ProjectSave }) {
-  Blockly.serialization.workspaces.load(save.blocklyWorkspace, workspace)
-  useProjectConfigStore.getState().replaceConfig(save.projectConfig)
   variableRegistry.replace(save.blocklyRegistry.variableEntries)
   procedureRegistry.replace(save.blocklyRegistry.procedureEntries)
+  Blockly.serialization.workspaces.load(save.blocklyWorkspace, workspace)
+  useProjectConfigStore.getState().replaceConfig(save.projectConfig)
 }
