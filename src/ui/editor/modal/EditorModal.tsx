@@ -16,6 +16,12 @@ export function EditorModal() {
 
   if (!open || !payload) return null
 
+  const handleConfirm = () => {
+    if (payload.mode !== 'confirm') return
+    payload.onConfirm()
+    controller.closeEditorModal()
+  }
+
   return (
     <Modal open={open}>
       <Stack sx={{
@@ -73,13 +79,22 @@ export function EditorModal() {
             </Box>
           </Box>
         </Box>
-        <Stack direction={'row-reverse'} sx={{
+        <Stack direction={'row'} sx={{
           backgroundColor: 'background.paper',
           p: 1,
+          gap: 1,
+          justifyContent: 'flex-end',
           borderBottomLeftRadius: theme => theme.shape.surfaceBorderRadius,
           borderBottomRightRadius: theme => theme.shape.surfaceBorderRadius
         }}>
-          <Button onClick={controller.closeEditorModal}>Done</Button>
+          {payload.mode === 'confirm' ? (
+            <>
+              <Button onClick={controller.closeEditorModal}>Cancel</Button>
+              <Button onClick={handleConfirm}>Confirm</Button>
+            </>
+          ) : (
+            <Button onClick={controller.closeEditorModal}>Done</Button>
+          )}
         </Stack>
       </Stack>
     </Modal>
