@@ -174,14 +174,18 @@ export const variableBlockSpecs: BlockSpec[] = [
           const dropdown = new FieldDropdown(
             getVariableDropdownOptions,
             newVariableId => {
-              this.variable = variableRegistry.findById(newVariableId)
+              const nextVariable = variableRegistry.findById(newVariableId)
+              if (!nextVariable) return null
+
+              this.variable = nextVariable
               return newVariableId
             }
           )
-          dropdown.setValue(this.variable.id)
 
           this.appendDummyInput('input')
             .appendField(dropdown, FIELD_VAR_NAME)
+
+          dropdown.setValue(this.variable.id)
 
           this.setWarningText(null)
         }
