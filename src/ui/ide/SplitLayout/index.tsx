@@ -37,7 +37,7 @@ export function SplitLayout({ children }: SplitLayoutProps) {
         minHeight: 0,
         overflow: 'hidden',
         alignItems: 'stretch',
-        borderRadius: theme => theme.shape.splitLayoutPanelBorderRadius,
+        borderRadius: theme => theme.shape.surfaceBorderRadius,
         display: 'flex',
         flexDirection: 'row',
         gap: 0

@@ -21,7 +21,7 @@ declare module '@mui/material/styles' {
     editorMultilineStringInputMaxWidth: string,
     editorRowHeight: string,
     iconButtonSize: string,
-    splitLayoutPanelBorderRadius: string
+    surfaceBorderRadius: string
   }
   interface ThemeOptions {
     shape?: Partial<Shape>
@@ -52,14 +52,14 @@ let theme = createTheme({
     inputBorder: 'rgba(255, 255, 255, 0.23)',
   },
   shape: {
-    borderRadius: 2,
+    borderRadius: '4px',
     editorInputMinWidth: '10rem',
     editorInputMaxWidth: '20rem',
     editorMultilineStringInputMinWidth: '20rem',
     editorMultilineStringInputMaxWidth: '30rem',
     editorRowHeight: '2rem',
     iconButtonSize: '2rem',
-    splitLayoutPanelBorderRadius: '12px'
+    surfaceBorderRadius: '12px'
   },
   typography: {
     fontFamily: '"Inter", sans-serif',
@@ -87,6 +87,10 @@ let theme = createTheme({
       styleOverrides: {
         root: ({ theme }) => ({
           backgroundColor: theme.palette.background.input,
+          '& fieldset': {
+            border: 'none',
+            borderRadius: theme.shape.borderRadius
+          }
         }),
       },
     },

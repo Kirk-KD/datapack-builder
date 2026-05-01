@@ -25,18 +25,21 @@ export function EditorModal() {
           width: '100%',
           height: '100%'
         } : {
-          top: '50%',
+          top: '45%',
           left: '50%',
-          transform: 'translate(-50%, -25rem)',
+          transform: 'translate(-50%, -45%)',
           width: '50rem',
-          maxHeight: '50rem',
-        })
+          maxHeight: '90%',
+          height: '90%'
+        }),
       }}>
         <Stack direction={'row'} sx={{
           backgroundColor: 'background.paper',
           alignItems: 'center',
           p: 1,
           pl: 2,
+          borderTopLeftRadius: theme => theme.shape.surfaceBorderRadius,
+          borderTopRightRadius: theme => theme.shape.surfaceBorderRadius
         }}>
           <Typography variant={'h6'} sx={{
             flex: 1,
@@ -44,23 +47,37 @@ export function EditorModal() {
           <MaximizeButton maximized={maximized}/>
         </Stack>
         <Box sx={{
-          backgroundColor: 'background.default',
-          p: 2,
+          backgroundColor: 'background.paper',
+          p: 1,
           width: '100%',
-          overflowX: 'auto',
-          flex: maximized ? 1 : undefined
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden'
         }}>
           <Box sx={{
-            width: 'fit-content',
-            minWidth: 'min-content',
-            mx: 'auto'
+            p: 1,
+            width: '100%',
+            height: '100%',
+            minWidth: 0,
+            minHeight: 0,
+            overflow: 'auto',
+            backgroundColor: 'background.default',
+            borderRadius: theme => theme.shape.surfaceBorderRadius,
           }}>
-            {payload.editor}
+            <Box sx={{
+              width: 'fit-content',
+              minWidth: 'min-content',
+              mx: 'auto',
+            }}>
+              {payload.editor}
+            </Box>
           </Box>
         </Box>
         <Stack direction={'row-reverse'} sx={{
           backgroundColor: 'background.paper',
-          p: 1
+          p: 1,
+          borderBottomLeftRadius: theme => theme.shape.surfaceBorderRadius,
+          borderBottomRightRadius: theme => theme.shape.surfaceBorderRadius
         }}>
           <Button onClick={controller.closeEditorModal}>Done</Button>
         </Stack>
