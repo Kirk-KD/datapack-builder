@@ -44,7 +44,7 @@ export class Emitter implements IrVisitor<string> {
       const clauseString = node.clauseNodes.map(clauseNode => clauseNode.accept(this)).join(' ')
       return `execute ${clauseString} run function ${this.naming.internalNamespace()}:${bodyFunctionId}`
     } else {
-      return `run function ${this.naming.internalNamespace()}:${bodyFunctionId}`
+      return `function ${this.naming.internalNamespace()}:${bodyFunctionId}`
     }
   }
 
