@@ -117,13 +117,13 @@ export class LiteralPositionNode extends IrNode {
 }
 
 export class LiteralRangeNode extends IrNode {
-  readonly min: number
-  readonly max: number
+  readonly minNode: OrParameter<LiteralIntNode> // TODO add number type (not just int)
+  readonly maxNode: OrParameter<LiteralIntNode>
 
-  constructor(min: number, max: number, sourceBlockId?: string | null) {
+  constructor(minNode: OrParameter<LiteralIntNode>, maxNode: OrParameter<LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
-    this.min = min
-    this.max = max
+    this.minNode = minNode
+    this.maxNode = maxNode
   }
 
   accept<T>(visitor: IrVisitor<T>): T {

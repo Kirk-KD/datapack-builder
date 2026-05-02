@@ -1,5 +1,7 @@
 import type { BlockSpec } from '../types'
 import {setShadowState} from "../../extensions/shadows.ts";
+import {LiteralIntNode, LiteralRangeNode, LiteralStringNode} from '../../../compiler/ir'
+import {valueToIr} from '../../../compiler/generator'
 
 const FIELD_VALUE = 'VALUE'
 
@@ -24,7 +26,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       extensions: ['mc_int_validator'],
     },
     generator(block) {
-      return [String(block.getFieldValue(FIELD_VALUE)), 0]
+      return new LiteralIntNode(block.getFieldValue(FIELD_VALUE), block.id)
     },
   },
   {
@@ -46,7 +48,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_string',
     },
     generator(block) {
-      return [String(block.getFieldValue(FIELD_VALUE)), 0]
+      return new LiteralStringNode(block.getFieldValue(FIELD_VALUE), block.id)
     },
   },
   {
@@ -75,7 +77,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_block_pos',
       inputsInline: true,
     },
-    generator(block) {
+    generator(block) { // TODO add tilde caret node type
       const x = mcfunctionGenerator.valueToCode(block, 'X', 0)
       const y = mcfunctionGenerator.valueToCode(block, 'Y', 0)
       const z = mcfunctionGenerator.valueToCode(block, 'Z', 0)
@@ -109,10 +111,11 @@ export const literalBlockSpecs: BlockSpec[] = [
       inputsInline: true,
     },
     generator(block) {
-      const min = mcfunctionGenerator.valueToCode(block, 'MIN', 0)
-      const max = mcfunctionGenerator.valueToCode(block, 'MAX', 0)
-      if (min === '' && max === '') return ['', 0]
-      return [`${min}..${max}`, 0]
+      return new LiteralRangeNode(
+        valueToIr(block, 'MIN'),
+        valueToIr(block, 'MAX'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MIN', {type: 'number', fields: { VALUE: '' }})
@@ -140,7 +143,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_rotation',
       inputsInline: true,
     },
-    generator(block) {
+    generator(block) { // TODO caret
       const yaw = mcfunctionGenerator.valueToCode(block, 'YAW', 0)
       const pitch = mcfunctionGenerator.valueToCode(block, 'PITCH', 0)
       return [`${yaw} ${pitch}`, 0]

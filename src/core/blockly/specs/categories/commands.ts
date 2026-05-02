@@ -4,6 +4,8 @@ import * as Blockly from "blockly"
 import {colours} from "../../colours.ts";
 import { createStateCheckbox, createStateDropdown } from "../dynamicFields.ts";
 import { bindExtraState } from "../extraState.ts";
+import {SegmentNode} from '../../../compiler/ir'
+import {valueToIr} from '../../../compiler/generator'
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 
@@ -77,8 +79,7 @@ export const commandBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const message = mcfunctionGenerator.valueToCode(block, 'MESSAGE', 0) || ''
-      return `say ${message}\n`
+      return new SegmentNode(['say', valueToIr(block, 'MESSAGE')])
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MESSAGE', {
@@ -111,9 +112,12 @@ export const commandBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const selector = mcfunctionGenerator.valueToCode(block, 'SELECTOR', 0)
-      const target = mcfunctionGenerator.valueToCode(block, 'TARGET', 0)
-      return `teleport ${selector} ${target}\n`
+      const selector = valueToIr(block, 'SELECTOR')
+      const target = valueToIr(block, 'TARGET')
+      return new SegmentNode(
+        ['teleport', selector, target],
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'SELECTOR', { type: 'mc_target_selector' })
@@ -432,9 +436,12 @@ export const commandBlockSpecs: BlockSpec[] = [
       inputsInline: true,
     },
     generator(block) {
-      const target = mcfunctionGenerator.valueToCode(block, 'TARGET', 0)
-      const item = mcfunctionGenerator.valueToCode(block, 'ITEM', 0)
-      return `give ${target} ${item}\n`
+      const target = valueToIr(block, 'TARGET')
+      const item = valueToIr(block, 'ITEM')
+      return new SegmentNode(
+        ['give', target, item],
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'TARGET', { type: 'mc_target_selector' })

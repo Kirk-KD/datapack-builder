@@ -6,7 +6,7 @@ import { eventBlockSpecs } from './categories/events'
 import { executeBlockSpecs } from './categories/execute'
 import { literalBlockSpecs } from './categories/literals'
 import { procedureBlockSpecs } from './categories/procedures'
-import { selectorBlockSpecs, targetSelectorRootType } from './categories/selectors'
+import { selectorBlockSpecs } from './categories/selectors'
 import { variableBlockSpecs } from './categories/variable'
 import type { BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
 import {shadowInputBlockSpecs} from "./shadowInputs.ts";
@@ -96,5 +96,3 @@ export function registerBlockSpecs() {
     registerBlockIrGenerator(spec)
   }
 }
-
-export { targetSelectorRootType } // TODO what?

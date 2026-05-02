@@ -17,7 +17,15 @@ export class Naming {
   }
 
   variableObjectiveName() {
-    return this.dpb(this.projectConfig.namespace)
+    return this.dpb('VARIABLES')
+  }
+
+  variableName(name: string) {
+    return this.dpb(name)
+  }
+
+  tempName() {
+    return this.dpb('TEMP')
   }
 
   initializedFlagName() {

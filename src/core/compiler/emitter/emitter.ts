@@ -7,6 +7,7 @@ import {
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
 import type {ProjectConfig} from '../../../stores'
+import {compileEditorState} from './emitEditorState.ts'
 
 export class Emitter implements IrVisitor<string> {
   readonly files: OutputFiles
@@ -48,31 +49,53 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitIf(node: IfNode): string {
-    return undefined
+    if (!node.trueBodyNodes.length && !node.falseBodyNodes.length) return ''
+
+    let res = ''
+
+    if (node.trueBodyNodes.length) {
+      const id = this.naming.nextId('if_true')
+      const code = node.trueBodyNodes.map(n => n.accept(this)).join('\n') + '\n'
+      this.files.with(this.naming.internalMcfunctionFilePath(id)).write(code)
+
+      const conditionCode = node.conditionNode.accept(this)
+      res += `execute if ${conditionCode} run function ${this.naming.internalNamespace()}:${id}`
+    }
+
+    if (node.falseBodyNodes.length) {
+      const id = this.naming.nextId('if_false')
+      const code = node.falseBodyNodes.map(n => n.accept(this)).join('\n') + '\n'
+      this.files.with(this.naming.internalMcfunctionFilePath(id)).write(code)
+
+      const conditionCode = node.conditionNode.accept(this)
+      res += `execute unless ${conditionCode} run function ${this.naming.internalNamespace()}:${id}`
+    }
+
+    return res
   }
 
   visitItemStack(node: ItemStackNode): string {
-    return undefined
+    return compileEditorState({ compiler: 'item_stack', error: false, data: node.itemStackData }, {})
   }
 
   visitLiteralAngle(node: LiteralAngleNode): string {
-    return undefined
+    return `${node.yaw} ${node.pitch}`
   }
 
   visitLiteralInt(node: LiteralIntNode): string {
-    return undefined
+    return `${node.value}`
   }
 
   visitLiteralPosition(node: LiteralPositionNode): string {
-    return undefined
+    return `${node.x} ${node.y} ${node.z}`
   }
 
   visitLiteralRange(node: LiteralRangeNode): string {
-    return undefined
+    return `${node.minNode.accept(this)}..${node.maxNode.accept(this)}`
   }
 
   visitLiteralString(node: LiteralStringNode): string {
-    return undefined
+    return node.value
   }
 
   visitOnLoad(node: OnLoadNode): string {
@@ -136,15 +159,15 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitVariable(node: VariableNode): string {
-    return undefined
+    return this.naming.variableName(node.variableEntry.name)  // consider using ID in the future?
   }
 
   visitVariableCompare(node: VariableCompareNode): string {
-    return undefined
+    return undefined // TODO this requires a lowering pass before running the emitter.
   }
 
   visitVariableMatches(node: VariableMatchesNode): string {
-    return undefined
+    return `score ${node.variableNode.accept(this)} ${this.naming.variableObjectiveName()} matches ${node.rangeNode.accept(this)}`
   }
 
   visitVariableOperation(node: VariableOperationNode): string {
