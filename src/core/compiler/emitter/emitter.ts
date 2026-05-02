@@ -132,30 +132,35 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitProcedureCall(node: ProcedureCallNode): string {
-    return undefined
+    return undefined // TODO pending lowering pass
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): string {
-    return undefined
+    return undefined // TODO pending lowering pass
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): string {
-    return undefined
+    this.files.with(this.naming.procedureMcfunctionFilePath(node.procedureEntry.name)).write(
+      node.bodyNodes.map(n => n.accept(this)).join('\n') + '\n'
+    )
+    return ''
   }
 
   visitProcedureParameter(node: ProcedureParameterNode): string {
-    return undefined
+    return `$(${node.parameterEntry.name})`
   }
 
   visitSegment(node: SegmentNode): string {
     const res = node.parts.map(
       part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
-    console.assert(res.indexOf('\n') === -1) // TODO better design
+    console.assert(res.indexOf('\n') === -1)
     return res
   }
 
-  visitTargetSelector(node: TargetSelectorNode): string {
-    return undefined
+  visitTargetSelector(node: TargetSelectorNode): string { // Placeholder; will switch to editor
+    let res = node.targetCategory
+    if (node.clauseNodes.length) res += `[${node.clauseNodes.map(n => n.accept(this)).join(',')}]`
+    return res
   }
 
   visitVariable(node: VariableNode): string {
@@ -163,7 +168,7 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitVariableCompare(node: VariableCompareNode): string {
-    return undefined // TODO this requires a lowering pass before running the emitter.
+    return undefined // TODO pending lowering pass
   }
 
   visitVariableMatches(node: VariableMatchesNode): string {
@@ -171,10 +176,10 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitVariableOperation(node: VariableOperationNode): string {
-    return undefined
+    return undefined // TODO pending lowering pass
   }
 
   visitWhile(node: WhileNode): string {
-    return undefined
+    return undefined // TODO pending lowering pass
   }
 }

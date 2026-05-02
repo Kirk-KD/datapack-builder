@@ -100,7 +100,7 @@ export class LiteralStringNode extends IrNode {
 }
 
 export class LiteralPositionNode extends IrNode {
-  readonly x: string
+  readonly x: string // TODO placeholder; should be tilde-and-caret node
   readonly y: string
   readonly z: string
 
@@ -132,7 +132,7 @@ export class LiteralRangeNode extends IrNode {
 }
 
 export class LiteralAngleNode extends IrNode {
-  readonly yaw: string
+  readonly yaw: string // TODO placeholder
   readonly pitch: string
 
   constructor(yaw: string, pitch: string, sourceBlockId?: string | null) {
