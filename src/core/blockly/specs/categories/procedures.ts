@@ -4,8 +4,13 @@ import {procedureRegistry, type ProcedureParameterRegistryEntry, type ProcedureR
 import * as Blockly from "blockly";
 import {colours} from "../../colours.ts";
 import getToolboxContents from "../../getToolboxContents.ts";
-import {ProcedureDefinitionNode} from '../../../compiler/ir'
-import {nextBlocksToIr} from '../../../compiler/generator'
+import {
+  ProcedureCallArgumentNode,
+  ProcedureCallNode,
+  ProcedureDefinitionNode,
+  ProcedureParameterNode
+} from '../../../compiler/ir'
+import {blockToIr, nextBlocksToIr} from '../../../compiler/generator'
 
 type ProcBlockState = {
   procedure: ProcedureRegistryEntry | null
@@ -217,9 +222,23 @@ const procCallBlockSpec: BlockSpec = {
 
     block.updateShape_()
   },
-  generator() {
-    // TODO pending a generator/compiler refactor
-    return ''
+  generator(block: Blockly.Block) {
+    const proc = (block as ProcCallBlock).procedure!
+    return new ProcedureCallNode(
+      proc,
+      proc.parameters
+        .map(param => {
+          const argBlock = block.getInputTargetBlock(`ARG_${param.id}`)
+          if (!argBlock) return null
+
+          return new ProcedureCallArgumentNode(
+            param,
+            blockToIr(argBlock),
+            block.id
+          )
+        })
+        .filter(e => e !== null)
+    )
   }
 }
 
@@ -257,9 +276,11 @@ const procParamBlockSpec: BlockSpec = {
 
     block.updateShape_()
   },
-  generator() {
-    // TODO pending a generator/compiler refactor
-    return ''
+  generator(block: Blockly.Block) {
+    return new ProcedureParameterNode(
+      (block as ProcParamBlock).parameter!,
+      block.id
+    )
   }
 }
 
