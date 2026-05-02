@@ -173,7 +173,7 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitVariable(node: VariableNode): string {
-    return this.naming.variableName(node.variableEntry.name)  // consider using ID in the future?
+    return `${this.naming.variableName(node.variableEntry.name)} ${this.naming.variableObjectiveName()}`
   }
 
   visitVariableCompare(node: VariableCompareNode): string {

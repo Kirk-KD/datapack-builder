@@ -25,15 +25,11 @@ export class Naming {
   }
 
   variableName(name: string) {
-    return this.dpb(name)
-  }
-
-  tempName() {
-    return this.dpb('TEMP')
+    return '$' + this.dpb(name)
   }
 
   initializedFlagName() {
-    return this.dpb('FLAG_INIT')
+    return this.variableName('FLAG_INIT')
   }
 
   nextId(name: string) {

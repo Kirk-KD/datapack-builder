@@ -27,7 +27,7 @@ The IR is the only construct that crosses the boundary between the authoring sta
 (Blockly, editors) and the output stage (emitter). Every stage after generators reads
 from or writes to the IR exclusively.
 
-## `pass`
+## `passes`
 
 A pass is a function that walks the IR with a single responsibility. A pass is either:
 - **Read-only (validation):** inspects the IR and produces errors or warnings without
@@ -39,6 +39,11 @@ A pass is a function that walks the IR with a single responsibility. A pass is e
 
 Passes run in a defined order after all generators have completed, ensuring the full
 IR is available before any validation or transformation is applied.
+
+### Lowering Pass
+
+The lowering pass breaks down complex nodes into less complex ones by inserting commands before the encountered node.
+For example, a node with a different way of output for each type of input should not exist past the lowering pass.
 
 ## `emitter`
 
