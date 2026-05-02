@@ -1,14 +1,11 @@
-import * as Blockly from 'blockly'
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
 import {
   IfNode,
-  LiteralIntNode,
-  LiteralRangeNode, type OrParameter,
   VariableCompareNode,
   type VariableCompareOpType,
   VariableMatchesNode,
-  VariableNode, WhileNode
+  WhileNode
 } from '../../../compiler/ir'
 import {statementToIr, valueToIr} from '../../../compiler/generator'
 
@@ -18,27 +15,6 @@ const INPUT_VAR_B = 'VAR_B'
 const INPUT_CONDITION = 'CONDITION'
 const INPUT_DO = 'DO'
 const INPUT_ELSE = 'ELSE'
-
-const opMap: Record<string, string> = {
-  LT: '<',
-  LTE: '<=',
-  EQ: '=',
-  GTE: '>=',
-  GT: '>',
-}
-
-export function getConditionSetup(conditionBlock: Blockly.Block): string {
-  if (conditionBlock.type === 'mc_comp_score_compare') {
-    const valueBBlock = conditionBlock.getInputTargetBlock(INPUT_VAR_B)
-    if (valueBBlock?.type === 'mc_int') {
-      const num = valueBBlock.getFieldValue('VALUE')
-      const tempName = getTempVarName()
-      const obj = getObjectiveName()
-      return `scoreboard players set ${tempName} ${obj} ${num}\n`
-    }
-  }
-  return ''
-}
 
 export const controlBlockSpecs: BlockSpec[] = [
   {

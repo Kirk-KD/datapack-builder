@@ -178,13 +178,15 @@ export const commandBlockSpecs: BlockSpec[] = [
     },
     generator(block: Blockly.Block) {
       const action = block.getFieldValue(ADVANCEMENT_ACTION_NAME)
-      const target = mcfunctionGenerator.valueToCode(block, ADVANCEMENT_TARGET_NAME, 0)
+      const target = valueToIr(block, ADVANCEMENT_TARGET_NAME)
       const specifier = block.getFieldValue(ADVANCEMENT_SPECIFIER_NAME)
       const advancement = block.getInput(ADVANCEMENT_ADVANCEMENT_NAME) ?
-        ` ${mcfunctionGenerator.valueToCode(block, ADVANCEMENT_ADVANCEMENT_NAME, 0)}` : ''
+        valueToIr(block, ADVANCEMENT_ADVANCEMENT_NAME) : null
       const criterion = block.getInput(ADVANCEMENT_CRITERION_NAME) ?
-        ` ${mcfunctionGenerator.valueToCode(block, ADVANCEMENT_CRITERION_NAME, 0)}` : ''
-      return `advancement ${action} ${target} ${specifier}${advancement}${criterion}\n`
+        valueToIr(block, ADVANCEMENT_CRITERION_NAME) : null
+      return new SegmentNode([
+        'advancement', action, target, specifier, advancement, criterion
+      ].filter(e => e !== null), block.id)
     }
   },
   {
@@ -274,17 +276,30 @@ export const commandBlockSpecs: BlockSpec[] = [
       block.updateShape_()
     },
     generator(block: Blockly.Block) {
-      const target = mcfunctionGenerator.valueToCode(block, ATTRIBUTE_TARGET_NAME, 0)
-      const attribute = mcfunctionGenerator.valueToCode(block, ATTRIBUTE_ATTRIBUTE_NAME, 0)
+      const target = valueToIr(block, ATTRIBUTE_TARGET_NAME)
+      const attribute = valueToIr(block, ATTRIBUTE_ATTRIBUTE_NAME)
       const action = block.getFieldValue(ATTRIBUTE_ACTION_NAME)
-      const scale = block.getInput(ATTRIBUTE_SCALE_NAME) ?
-        ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_SCALE_NAME, 0)}` : ''
-      const value = block.getInput(ATTRIBUTE_VALUE_NAME) ?
-        ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_VALUE_NAME, 0)}` : ''
-      const id = block.getInput(ATTRIBUTE_ID_NAME) ?
-        ` ${mcfunctionGenerator.valueToCode(block, ATTRIBUTE_ID_NAME, 0)}` : ''
-      const property = ` ${block.getFieldValue(ATTRIBUTE_PROPERTY_NAME) ?? ''}`
-      return `attribute ${target} ${attribute} ${action}${id}${value}${scale}${property}\n`
+
+      const scale = block.getInput(ATTRIBUTE_SCALE_NAME)
+        ? valueToIr(block, ATTRIBUTE_SCALE_NAME)
+        : null
+
+      const value = block.getInput(ATTRIBUTE_VALUE_NAME)
+        ? valueToIr(block, ATTRIBUTE_VALUE_NAME)
+        : null
+
+      const id = block.getInput(ATTRIBUTE_ID_NAME)
+        ? valueToIr(block, ATTRIBUTE_ID_NAME)
+        : null
+
+      const propertyValue = block.getFieldValue(ATTRIBUTE_PROPERTY_NAME)
+      const property = propertyValue ? propertyValue : null
+
+      return new SegmentNode(
+        ['attribute', target, attribute, action, id, value, scale, property]
+          .filter(e => e !== null),
+        block.id
+      )
     }
   },
   {
@@ -381,36 +396,50 @@ export const commandBlockSpecs: BlockSpec[] = [
     generator(block: Blockly.Block) {
       const cloneBlock = block as CloneBlock
 
-      let cmd = 'clone'
+      const fromDim = cloneBlock.hasFromDimension_
+        ? ['from', valueToIr(cloneBlock, CLONE_SOURCE_DIMENSION_NAME)]
+        : null
 
-      if (cloneBlock.hasFromDimension_) {
-        const srcDim = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_SOURCE_DIMENSION_NAME, 0)
-        cmd += ` from ${srcDim}`
-      }
+      const begin = valueToIr(cloneBlock, CLONE_BEGIN_NAME)
+      const end = valueToIr(cloneBlock, CLONE_END_NAME)
 
-      const begin = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_BEGIN_NAME, 0)
-      const end = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_END_NAME, 0)
-      cmd += ` ${begin} ${end}`
+      const toDim = cloneBlock.hasToDimension_
+        ? ['to', valueToIr(cloneBlock, CLONE_TARGET_DIMENSION_NAME)]
+        : null
 
-      if (cloneBlock.hasToDimension_) {
-        const tarDim = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_TARGET_DIMENSION_NAME, 0)
-        cmd += ` to ${tarDim}`
-      }
+      const destination = valueToIr(cloneBlock, CLONE_DESTINATION_NAME)
 
-      const destination = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_DESTINATION_NAME, 0)
-      cmd += ` ${destination}`
+      const strict = cloneBlock.isStrict_ ? 'strict' : null
 
-      if (cloneBlock.isStrict_) cmd += ' strict'
+      const maskMode = cloneBlock.maskMode_ !== '(none)'
+        ? cloneBlock.maskMode_
+        : null
 
-      if (cloneBlock.maskMode_ !== '(none)') cmd += ` ${cloneBlock.maskMode_}`
-      if (cloneBlock.maskMode_ === 'filtered') {
-        const filter = mcfunctionGenerator.valueToCode(cloneBlock, CLONE_FILTER_NAME, 0)
-        cmd += ` ${filter}`
-      }
+      const filter = cloneBlock.maskMode_ === 'filtered'
+        ? valueToIr(cloneBlock, CLONE_FILTER_NAME)
+        : null
 
-      if (cloneBlock.cloneMode_ !== '(none)') cmd += ` ${cloneBlock.cloneMode_}`
+      const cloneMode = cloneBlock.cloneMode_ !== '(none)'
+        ? cloneBlock.cloneMode_
+        : null
 
-      return cmd + '\n'
+      return new SegmentNode(
+        [
+          'clone',
+          fromDim,
+          begin,
+          end,
+          toDim,
+          destination,
+          strict,
+          maskMode,
+          filter,
+          cloneMode
+        ]
+          .flat()
+          .filter(e => e !== null),
+        block.id
+      )
     }
   },
   {
