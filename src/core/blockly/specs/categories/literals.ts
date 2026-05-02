@@ -1,6 +1,12 @@
 import type { BlockSpec } from '../types'
 import {setShadowState} from "../../extensions/shadows.ts";
-import {LiteralIntNode, LiteralRangeNode, LiteralStringNode} from '../../../compiler/ir'
+import {
+  LiteralAngleNode,
+  LiteralIntNode,
+  LiteralPositionNode,
+  LiteralRangeNode,
+  LiteralStringNode
+} from '../../../compiler/ir'
 import {valueToIr} from '../../../compiler/generator'
 
 const FIELD_VALUE = 'VALUE'
@@ -78,10 +84,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       inputsInline: true,
     },
     generator(block) { // TODO add tilde caret node type
-      const x = mcfunctionGenerator.valueToCode(block, 'X', 0)
-      const y = mcfunctionGenerator.valueToCode(block, 'Y', 0)
-      const z = mcfunctionGenerator.valueToCode(block, 'Z', 0)
-      return [`${x} ${y} ${z}`, 0]
+      return new LiteralPositionNode('~', '~', '~', block.id)
     },
     setShadowBlocks(this) {
       setShadowState(this, 'X', {type: 'tilde_caret'})
@@ -143,10 +146,8 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_rotation',
       inputsInline: true,
     },
-    generator(block) { // TODO caret
-      const yaw = mcfunctionGenerator.valueToCode(block, 'YAW', 0)
-      const pitch = mcfunctionGenerator.valueToCode(block, 'PITCH', 0)
-      return [`${yaw} ${pitch}`, 0]
+    generator(block) { // TODO tilde
+      return new LiteralAngleNode('~','~', block.id)
     },
     setShadowBlocks(this) {
       setShadowState(this, 'YAW', {type: 'angle'})
