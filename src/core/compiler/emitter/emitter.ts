@@ -1,8 +1,10 @@
 import {
   DatapackNode, ExecuteNode, IfNode, type IrVisitor, ItemStackNode, LiteralRotationNode, LiteralIntNode,
   LiteralPositionNode, LiteralRangeNode, LiteralStringNode, OnLoadNode, OnTickNode,
-  ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode, SegmentNode,
-  TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode
+  ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode,
+  TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode,
+  CommandCompositeNode,
+  FragmentCompositeNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
@@ -18,6 +20,20 @@ export class Emitter implements IrVisitor<string> {
     this.files = outputFiles
     this.projectConfig = projectConfig
     this.naming = new Naming(this.projectConfig)
+  }
+
+  visitCommandComposite(node: CommandCompositeNode): string {
+    const res = node.parts.map(
+      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
+    console.assert(res.indexOf('\n') === -1)
+    return res
+  }
+
+  visitFragmentComposite(node: FragmentCompositeNode): string {
+    const res = node.parts.map(
+      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
+    console.assert(res.indexOf('\n') === -1)
+    return res
   }
 
   visitDatapack(node: DatapackNode): string {
@@ -148,13 +164,6 @@ export class Emitter implements IrVisitor<string> {
 
   visitProcedureParameter(node: ProcedureParameterNode): string {
     return `$(${node.parameterEntry.name})`
-  }
-
-  visitSegment(node: SegmentNode): string {
-    const res = node.parts.map(
-      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
-    console.assert(res.indexOf('\n') === -1)
-    return res
   }
 
   visitTargetSelector(node: TargetSelectorNode): string { // Placeholder; will switch to editor

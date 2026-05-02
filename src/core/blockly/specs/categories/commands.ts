@@ -4,8 +4,8 @@ import * as Blockly from "blockly"
 import {colours} from "../../colours.ts";
 import { createStateCheckbox, createStateDropdown } from "../dynamicFields.ts";
 import { bindExtraState } from "../extraState.ts";
-import {SegmentNode} from '../../../compiler/ir'
 import {valueToIr} from '../../../compiler/generator'
+import {CommandCompositeNode} from '../../../compiler/ir'
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 
@@ -79,7 +79,7 @@ export const commandBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      return new SegmentNode(['say', valueToIr(block, 'MESSAGE')])
+      return new CommandCompositeNode(['say', valueToIr(block, 'MESSAGE')])
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MESSAGE', {
@@ -114,7 +114,7 @@ export const commandBlockSpecs: BlockSpec[] = [
     generator(block) {
       const selector = valueToIr(block, 'SELECTOR')
       const target = valueToIr(block, 'TARGET')
-      return new SegmentNode(
+      return new CommandCompositeNode(
         ['teleport', selector, target],
         block.id
       )
@@ -184,7 +184,7 @@ export const commandBlockSpecs: BlockSpec[] = [
         valueToIr(block, ADVANCEMENT_ADVANCEMENT_NAME) : null
       const criterion = block.getInput(ADVANCEMENT_CRITERION_NAME) ?
         valueToIr(block, ADVANCEMENT_CRITERION_NAME) : null
-      return new SegmentNode([
+      return new CommandCompositeNode([
         'advancement', action, target, specifier, advancement, criterion
       ].filter(e => e !== null), block.id)
     }
@@ -295,7 +295,7 @@ export const commandBlockSpecs: BlockSpec[] = [
       const propertyValue = block.getFieldValue(ATTRIBUTE_PROPERTY_NAME)
       const property = propertyValue ? propertyValue : null
 
-      return new SegmentNode(
+      return new CommandCompositeNode(
         ['attribute', target, attribute, action, id, value, scale, property]
           .filter(e => e !== null),
         block.id
@@ -423,7 +423,7 @@ export const commandBlockSpecs: BlockSpec[] = [
         ? cloneBlock.cloneMode_
         : null
 
-      return new SegmentNode(
+      return new CommandCompositeNode(
         [
           'clone',
           fromDim,
@@ -467,7 +467,7 @@ export const commandBlockSpecs: BlockSpec[] = [
     generator(block) {
       const target = valueToIr(block, 'TARGET')
       const item = valueToIr(block, 'ITEM')
-      return new SegmentNode(
+      return new CommandCompositeNode(
         ['give', target, item],
         block.id
       )

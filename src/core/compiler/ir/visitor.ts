@@ -1,16 +1,16 @@
 import {
-  SegmentNode,
   type DatapackNode, ItemStackNode, LiteralIntNode, LiteralStringNode,
   OnLoadNode,
   OnTickNode, ProcedureCallArgumentNode, ProcedureCallNode,
   ProcedureDefinitionNode, ProcedureParameterNode,
   VariableNode,
   VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
-  VariableMatchesNode, VariableCompareNode, IfNode, WhileNode
+  VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
-  visitSegment(node: SegmentNode): T
+  visitCommandComposite(node: CommandCompositeNode): T
+  visitFragmentComposite(node: FragmentCompositeNode): T
 
   visitDatapack(node: DatapackNode): T
 

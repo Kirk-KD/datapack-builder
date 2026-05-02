@@ -21,6 +21,22 @@ export abstract class IrNode {
   abstract accept<T>(visitor: IrVisitor<T>): T
 }
 
+/**
+ * Represents one line of command.
+ */
+export abstract class CommandNode extends IrNode {
+  isMacro: boolean = false
+
+  prefix(code: string) {
+    return (this.isMacro ? '$' : '') + code
+  }
+}
+
+/**
+ * Represents a fragment of a command, not a complete line.
+ */
+export abstract class FragmentNode extends IrNode {}
+
 export class DatapackNode extends IrNode {
   readonly topLevelNodes: TopLevelNode[]
 
@@ -34,23 +50,36 @@ export class DatapackNode extends IrNode {
   }
 }
 
-export class SegmentNode extends IrNode {
-  readonly parts: (IrNode | string)[]
+export class CommandCompositeNode extends CommandNode {
+  readonly parts: (FragmentNode | string)[]
 
-  constructor(parts: (IrNode | string)[], sourceBlockId?: string | null) {
+  constructor(parts: (FragmentNode | string)[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.parts = parts
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
-    return visitor.visitSegment(this)
+    return visitor.visitCommandComposite(this)
+  }
+}
+
+export class FragmentCompositeNode extends FragmentNode {
+  readonly parts: (FragmentNode | string)[]
+
+  constructor(parts: (FragmentNode | string)[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.parts = parts
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitFragmentComposite(this)
   }
 }
 
 export class OnLoadNode extends IrNode {
-  readonly bodyNodes: IrNode[]
+  readonly bodyNodes: CommandNode[]
 
-  constructor(bodyNodes: IrNode[], sourceBlockId?: string | null) {
+  constructor(bodyNodes: CommandNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.bodyNodes = bodyNodes
   }
@@ -61,9 +90,9 @@ export class OnLoadNode extends IrNode {
 }
 
 export class OnTickNode extends IrNode {
-  readonly bodyNodes: IrNode[]
+  readonly bodyNodes: CommandNode[]
 
-  constructor(bodyNodes: IrNode[], sourceBlockId?: string | null) {
+  constructor(bodyNodes: CommandNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.bodyNodes = bodyNodes
   }
@@ -73,7 +102,7 @@ export class OnTickNode extends IrNode {
   }
 }
 
-export class LiteralIntNode extends IrNode {
+export class LiteralIntNode extends FragmentNode {
   readonly value: number
 
   constructor(value: number, sourceBlockId?: string | null) {
@@ -86,7 +115,7 @@ export class LiteralIntNode extends IrNode {
   }
 }
 
-export class LiteralStringNode extends IrNode {
+export class LiteralStringNode extends FragmentNode {
   readonly value: string
 
   constructor(value: string, sourceBlockId?: string | null) {
@@ -99,7 +128,7 @@ export class LiteralStringNode extends IrNode {
   }
 }
 
-export class LiteralPositionNode extends IrNode {
+export class LiteralPositionNode extends FragmentNode {
   readonly xNode: LiteralStringNode
   readonly yNode: LiteralStringNode
   readonly zNode: LiteralStringNode
@@ -116,7 +145,7 @@ export class LiteralPositionNode extends IrNode {
   }
 }
 
-export class LiteralRangeNode extends IrNode {
+export class LiteralRangeNode extends FragmentNode {
   readonly minNode: LiteralIntNode // TODO add number type (not just int)
   readonly maxNode: LiteralIntNode
 
@@ -131,7 +160,7 @@ export class LiteralRangeNode extends IrNode {
   }
 }
 
-export class LiteralRotationNode extends IrNode {
+export class LiteralRotationNode extends FragmentNode {
   readonly yawNode: LiteralStringNode
   readonly pitchNode: LiteralStringNode
 
@@ -146,7 +175,7 @@ export class LiteralRotationNode extends IrNode {
   }
 }
 
-export abstract class BooleanNode extends IrNode {}
+export abstract class BooleanNode extends FragmentNode {}
 
 export class VariableMatchesNode extends BooleanNode {
   readonly variableNode: VariableNode
@@ -180,12 +209,12 @@ export class VariableCompareNode extends BooleanNode {
   }
 }
 
-export class IfNode extends IrNode {
+export class IfNode extends CommandNode {
   readonly conditionNode: BooleanNode
-  readonly trueBodyNodes: IrNode[]
-  readonly falseBodyNodes: IrNode[]
+  readonly trueBodyNodes: CommandNode[]
+  readonly falseBodyNodes: CommandNode[]
 
-  constructor(conditionNode: BooleanNode, trueBodyNodes: IrNode[], falseBodyNodes: IrNode[], sourceBlockId?: string | null) {
+  constructor(conditionNode: BooleanNode, trueBodyNodes: CommandNode[], falseBodyNodes: CommandNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.conditionNode = conditionNode
     this.trueBodyNodes = trueBodyNodes
@@ -197,11 +226,11 @@ export class IfNode extends IrNode {
   }
 }
 
-export class WhileNode extends IrNode {
+export class WhileNode extends CommandNode {
   readonly conditionNode: BooleanNode
-  readonly bodyNodes: IrNode[]
+  readonly bodyNodes: CommandNode[]
 
-  constructor(conditionNode: BooleanNode, bodyNodes: IrNode[], sourceBlockId?: string | null) {
+  constructor(conditionNode: BooleanNode, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.conditionNode = conditionNode
     this.bodyNodes = bodyNodes
@@ -212,7 +241,7 @@ export class WhileNode extends IrNode {
   }
 }
 
-export class VariableNode extends IrNode {
+export class VariableNode extends FragmentNode {
   readonly variableEntry: VariableRegistryEntry
 
   constructor(variableEntry: VariableRegistryEntry, sourceBlockId?: string | null) {
@@ -225,12 +254,12 @@ export class VariableNode extends IrNode {
   }
 }
 
-export class VariableOperationNode extends IrNode {
+export class VariableOperationNode extends CommandNode {
   readonly variableNode: VariableNode
   readonly opType: VariableOpType
-  readonly rightNode: IrNode
+  readonly rightNode: FragmentNode
 
-  constructor(variableNode: VariableNode, opType: VariableOpType, rightNode: IrNode, sourceBlockId?: string | null) {
+  constructor(variableNode: VariableNode, opType: VariableOpType, rightNode: FragmentNode, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.variableNode = variableNode
     this.opType = opType
@@ -242,11 +271,11 @@ export class VariableOperationNode extends IrNode {
   }
 }
 
-export class ProcedureDefinitionNode extends IrNode {
+export class ProcedureDefinitionNode extends CommandNode {
   readonly procedureEntry: ProcedureRegistryEntry
-  readonly bodyNodes: IrNode[]
+  readonly bodyNodes: CommandNode[]
 
-  constructor(procedureEntry: ProcedureRegistryEntry, bodyNodes: IrNode[], sourceBlockId?: string | null) {
+  constructor(procedureEntry: ProcedureRegistryEntry, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.procedureEntry = procedureEntry
     this.bodyNodes = bodyNodes
@@ -257,7 +286,7 @@ export class ProcedureDefinitionNode extends IrNode {
   }
 }
 
-export class ProcedureParameterNode extends IrNode {
+export class ProcedureParameterNode extends FragmentNode {
   readonly parameterEntry: ProcedureParameterRegistryEntry
 
   constructor(parameterEntry: ProcedureParameterRegistryEntry, sourceBlockId?: string | null) {
@@ -270,11 +299,11 @@ export class ProcedureParameterNode extends IrNode {
   }
 }
 
-export class ProcedureCallArgumentNode extends IrNode {
+export class ProcedureCallArgumentNode extends FragmentNode {
   readonly parameterEntry: ProcedureParameterRegistryEntry
-  readonly valueNode: IrNode
+  readonly valueNode: FragmentNode
 
-  constructor(parameterEntry: ProcedureParameterRegistryEntry, valueNode: IrNode, sourceBlockId?: string | null) {
+  constructor(parameterEntry: ProcedureParameterRegistryEntry, valueNode: FragmentNode, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.parameterEntry = parameterEntry
     this.valueNode = valueNode
@@ -285,7 +314,7 @@ export class ProcedureCallArgumentNode extends IrNode {
   }
 }
 
-export class ProcedureCallNode extends IrNode {
+export class ProcedureCallNode extends CommandNode {
   readonly procedureEntry: ProcedureRegistryEntry
   readonly argumentNodes: ProcedureCallArgumentNode[]
 
@@ -300,7 +329,7 @@ export class ProcedureCallNode extends IrNode {
   }
 }
 
-export class ItemStackNode extends IrNode {
+export class ItemStackNode extends FragmentNode {
   readonly itemStackData: ItemStackEditorResult
 
   constructor(itemStackData: ItemStackEditorResult, sourceBlockId?: string | null) {
@@ -313,11 +342,11 @@ export class ItemStackNode extends IrNode {
   }
 }
 
-export class TargetSelectorNode extends IrNode {
+export class TargetSelectorNode extends FragmentNode {
   readonly targetCategory: string
-  readonly clauseNodes: SegmentNode[]
+  readonly clauseNodes: FragmentCompositeNode[]
 
-  constructor(targetCategory: string, clauseNodes: SegmentNode[], sourceBlockId?: string | null) {
+  constructor(targetCategory: string, clauseNodes: FragmentCompositeNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.targetCategory = targetCategory
     this.clauseNodes = clauseNodes
@@ -328,11 +357,11 @@ export class TargetSelectorNode extends IrNode {
   }
 }
 
-export class ExecuteNode extends IrNode {
-  readonly clauseNodes: SegmentNode[]
-  readonly bodyNodes: IrNode[]
+export class ExecuteNode extends CommandNode {
+  readonly clauseNodes: FragmentCompositeNode[]
+  readonly bodyNodes: CommandNode[]
 
-  constructor(clauseNodes: SegmentNode[], bodyNodes: IrNode[], sourceBlockId?: string | null) {
+  constructor(clauseNodes: FragmentCompositeNode[], bodyNodes: CommandNode[], sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.clauseNodes = clauseNodes
     this.bodyNodes = bodyNodes

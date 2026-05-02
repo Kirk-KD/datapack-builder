@@ -4,7 +4,7 @@ import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
 import { createStateDropdown } from '../dynamicFields.ts'
 import { blockToIr, valueToIr } from '../../../compiler/generator'
-import { ExecuteNode, type IrNode, SegmentNode } from '../../../compiler/ir'
+import { ExecuteNode, type IrNode, FragmentCompositeNode } from '../../../compiler/ir'
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'
@@ -30,7 +30,7 @@ function executeModifierSpec(
   type: string,
   message0: string,
   args0: Record<string, unknown>[],
-  generator: (block: Blockly.Block) => SegmentNode,
+  generator: (block: Blockly.Block) => FragmentCompositeNode,
   jsonExtras: Record<string, unknown> = {},
   setShadowBlocks?: (this: Blockly.Block) => void,
 ): BlockSpec {
@@ -95,7 +95,7 @@ type ExecuteConditionInputConfig =
 type ExecuteConditionConfig = {
   message: string
   args: ExecuteConditionInputConfig[]
-  partialGenerator: (block: Blockly.Block) => SegmentNode
+  partialGenerator: (block: Blockly.Block) => FragmentCompositeNode
   customAppender?: (block: ExecuteConditionBlock, args: ExecuteConditionInputConfig[]) => void
   inputsInline?: boolean
 }
@@ -169,7 +169,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'BIOME', text: 'minecraft:plains' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'POS'),
         block.getFieldValue('BIOME')
       ])
@@ -182,7 +182,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'BLOCK', text: 'minecraft:stone' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'POS'),
         block.getFieldValue('BLOCK'),
       ])
@@ -198,7 +198,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_dropdown', name: 'SCAN_MODE', options: executeBlocksScanModeOptions },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'START_POS'),
         valueToIr(block, 'END_POS'),
         valueToIr(block, 'DEST_POS'),
@@ -216,7 +216,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
     message: '',
     args: [],
     partialGenerator() {
-      return new SegmentNode([])
+      return new FragmentCompositeNode([])
     },
   },
   dimension: {
@@ -225,7 +225,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'DIMENSION', text: 'minecraft:overworld' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([String(block.getFieldValue('DIMENSION'))])
+      return new FragmentCompositeNode([String(block.getFieldValue('DIMENSION'))])
     },
   },
   entity: {
@@ -234,7 +234,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'value', name: INPUT_TARGET, check: selectorLikeChecks },
     ],
     partialGenerator(block) {
-      return new SegmentNode([valueToIr(block, INPUT_TARGET)])
+      return new FragmentCompositeNode([valueToIr(block, INPUT_TARGET)])
     },
   },
   function: {
@@ -243,14 +243,14 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'FUNCTION', text: 'namespace:path' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([block.getFieldValue('FUNCTION')])
+      return new FragmentCompositeNode([block.getFieldValue('FUNCTION')])
     },
   },
   items: {
     message: '',
     args: [],
     partialGenerator() {
-      return new SegmentNode([])
+      return new FragmentCompositeNode([])
     },
   },
   loaded: {
@@ -259,7 +259,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
     ],
     partialGenerator(block) {
-      return new SegmentNode([valueToIr(block, 'POS')])
+      return new FragmentCompositeNode([valueToIr(block, 'POS')])
     },
   },
   predicate: {
@@ -268,14 +268,14 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'PREDICATE', text: '{}' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([block.getFieldValue('PREDICATE')])
+      return new FragmentCompositeNode([block.getFieldValue('PREDICATE')])
     },
   },
   score: {
     message: '',
     args: [],
     partialGenerator() {
-      return new SegmentNode([])
+      return new FragmentCompositeNode([])
     },
   },
 }
@@ -288,7 +288,7 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         'block',
         valueToIr(block, 'POS'),
         block.getFieldValue('PATH'),
@@ -302,7 +302,7 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         'entity',
         valueToIr(block, INPUT_TARGET),
         block.getFieldValue('PATH'),
@@ -316,7 +316,7 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         'storage',
         block.getFieldValue('SOURCE'),
         block.getFieldValue('PATH'),
@@ -335,7 +335,7 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
       { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         'block',
         valueToIr(block, 'SOURCE_POS'),
         valueToIr(block, 'SLOTS'),
@@ -352,7 +352,7 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
       { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
     ],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         'entity',
         valueToIr(block, 'SOURCE'),
         valueToIr(block, 'SLOTS'),
@@ -368,7 +368,7 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'TARGET'),
         valueToIr(block, 'TARGET_OBJECTIVE'),
         '<',
@@ -382,7 +382,7 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'TARGET'),
         valueToIr(block, 'TARGET_OBJECTIVE'),
         '<=',
@@ -396,7 +396,7 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'TARGET'),
         valueToIr(block, 'TARGET_OBJECTIVE'),
         '=',
@@ -410,7 +410,7 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'TARGET'),
         valueToIr(block, 'TARGET_OBJECTIVE'),
         '>=',
@@ -424,7 +424,7 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'TARGET'),
         valueToIr(block, 'TARGET_OBJECTIVE'),
         '>',
@@ -438,7 +438,7 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreRangeArg],
     partialGenerator(block) {
-      return new SegmentNode([
+      return new FragmentCompositeNode([
         valueToIr(block, 'TARGET'),
         valueToIr(block, 'TARGET_OBJECTIVE'),
         'matches',
@@ -580,7 +580,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       return new ExecuteNode(
-        statementInputToIr<SegmentNode>(block, INPUT_MODIFIER_STACK),
+        statementInputToIr<FragmentCompositeNode>(block, INPUT_MODIFIER_STACK),
         statementInputToIr(block, INPUT_RUN_STACK),
         block.id
       )
@@ -766,14 +766,14 @@ export const executeBlockSpecs: BlockSpec[] = [
           : mode === 'score'
             ? executeConditionScoreModeConfigs[(block as ExecuteConditionBlock).scoreMode_].partialGenerator(block)
             : executeConditionModeConfigs[mode].partialGenerator(block)
-      return new SegmentNode([conditionKind, mode, ...suffixNode.parts], block.id)
+      return new FragmentCompositeNode([conditionKind, mode, ...suffixNode.parts], block.id)
     }
   },
   executeModifierSpec(
     'execute_mod_align',
     'align %1',
     [{ type: 'input_value', name: 'AXES', check: ['swizzle'] }],
-    block => new SegmentNode(['align', valueToIr(block, 'AXES')], block.id),
+    block => new FragmentCompositeNode(['align', valueToIr(block, 'AXES')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'AXES', { type: 'swizzle' })
@@ -787,13 +787,13 @@ export const executeBlockSpecs: BlockSpec[] = [
       name: 'ANCHOR',
       options: [['eyes', 'eyes'], ['feet', 'feet']],
     }],
-    block => new SegmentNode(['anchored', block.getFieldValue('ANCHOR')], block.id),
+    block => new FragmentCompositeNode(['anchored', block.getFieldValue('ANCHOR')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_as',
     'as %1',
     [targetInput(selectorLikeChecks)],
-    block => new SegmentNode(['as', valueToIr(block, INPUT_TARGET)], block.id),
+    block => new FragmentCompositeNode(['as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -803,7 +803,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_at',
     'at %1',
     [targetInput(selectorLikeChecks)],
-    block => new SegmentNode(['at', valueToIr(block, INPUT_TARGET)], block.id),
+    block => new FragmentCompositeNode(['at', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -813,7 +813,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_facing',
     'facing %1',
     [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
-    block => new SegmentNode(['facing', valueToIr(block, 'POS')], block.id),
+    block => new FragmentCompositeNode(['facing', valueToIr(block, 'POS')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'POS', { type: 'mc_block_pos' })
@@ -830,7 +830,7 @@ export const executeBlockSpecs: BlockSpec[] = [
         options: [['eyes', 'eyes'], ['feet', 'feet']],
       },
     ],
-    block => new SegmentNode(['facing', 'entity', valueToIr(block, INPUT_TARGET), block.getFieldValue('ANCHOR')], block.id),
+    block => new FragmentCompositeNode(['facing', 'entity', valueToIr(block, INPUT_TARGET), block.getFieldValue('ANCHOR')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -840,7 +840,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_in',
     'in %1',
     [{ type: 'field_input', name: 'DIMENSION', text: 'minecraft:overworld' }],
-    block => new SegmentNode(['in', block.getFieldValue('DIMENSION')], block.id),
+    block => new FragmentCompositeNode(['in', block.getFieldValue('DIMENSION')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_on',
@@ -859,13 +859,13 @@ export const executeBlockSpecs: BlockSpec[] = [
         ['vehicle', 'vehicle'],
       ],
     }],
-    block => new SegmentNode(['on', block.getFieldValue('RELATION')], block.id),
+    block => new FragmentCompositeNode(['on', block.getFieldValue('RELATION')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_positioned',
     'positioned %1',
     [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
-    block => new SegmentNode(['positioned', valueToIr(block, 'POS')], block.id),
+    block => new FragmentCompositeNode(['positioned', valueToIr(block, 'POS')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'POS', { type: 'mc_block_pos' })
@@ -875,7 +875,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_positioned_as',
     'positioned as %1',
     [targetInput(selectorLikeChecks)],
-    block => new SegmentNode(['positioned', 'as', valueToIr(block, INPUT_TARGET)], block.id),
+    block => new FragmentCompositeNode(['positioned', 'as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -894,13 +894,13 @@ export const executeBlockSpecs: BlockSpec[] = [
         ['ocean_floor', 'ocean_floor'],
       ],
     }],
-    block => new SegmentNode(['positioned', 'over', block.getFieldValue('HEIGHTMAP')], block.id),
+    block => new FragmentCompositeNode(['positioned', 'over', block.getFieldValue('HEIGHTMAP')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_rotated',
     'rotated %1',
     [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_param'] }],
-    block => new SegmentNode(['rotated', valueToIr(block, 'ROTATION')], block.id),
+    block => new FragmentCompositeNode(['rotated', valueToIr(block, 'ROTATION')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'ROTATION', { type: 'mc_rotation' })
@@ -910,7 +910,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_rotated_as',
     'rotated as %1',
     [targetInput(selectorLikeChecks)],
-    block => new SegmentNode(['rotated', 'as', valueToIr(block, INPUT_TARGET)], block.id),
+    block => new FragmentCompositeNode(['rotated', 'as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -920,6 +920,6 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_summon',
     'summon %1',
     [{ type: 'field_input', name: 'ENTITY', text: 'armor_stand' }],
-    block => new SegmentNode(['summon', block.getFieldValue('ENTITY')], block.id),
+    block => new FragmentCompositeNode(['summon', block.getFieldValue('ENTITY')], block.id),
   ),
 ]
