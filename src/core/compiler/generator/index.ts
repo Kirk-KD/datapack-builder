@@ -34,7 +34,8 @@ export function nextBlocksToIr(block: Blockly.Block): IrNode[] {
 }
 
 export function statementToIr(block: Blockly.Block, name: string): IrNode[] {
-  return nextBlocksToIr(block.getInputTargetBlock(name)!)
+  const first = block.getInputTargetBlock(name)!
+  return [blockToIr(first), ...nextBlocksToIr(block.getInputTargetBlock(name)!)]
 }
 
 export function generateDatapackIr(workspace: Blockly.WorkspaceSvg) {

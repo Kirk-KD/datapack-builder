@@ -3,7 +3,6 @@ import type {OrParameter, TopLevelNode, VariableCompareOpType, VariableOpType} f
 import type {
   ProcedureParameterRegistryEntry,
   ProcedureRegistryEntry,
-  VariableRegistryEntry
 } from "../../blockly/registry";
 import type {ItemStackEditorResult} from '../../editor'
 
@@ -242,11 +241,11 @@ export class WhileNode extends CommandNode {
 }
 
 export class VariableNode extends FragmentNode {
-  readonly variableEntry: VariableRegistryEntry
+  readonly variableName: string
 
-  constructor(variableEntry: VariableRegistryEntry, sourceBlockId?: string | null) {
+  constructor(variableName: string, sourceBlockId?: string | null) {
     super(sourceBlockId)
-    this.variableEntry = variableEntry
+    this.variableName = variableName
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
@@ -254,12 +253,33 @@ export class VariableNode extends FragmentNode {
   }
 }
 
+export class TempVariableNode extends VariableNode {
+  constructor() {
+    super('__TEMP')
+  }
+}
+
+export class VariableSetNode extends CommandNode {
+  readonly variableNode: VariableNode
+  readonly rightNode: OrParameter<VariableNode | LiteralIntNode>
+
+  constructor(variableNode: VariableNode, rightNode: OrParameter<VariableNode | LiteralIntNode>, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.variableNode = variableNode
+    this.rightNode = rightNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitVariableSet(this)
+  }
+}
+
 export class VariableOperationNode extends CommandNode {
   readonly variableNode: VariableNode
   readonly opType: VariableOpType
-  readonly rightNode: FragmentNode
+  readonly rightNode: OrParameter<VariableNode | LiteralIntNode>
 
-  constructor(variableNode: VariableNode, opType: VariableOpType, rightNode: FragmentNode, sourceBlockId?: string | null) {
+  constructor(variableNode: VariableNode, opType: VariableOpType, rightNode: OrParameter<VariableNode | LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.variableNode = variableNode
     this.opType = opType

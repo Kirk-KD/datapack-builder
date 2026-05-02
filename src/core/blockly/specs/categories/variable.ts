@@ -5,7 +5,7 @@ import {FieldDropdown} from "blockly";
 import {colours} from "../../colours.ts";
 import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
 import {variableRegistry, type VariableRegistryEntry} from "../../registry";
-import {VariableNode, VariableOperationNode, type VariableOpType} from '../../../compiler/ir'
+import {VariableNode, VariableOperationNode, type VariableOpType, VariableSetNode} from '../../../compiler/ir'
 import {valueToIr} from '../../../compiler/generator'
 
 const FIELD_VAR_NAME = 'VAR_NAME'
@@ -46,9 +46,8 @@ export const variableBlockSpecs: BlockSpec[] = [
       inputsInline: true,
     },
     generator(block) {
-      return new VariableOperationNode(
+      return new VariableSetNode(
         valueToIr(block, FIELD_VAR_NAME),
-        '=',
         valueToIr(block, INPUT_VALUE),
         block.id
       )
@@ -173,7 +172,7 @@ export const variableBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       return new VariableNode(
-        (block as VarBlock).variable!,
+        (block as VarBlock).variable!.name,
         block.id
       )
     },

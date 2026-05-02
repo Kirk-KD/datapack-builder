@@ -1,6 +1,7 @@
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
 import {
+  CommandNode,
   IfNode,
   VariableCompareNode,
   type VariableCompareOpType,
@@ -66,12 +67,12 @@ export const controlBlockSpecs: BlockSpec[] = [
           type: 'field_dropdown',
           name: FIELD_OP,
           options: [
-            ['<', 'LT'],
-            ['<=', 'LTE'],
-            ['=', 'EQ'],
-            ['>=', 'GTE'],
-            ['>', 'GT'],
-          ],
+            ['<', '<'],
+            ['<=', '<='],
+            ['=', '='],
+            ['>=', '>='],
+            ['>', '>'],
+          ] as [VariableCompareOpType, VariableCompareOpType][],
         },
         {
           type: 'input_value',
@@ -126,7 +127,7 @@ export const controlBlockSpecs: BlockSpec[] = [
     generator(block) {
       return new IfNode(
         valueToIr(block, INPUT_CONDITION),
-        statementToIr(block, INPUT_DO),
+        statementToIr(block, INPUT_DO) as CommandNode[],
         [],
         block.id
       )
@@ -165,8 +166,8 @@ export const controlBlockSpecs: BlockSpec[] = [
     generator(block) {
       return new IfNode(
         valueToIr(block, INPUT_CONDITION),
-        statementToIr(block, INPUT_DO),
-        statementToIr(block, INPUT_ELSE),
+        statementToIr(block, INPUT_DO) as CommandNode[],
+        statementToIr(block, INPUT_ELSE) as CommandNode[],
         block.id
       )
     },
@@ -197,7 +198,7 @@ export const controlBlockSpecs: BlockSpec[] = [
     generator(block) {
       return new WhileNode(
         valueToIr(block, INPUT_CONDITION),
-        statementToIr(block, INPUT_DO),
+        statementToIr(block, INPUT_DO) as CommandNode[],
         block.id
       )
     },

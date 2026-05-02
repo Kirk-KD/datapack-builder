@@ -5,7 +5,8 @@ import {
   ProcedureDefinitionNode, ProcedureParameterNode,
   VariableNode,
   VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
-  VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode
+  VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode,
+  TempVariableNode, VariableSetNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
@@ -28,7 +29,9 @@ export interface IrVisitor<T> {
   visitIf(node: IfNode): T
   visitWhile(node: WhileNode): T
 
+  visitTempVariable(node: TempVariableNode): T
   visitVariable(node: VariableNode): T
+  visitVariableSet(node: VariableSetNode): T
   visitVariableOperation(node: VariableOperationNode): T
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): T

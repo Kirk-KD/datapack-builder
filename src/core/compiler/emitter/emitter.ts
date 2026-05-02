@@ -4,7 +4,7 @@ import {
   ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode,
   TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode,
   CommandCompositeNode,
-  FragmentCompositeNode
+  FragmentCompositeNode, TempVariableNode, VariableSetNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
@@ -172,20 +172,37 @@ export class Emitter implements IrVisitor<string> {
     return res
   }
 
+  visitTempVariable(node: TempVariableNode): string {
+    return this.visitVariable(node)
+  }
+
   visitVariable(node: VariableNode): string {
-    return `${this.naming.variableName(node.variableEntry.name)} ${this.naming.variableObjectiveName()}`
+    return `${this.naming.variableName(node.variableName)} ${this.naming.variableObjectiveName()}`
   }
 
   visitVariableCompare(node: VariableCompareNode): string {
-    return undefined // TODO pending lowering pass
+    const rightNode = node.rightNode as VariableNode
+    return `score ${node.variableNode.accept(this)} ${node.op} ${rightNode.accept(this)}`
   }
 
   visitVariableMatches(node: VariableMatchesNode): string {
     return `score ${node.variableNode.accept(this)} ${this.naming.variableObjectiveName()} matches ${node.rangeNode.accept(this)}`
   }
 
+  visitVariableSet(node: VariableSetNode): string {
+    if (node.rightNode instanceof VariableNode) {
+      return `scoreboard players operation ${node.variableNode.accept(this)} = ${node.rightNode.accept(this)}`
+    }
+    return `scoreboard players set ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}`
+  }
+
   visitVariableOperation(node: VariableOperationNode): string {
-    return undefined // TODO pending lowering pass
+    if (node.rightNode instanceof LiteralIntNode) {
+      const op = node.opType as '+=' | '-=' // After lowering
+      return `scoreboard players ${op === '+=' ? 'add' : 'remove'} ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}`
+    }
+
+    return `scoreboard players operation ${node.variableNode.accept(this)} ${node.opType} ${node.rightNode.accept(this)}`
   }
 
   visitWhile(node: WhileNode): string {

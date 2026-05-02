@@ -9,7 +9,8 @@ export function orchestrate(workspace: Blockly.WorkspaceSvg, projectConfig: Proj
   const datapackIr = generateDatapackIr(workspace)
 
   // Passes
-  const loweredIr = new LoweringPass().run(datapackIr)
+  const loweredIr = new LoweringPass(projectConfig).run(datapackIr)
+  console.log(loweredIr)
 
   // Emission
   const outputFiles = new OutputFiles()
