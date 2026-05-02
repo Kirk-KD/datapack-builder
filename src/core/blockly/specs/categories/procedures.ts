@@ -4,6 +4,8 @@ import {procedureRegistry, type ProcedureParameterRegistryEntry, type ProcedureR
 import * as Blockly from "blockly";
 import {colours} from "../../colours.ts";
 import getToolboxContents from "../../getToolboxContents.ts";
+import {ProcedureDefinitionNode} from '../../../compiler/ir'
+import {nextBlocksToIr} from '../../../compiler/generator'
 
 type ProcBlockState = {
   procedure: ProcedureRegistryEntry | null
@@ -165,9 +167,12 @@ const procDefBlockSpec: BlockSpec = {
 
     block.updateShape_()
   },
-  generator() {
-    // TODO pending a generator/compiler refactor
-    return ''
+  generator(block: Blockly.Block) {
+    return new ProcedureDefinitionNode(
+      (block as ProcDefBlock).procedure!,
+      nextBlocksToIr(block),
+      block.id
+    )
   }
 }
 
