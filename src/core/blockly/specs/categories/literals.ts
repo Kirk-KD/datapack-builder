@@ -1,7 +1,7 @@
 import type { BlockSpec } from '../types'
 import {setShadowState} from "../../extensions/shadows.ts";
 import {
-  LiteralAngleNode,
+  LiteralRotationNode,
   LiteralIntNode,
   LiteralPositionNode,
   LiteralRangeNode,
@@ -83,8 +83,13 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_block_pos',
       inputsInline: true,
     },
-    generator(block) { // TODO add tilde caret node type
-      return new LiteralPositionNode('~', '~', '~', block.id)
+    generator(block) {
+      return new LiteralPositionNode(
+        valueToIr(block, 'X'),
+        valueToIr(block, 'Y'),
+        valueToIr(block, 'Z'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'X', {type: 'tilde_caret'})
@@ -146,8 +151,12 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_rotation',
       inputsInline: true,
     },
-    generator(block) { // TODO tilde
-      return new LiteralAngleNode('~','~', block.id)
+    generator(block) {
+      return new LiteralRotationNode(
+        valueToIr(block, 'YAW'),
+        valueToIr(block, 'PITCH'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'YAW', {type: 'angle'})

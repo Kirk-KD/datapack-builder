@@ -78,7 +78,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return validateNumber(input) ?? validateTilde(input) ?? validateCaret(input)
     },
     function(block: Blockly.Block) {
-      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE)) || 0) // TODO placeholder
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
     },
     '~'
   ),
@@ -88,7 +88,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return validateNumber(input) ?? validateTilde(input)
     },
     function(block: Blockly.Block) {
-      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE)) || 0) // TODO placeholder
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
     },
     '~'
   ),
@@ -98,7 +98,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return /^(?!.*(.).*\1)[xyz]{1,3}$/.test(input) ? input : null
     },
     function(block: Blockly.Block) {
-      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE)) // TODO placeholder
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
     },
     'xyz'
   ),
@@ -108,7 +108,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return validateNumber(input) ?? validateTilde(input)
     },
     function(block: Blockly.Block) {
-      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE)) || 0) // TODO placeholder
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
     },
     '~'
   )

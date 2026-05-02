@@ -5,7 +5,7 @@ import {
   OnTickNode, ProcedureCallArgumentNode, ProcedureCallNode,
   ProcedureDefinitionNode, ProcedureParameterNode,
   VariableNode,
-  VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralAngleNode, TargetSelectorNode,
+  VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
   VariableMatchesNode, VariableCompareNode, IfNode, WhileNode
 } from "./nodes.ts";
 
@@ -21,7 +21,7 @@ export interface IrVisitor<T> {
   visitLiteralString(node: LiteralStringNode): T
   visitLiteralPosition(node: LiteralPositionNode): T
   visitLiteralRange(node: LiteralRangeNode): T
-  visitLiteralAngle(node: LiteralAngleNode): T
+  visitLiteralRotation(node: LiteralRotationNode): T
 
   visitVariableMatches(node: VariableMatchesNode): T
   visitVariableCompare(node: VariableCompareNode): T

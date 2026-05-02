@@ -1,5 +1,5 @@
 import {
-  DatapackNode, ExecuteNode, IfNode, type IrVisitor, ItemStackNode, LiteralAngleNode, LiteralIntNode,
+  DatapackNode, ExecuteNode, IfNode, type IrVisitor, ItemStackNode, LiteralRotationNode, LiteralIntNode,
   LiteralPositionNode, LiteralRangeNode, LiteralStringNode, OnLoadNode, OnTickNode,
   ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode, SegmentNode,
   TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode
@@ -78,8 +78,8 @@ export class Emitter implements IrVisitor<string> {
     return compileEditorState({ compiler: 'item_stack', error: false, data: node.itemStackData }, {})
   }
 
-  visitLiteralAngle(node: LiteralAngleNode): string {
-    return `${node.yaw} ${node.pitch}`
+  visitLiteralRotation(node: LiteralRotationNode): string {
+    return `${node.yawNode.accept(this)} ${node.pitchNode.accept(this)}`
   }
 
   visitLiteralInt(node: LiteralIntNode): string {
@@ -87,7 +87,7 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitLiteralPosition(node: LiteralPositionNode): string {
-    return `${node.x} ${node.y} ${node.z}`
+    return `${node.xNode.accept(this)} ${node.yNode.accept(this)} ${node.zNode.accept(this)}`
   }
 
   visitLiteralRange(node: LiteralRangeNode): string {

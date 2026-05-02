@@ -100,15 +100,15 @@ export class LiteralStringNode extends IrNode {
 }
 
 export class LiteralPositionNode extends IrNode {
-  readonly x: string // TODO placeholder; should be tilde-and-caret node
-  readonly y: string
-  readonly z: string
+  readonly xNode: LiteralStringNode
+  readonly yNode: LiteralStringNode
+  readonly zNode: LiteralStringNode
 
-  constructor(x: string, y: string, z: string, sourceBlockId?: string | null) {
+  constructor(xNode: LiteralStringNode, yNode: LiteralStringNode, zNode: LiteralStringNode, sourceBlockId?: string | null) {
     super(sourceBlockId)
-    this.x = x
-    this.y = y
-    this.z = z
+    this.xNode = xNode
+    this.yNode = yNode
+    this.zNode = zNode
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
@@ -117,10 +117,10 @@ export class LiteralPositionNode extends IrNode {
 }
 
 export class LiteralRangeNode extends IrNode {
-  readonly minNode: OrParameter<LiteralIntNode> // TODO add number type (not just int)
-  readonly maxNode: OrParameter<LiteralIntNode>
+  readonly minNode: LiteralIntNode // TODO add number type (not just int)
+  readonly maxNode: LiteralIntNode
 
-  constructor(minNode: OrParameter<LiteralIntNode>, maxNode: OrParameter<LiteralIntNode>, sourceBlockId?: string | null) {
+  constructor(minNode: LiteralIntNode, maxNode: LiteralIntNode, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.minNode = minNode
     this.maxNode = maxNode
@@ -131,18 +131,18 @@ export class LiteralRangeNode extends IrNode {
   }
 }
 
-export class LiteralAngleNode extends IrNode {
-  readonly yaw: string // TODO placeholder
-  readonly pitch: string
+export class LiteralRotationNode extends IrNode {
+  readonly yawNode: LiteralStringNode
+  readonly pitchNode: LiteralStringNode
 
-  constructor(yaw: string, pitch: string, sourceBlockId?: string | null) {
+  constructor(yawNode: LiteralStringNode, pitchNode: LiteralStringNode, sourceBlockId?: string | null) {
     super(sourceBlockId)
-    this.yaw = yaw
-    this.pitch = pitch
+    this.yawNode = yawNode
+    this.pitchNode = pitchNode
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
-    return visitor.visitLiteralAngle(this)
+    return visitor.visitLiteralRotation(this)
   }
 }
 
