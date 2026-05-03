@@ -28,6 +28,10 @@ export class Naming {
     return '$' + this.dpb(name)
   }
 
+  procedureName(name: string) {
+    return 'proc_' + name
+  }
+
   initializedFlagName() {
     return this.variableName('FLAG_INIT')
   }

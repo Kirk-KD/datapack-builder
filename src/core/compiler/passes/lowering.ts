@@ -263,7 +263,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   }
 
   visitProcedureCall(node: ProcedureCallNode): LoweredResult {
-    return { pre: [], nodes: [node] }
+    return {
+      pre: [],
+      nodes: [ // TODO arguments
+        new FunctionCallNode(this.naming.procedureName(node.procedureEntry.name), node.sourceBlockId)
+      ]
+    }
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): LoweredResult {
@@ -271,7 +276,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): LoweredResult {
-    return { pre: [], nodes: [node] }
+    return {
+      pre: [],
+      nodes: [
+        new FunctionDefinitionNode(this.naming.procedureName(node.procedureEntry.name), this.lowerBody(node.bodyNodes), node.sourceBlockId)
+      ]
+    }
   }
 
   visitProcedureParameter(node: ProcedureParameterNode): LoweredResult {
