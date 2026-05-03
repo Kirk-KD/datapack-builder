@@ -16,10 +16,6 @@ export class Naming {
     return `data/${this.internalNamespace()}/function/${name}.mcfunction`
   }
 
-  procedureMcfunctionFilePath(name: string) {
-    return this.internalMcfunctionFilePath(`proc_${name}`)
-  }
-
   variableObjectiveName() {
     return this.dpb('VARIABLES')
   }
@@ -30,6 +26,14 @@ export class Naming {
 
   procedureName(name: string) {
     return 'proc_' + name
+  }
+
+  procedureStorageName(name: string) {
+    return `${this.internalNamespace()}:${this.procedureName(name)}_ARGS`
+  }
+
+  procedureStoragePath(paramName: string) {
+    return `args."${paramName}"`
   }
 
   initializedFlagName() {

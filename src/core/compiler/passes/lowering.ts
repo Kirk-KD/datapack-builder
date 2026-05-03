@@ -263,16 +263,61 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   }
 
   visitProcedureCall(node: ProcedureCallNode): LoweredResult {
+    const pre: CommandNode[] = []
+    for (const argumentNode of node.argumentNodes) {
+      const lowered = argumentNode.accept(this)
+      pre.push(...lowered.pre)
+    }
+
     return {
-      pre: [],
-      nodes: [ // TODO arguments
-        new FunctionCallNode(this.naming.procedureName(node.procedureEntry.name), node.sourceBlockId)
+      pre: [...pre],
+      nodes: [
+        new CommandCompositeNode([
+          new FunctionCallNode(this.naming.procedureName(node.procedureEntry.name), node.sourceBlockId),
+          ...(node.argumentNodes.length ? [
+            'with storage',
+            this.naming.procedureStorageName(node.procedureEntry.name)
+          ] : [])
+        ], node.sourceBlockId)
       ]
     }
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): LoweredResult {
-    return { pre: [], nodes: [node] }
+    const value = node.valueNode.accept(this)
+    const storageName = this.naming.procedureStorageName(node.procedureEntry.name)
+    const storagePath = this.naming.procedureStoragePath(node.parameterEntry.name)
+
+    if (value.nodes[0] instanceof VariableNode) {
+      return {
+        pre: [
+          ...value.pre,
+          new CommandCompositeNode([
+            'execute store result storage',
+            storageName,
+            storagePath,
+            'int 1 run scoreboard players get',
+            value.nodes[0],
+          ], node.sourceBlockId)
+        ],
+        nodes: []
+      }
+    } else {
+      return {
+        pre: [
+          ...value.pre,
+          new CommandCompositeNode([
+            'data modify storage',
+            storageName,
+            storagePath,
+            'set value',
+            // TODO handle adding quotes; right now it's fine because only integers
+            value.nodes[0],
+          ], node.sourceBlockId)
+        ],
+        nodes: []
+      }
+    }
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): LoweredResult {

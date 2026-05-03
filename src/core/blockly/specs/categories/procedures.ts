@@ -5,6 +5,7 @@ import * as Blockly from "blockly";
 import {colours} from "../../colours.ts";
 import getToolboxContents from "../../getToolboxContents.ts";
 import {
+  CommandNode,
   ProcedureCallArgumentNode,
   ProcedureCallNode,
   ProcedureDefinitionNode,
@@ -175,7 +176,7 @@ const procDefBlockSpec: BlockSpec = {
   generator(block: Blockly.Block) {
     return new ProcedureDefinitionNode(
       (block as ProcDefBlock).procedure!,
-      nextBlocksToIr(block),
+      nextBlocksToIr(block) as CommandNode[],
       block.id
     )
   }
@@ -233,6 +234,7 @@ const procCallBlockSpec: BlockSpec = {
 
           return new ProcedureCallArgumentNode(
             param,
+            proc,
             blockToIr(argBlock),
             block.id
           )

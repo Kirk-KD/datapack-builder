@@ -350,11 +350,14 @@ export class ProcedureParameterNode extends FragmentNode {
 
 export class ProcedureCallArgumentNode extends FragmentNode {
   readonly parameterEntry: ProcedureParameterRegistryEntry
-  readonly valueNode: FragmentNode
+  readonly procedureEntry: ProcedureRegistryEntry
+  // Right now the only parameter and variable type is integer; handle other types later.
+  readonly valueNode: OrParameter<VariableNode | LiteralIntNode>
 
-  constructor(parameterEntry: ProcedureParameterRegistryEntry, valueNode: FragmentNode, sourceBlockId?: string | null) {
+  constructor(parameterEntry: ProcedureParameterRegistryEntry, procedureEntry: ProcedureRegistryEntry, valueNode: OrParameter<LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.parameterEntry = parameterEntry
+    this.procedureEntry = procedureEntry
     this.valueNode = valueNode
   }
 

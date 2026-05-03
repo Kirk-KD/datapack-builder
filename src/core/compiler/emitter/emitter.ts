@@ -136,7 +136,7 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): string {
-    return undefined // TODO pending lowering pass
+    this.disallow(node)
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): string {
