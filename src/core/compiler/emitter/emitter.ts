@@ -4,7 +4,7 @@ import {
   ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode,
   TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode,
   CommandCompositeNode,
-  FragmentCompositeNode, TempVariableNode, VariableSetNode
+  FragmentCompositeNode, TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
@@ -34,6 +34,17 @@ export class Emitter implements IrVisitor<string> {
       part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
     console.assert(res.indexOf('\n') === -1)
     return res
+  }
+
+  visitFunctionDefinition(node: FunctionDefinitionNode): string {
+    this.files.with(this.naming.internalMcfunctionFilePath(node.name)).write(
+      node.bodyNodes.map(n => n.accept(this)).join('\n') + '\n'
+    )
+    return ''
+  }
+
+  visitFunctionCall(node: FunctionCallNode): string {
+    return `function ${this.naming.internalNamespace()}:${node.name}`
   }
 
   visitDatapack(node: DatapackNode): string {

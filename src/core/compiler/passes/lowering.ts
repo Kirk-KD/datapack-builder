@@ -3,7 +3,7 @@ import {
   CommandCompositeNode, CommandNode,
   DatapackNode,
   ExecuteNode,
-  FragmentCompositeNode, FragmentNode,
+  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode,
   IfNode,
   IrNode,
   type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
@@ -50,7 +50,14 @@ interface LoweredResult {
 
 export class LoweringPass implements IrVisitor<LoweredResult> {
   naming: Naming
-  // TODO temp variable manager
+
+  /**
+   * Returns the next temporary scoreboard variable name to be passed to `new TempVariableNode(...)`.
+   * It does not return the `TempVariableNode` reference itself because each IR node should be distinct.
+   */
+  nextTempName() {
+    return this.naming.nextId('TEMP')
+  }
 
   constructor(projectConfig: ProjectConfig) {
     this.naming = new Naming(projectConfig)
@@ -105,6 +112,14 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     }
   }
 
+  visitFunctionCall(node: FunctionCallNode): LoweredResult {
+    return { pre: [], nodes: [node] }
+  }
+
+  visitFunctionDefinition(node: FunctionDefinitionNode): LoweredResult {
+    return { pre: [], nodes: [node] }
+  }
+
   visitDatapack(node: DatapackNode): LoweredResult {
     const topLevelNodes: TopLevelNode[] = []
     for (const topLevelNode of node.topLevelNodes) {
@@ -125,13 +140,15 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       pre.push(...lowered.pre)
       clauses.push(lowered.nodes[0] as FragmentCompositeNode)
     }
+
+    const bodyFuncName = this.naming.nextId('execute_body')
+
     return {
       pre,
-      nodes: [new ExecuteNode(
-        clauses,
-        this.lowerBody(node.bodyNodes),
-        node.sourceBlockId
-      )]
+      nodes: [
+        new FunctionDefinitionNode(bodyFuncName, this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new CommandCompositeNode(['execute', ...clauses, 'run', new FunctionCallNode(bodyFuncName, node.sourceBlockId)], node.sourceBlockId)
+      ]
     }
   }
 
@@ -295,19 +312,20 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const right = node.rightNode.accept(this)
 
     if (right.nodes[0] instanceof LiteralIntNode) {
+      const tempVarName = this.nextTempName()
       return {
         pre: [
           ...variable.pre,
           ...right.pre,
           new VariableSetNode(
-            new TempVariableNode(),
+            new TempVariableNode(tempVarName),
             right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>
           )
         ],
         nodes: [new VariableCompareNode(
           variable.nodes[0] as VariableNode,
           node.op,
-          new TempVariableNode(),
+          new TempVariableNode(tempVarName),
           node.sourceBlockId
         )]
       }
@@ -342,12 +360,13 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const right = node.rightNode.accept(this)
 
     if (right.nodes[0] instanceof LiteralIntNode && (node.opType === '*=' || node.opType === '/=' || node.opType === '%=')) {
+      const tempVarName = this.nextTempName()
       return {
-        pre: [...variable.pre, ...right.pre, new VariableSetNode(new TempVariableNode(), right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>)],
+        pre: [...variable.pre, ...right.pre, new VariableSetNode(new TempVariableNode(tempVarName), right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>)],
         nodes: [new VariableOperationNode(
           variable.nodes[0] as VariableNode,
           node.opType,
-          new TempVariableNode(),
+          new TempVariableNode(tempVarName),
           node.sourceBlockId
         )]
       }

@@ -7,10 +7,11 @@ import type {ProjectConfig} from '../../stores'
 
 export function orchestrate(workspace: Blockly.WorkspaceSvg, projectConfig: ProjectConfig): OutputFiles {
   const datapackIr = generateDatapackIr(workspace)
+  console.log(JSON.stringify(datapackIr, null, 2))
 
   // Passes
   const loweredIr = new LoweringPass(projectConfig).run(datapackIr)
-  console.log(loweredIr)
+  console.log(JSON.stringify(loweredIr, null, 2))
 
   // Emission
   const outputFiles = new OutputFiles()

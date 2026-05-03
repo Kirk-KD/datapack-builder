@@ -6,12 +6,14 @@ import {
   VariableNode,
   VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
   VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode,
-  TempVariableNode, VariableSetNode
+  TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
   visitCommandComposite(node: CommandCompositeNode): T
   visitFragmentComposite(node: FragmentCompositeNode): T
+  visitFunctionDefinition(node: FunctionDefinitionNode): T
+  visitFunctionCall(node: FunctionCallNode): T
 
   visitDatapack(node: DatapackNode): T
 

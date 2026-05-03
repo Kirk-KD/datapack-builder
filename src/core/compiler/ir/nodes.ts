@@ -75,6 +75,35 @@ export class FragmentCompositeNode extends FragmentNode {
   }
 }
 
+// Only internal functions for now
+export class FunctionDefinitionNode extends CommandNode {
+  readonly name: string
+  readonly bodyNodes: CommandNode[]
+
+  constructor(name: string, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.name = name
+    this.bodyNodes = bodyNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitFunctionDefinition(this)
+  }
+}
+
+export class FunctionCallNode extends FragmentNode {
+  readonly name: string
+
+  constructor(name: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.name = name
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitFunctionCall(this)
+  }
+}
+
 export class OnLoadNode extends IrNode {
   readonly bodyNodes: CommandNode[]
 
@@ -253,9 +282,9 @@ export class VariableNode extends FragmentNode {
   }
 }
 
-export class TempVariableNode extends VariableNode {
-  constructor() {
-    super('__TEMP')
+export class TempVariableNode extends VariableNode { // Should this just be a VariableNode instead?
+  constructor(variableName: string, sourceBlockId?: string | null) {
+    super(variableName, sourceBlockId)
   }
 }
 
