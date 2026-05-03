@@ -1,29 +1,25 @@
 import {
-  DatapackNode, ExecuteNode, IfNode, type IrVisitor, ItemStackNode, LiteralRotationNode, LiteralIntNode,
+  DatapackNode, ItemStackNode, LiteralRotationNode, LiteralIntNode,
   LiteralPositionNode, LiteralRangeNode, LiteralStringNode, OnLoadNode, OnTickNode,
-  ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode,
-  TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode,
-  CommandCompositeNode,
-  FragmentCompositeNode, TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode
+  ProcedureParameterNode, TargetSelectorNode, VariableNode, CommandCompositeNode,
+  FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
 import type {ProjectConfig} from '../../../stores'
 import {compileEditorState} from './emitEditorState.ts'
+import {SelectiveIrVisitor} from '../ir/visitor.ts'
 
-export class Emitter implements IrVisitor<string> {
+export class Emitter extends SelectiveIrVisitor<string> {
   readonly files: OutputFiles
   readonly naming: Naming
   readonly projectConfig: ProjectConfig
 
   constructor(outputFiles: OutputFiles, projectConfig: ProjectConfig) {
+    super()
     this.files = outputFiles
     this.projectConfig = projectConfig
     this.naming = new Naming(this.projectConfig)
-  }
-
-  private disallow(node: IrNode): never {
-    throw new Error(`Emitter should not encounter: ${node.constructor.name}`)
   }
 
   visitCommandComposite(node: CommandCompositeNode): string {
@@ -64,14 +60,6 @@ export class Emitter implements IrVisitor<string> {
     node.topLevelNodes.forEach(n => n.accept(this))
 
     return ''
-  }
-
-  visitExecute(node: ExecuteNode): string {
-    this.disallow(node)
-  }
-
-  visitIf(node: IfNode): string {
-    this.disallow(node)
   }
 
   visitItemStack(node: ItemStackNode): string {
@@ -131,18 +119,6 @@ export class Emitter implements IrVisitor<string> {
     return ''
   }
 
-  visitProcedureCall(node: ProcedureCallNode): string {
-    this.disallow(node)
-  }
-
-  visitProcedureCallArgument(node: ProcedureCallArgumentNode): string {
-    this.disallow(node)
-  }
-
-  visitProcedureDefinition(node: ProcedureDefinitionNode): string {
-    this.disallow(node)
-  }
-
   visitProcedureParameter(node: ProcedureParameterNode): string {
     return `$(${node.parameterEntry.name})`
   }
@@ -159,25 +135,5 @@ export class Emitter implements IrVisitor<string> {
 
   visitVariable(node: VariableNode): string {
     return `${this.naming.variableName(node.variableName)} ${this.naming.variableObjectiveName()}`
-  }
-
-  visitVariableCompare(node: VariableCompareNode): string {
-    this.disallow(node)
-  }
-
-  visitVariableMatches(node: VariableMatchesNode): string {
-    this.disallow(node)
-  }
-
-  visitVariableSet(node: VariableSetNode): string {
-    this.disallow(node)
-  }
-
-  visitVariableOperation(node: VariableOperationNode): string {
-    this.disallow(node)
-  }
-
-  visitWhile(node: WhileNode): string {
-    this.disallow(node)
   }
 }
