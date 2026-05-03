@@ -53,6 +53,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   /**
    * Returns the next temporary scoreboard variable name to be passed to `new TempVariableNode(...)`.
    * It does not return the `TempVariableNode` reference itself because each IR node should be distinct.
+   * TODO maybe distinction doesn't matter because nodes are immutable?
    */
   nextTempName() {
     return this.naming.nextId('TEMP')
