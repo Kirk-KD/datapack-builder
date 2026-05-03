@@ -26,7 +26,7 @@ export class Emitter implements IrVisitor<string> {
     const res = node.parts.map(
       part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
     console.assert(res.indexOf('\n') === -1)
-    return res
+    return res + '\n'
   }
 
   visitFragmentComposite(node: FragmentCompositeNode): string {
@@ -38,7 +38,7 @@ export class Emitter implements IrVisitor<string> {
 
   visitFunctionDefinition(node: FunctionDefinitionNode): string {
     this.files.with(this.naming.internalMcfunctionFilePath(node.name)).write(
-      node.bodyNodes.map(n => n.accept(this)).join('\n') + '\n'
+      node.bodyNodes.map(n => n.accept(this)).join('')
     )
     return ''
   }
@@ -63,42 +63,11 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitExecute(node: ExecuteNode): string {
-    const bodyString = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('\n')
-    const bodyFunctionId = this.naming.nextId('execute')
-    this.files.with(this.naming.internalMcfunctionFilePath(bodyFunctionId)).write(bodyString + '\n')
-
-    if (node.clauseNodes.length) {
-      const clauseString = node.clauseNodes.map(clauseNode => clauseNode.accept(this)).join(' ')
-      return `execute ${clauseString} run function ${this.naming.internalNamespace()}:${bodyFunctionId}`
-    } else {
-      return `function ${this.naming.internalNamespace()}:${bodyFunctionId}`
-    }
+    throw new Error(`Emitter should not encounter: ${node}`)
   }
 
   visitIf(node: IfNode): string {
-    if (!node.trueBodyNodes.length && !node.falseBodyNodes.length) return ''
-
-    let res = ''
-
-    if (node.trueBodyNodes.length) {
-      const id = this.naming.nextId('if_true')
-      const code = node.trueBodyNodes.map(n => n.accept(this)).join('\n') + '\n'
-      this.files.with(this.naming.internalMcfunctionFilePath(id)).write(code)
-
-      const conditionCode = node.conditionNode.accept(this)
-      res += `execute if ${conditionCode} run function ${this.naming.internalNamespace()}:${id}`
-    }
-
-    if (node.falseBodyNodes.length) {
-      const id = this.naming.nextId('if_false')
-      const code = node.falseBodyNodes.map(n => n.accept(this)).join('\n') + '\n'
-      this.files.with(this.naming.internalMcfunctionFilePath(id)).write(code)
-
-      const conditionCode = node.conditionNode.accept(this)
-      res += `execute unless ${conditionCode} run function ${this.naming.internalNamespace()}:${id}`
-    }
-
-    return res
+    throw new Error(`Emitter should not encounter: ${node}`)
   }
 
   visitItemStack(node: ItemStackNode): string {
@@ -136,7 +105,7 @@ export class Emitter implements IrVisitor<string> {
       }, null, 2)
     )
 
-    const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('\n')
+    const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('')
     this.files.with(this.naming.internalMcfunctionFilePath('load')).append(bodyCode + '\n')
 
     return ''
@@ -152,14 +121,14 @@ export class Emitter implements IrVisitor<string> {
       }, null, 2)
     )
 
-    const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('\n')
+    const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('')
     this.files.with(this.naming.internalMcfunctionFilePath('tick')).append(bodyCode + '\n')
 
     return ''
   }
 
   visitProcedureCall(node: ProcedureCallNode): string {
-    return undefined // TODO pending lowering pass
+    throw new Error(`Emitter should not encounter: ${node}`)
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): string {
@@ -167,10 +136,11 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): string {
-    this.files.with(this.naming.procedureMcfunctionFilePath(node.procedureEntry.name)).write(
-      node.bodyNodes.map(n => n.accept(this)).join('\n') + '\n'
-    )
-    return ''
+    // this.files.with(this.naming.procedureMcfunctionFilePath(node.procedureEntry.name)).write(
+    //   node.bodyNodes.map(n => n.accept(this)).join('\n') + '\n'
+    // )
+    // return ''
+    throw new Error(`Emitter should not encounter: ${node}`)
   }
 
   visitProcedureParameter(node: ProcedureParameterNode): string {
@@ -202,21 +172,21 @@ export class Emitter implements IrVisitor<string> {
 
   visitVariableSet(node: VariableSetNode): string {
     if (node.rightNode instanceof VariableNode) {
-      return `scoreboard players operation ${node.variableNode.accept(this)} = ${node.rightNode.accept(this)}`
+      return `scoreboard players operation ${node.variableNode.accept(this)} = ${node.rightNode.accept(this)}\n`
     }
-    return `scoreboard players set ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}`
+    return `scoreboard players set ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}\n`
   }
 
   visitVariableOperation(node: VariableOperationNode): string {
     if (node.rightNode instanceof LiteralIntNode) {
       const op = node.opType as '+=' | '-=' // After lowering
-      return `scoreboard players ${op === '+=' ? 'add' : 'remove'} ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}`
+      return `scoreboard players ${op === '+=' ? 'add' : 'remove'} ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}\n`
     }
 
-    return `scoreboard players operation ${node.variableNode.accept(this)} ${node.opType} ${node.rightNode.accept(this)}`
+    return `scoreboard players operation ${node.variableNode.accept(this)} ${node.opType} ${node.rightNode.accept(this)}\n`
   }
 
   visitWhile(node: WhileNode): string {
-    return undefined // TODO pending lowering pass
+    throw new Error(`Emitter should not encounter: ${node}`)
   }
 }

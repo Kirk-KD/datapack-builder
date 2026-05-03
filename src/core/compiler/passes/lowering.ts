@@ -172,14 +172,20 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
 
   visitIf(node: IfNode): LoweredResult {
     const condition = node.conditionNode.accept(this)
+
+    const trueFuncName = node.trueBodyNodes.length ? this.naming.nextId('if_true') : null
+    const falseFuncName = node.falseBodyNodes.length ? this.naming.nextId('if_false') : null
+
+    if (!trueFuncName && !falseFuncName) return { pre: condition.pre, nodes: [] }
+
     return {
       pre: condition.pre,
-      nodes: [new IfNode(
-        condition.nodes[0] as BooleanNode,
-        this.lowerBody(node.trueBodyNodes),
-        this.lowerBody(node.falseBodyNodes),
-        node.sourceBlockId
-      )]
+      nodes: [
+        trueFuncName ? new FunctionDefinitionNode(trueFuncName, this.lowerBody(node.trueBodyNodes), node.sourceBlockId) : null,
+        falseFuncName ? new FunctionDefinitionNode(falseFuncName, this.lowerBody(node.falseBodyNodes), node.sourceBlockId) : null,
+        trueFuncName ? new CommandCompositeNode(['execute', 'if', condition.nodes[0], 'run', new FunctionCallNode(trueFuncName, node.sourceBlockId)]) : null,
+        falseFuncName ? new CommandCompositeNode(['execute', 'unless', condition.nodes[0], 'run', new FunctionCallNode(falseFuncName, node.sourceBlockId)]) : null,
+      ].filter(n => n !== null)
     }
   }
 
