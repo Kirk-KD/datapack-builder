@@ -313,13 +313,30 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   visitVariableSet(node: VariableSetNode): LoweredResult {
     const variable = node.variableNode.accept(this)
     const right = node.rightNode.accept(this)
+
+    if (right.nodes[0] instanceof VariableNode) {
+      return {
+        pre: [...variable.pre, ...right.pre],
+        nodes: [
+          new CommandCompositeNode([
+            'scoreboard players operation',
+            variable.nodes[0],
+            '=',
+            right.nodes[0]
+          ], node.sourceBlockId)
+        ]
+      }
+    }
+
     return {
       pre: [...variable.pre, ...right.pre],
-      nodes: [new VariableSetNode(
-        variable.nodes[0] as VariableNode,
-        right.nodes[0] as OrParameter<LiteralIntNode | VariableNode>,
-        node.sourceBlockId
-      )]
+      nodes: [
+        new CommandCompositeNode([
+          'scoreboard players set',
+          variable.nodes[0],
+          right.nodes[0]
+        ], node.sourceBlockId)
+      ]
     }
   }
 
@@ -382,27 +399,45 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const variable = node.variableNode.accept(this)
     const right = node.rightNode.accept(this)
 
-    if (right.nodes[0] instanceof LiteralIntNode && (node.opType === '*=' || node.opType === '/=' || node.opType === '%=')) {
-      const tempVarName = this.nextTempName()
-      return {
-        pre: [...variable.pre, ...right.pre, new VariableSetNode(new TempVariableNode(tempVarName), right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>)],
-        nodes: [new VariableOperationNode(
-          variable.nodes[0] as VariableNode,
-          node.opType,
-          new TempVariableNode(tempVarName),
+    if (!(right.nodes[0] instanceof VariableNode)) {
+      if (node.opType === '*=' || node.opType === '/=' || node.opType === '%=') {
+        const tempVarName = this.nextTempName()
+        const tempVarSet = new VariableSetNode(
+          new TempVariableNode(tempVarName, node.sourceBlockId),
+          right.nodes[0] as OrParameter<LiteralIntNode>,
           node.sourceBlockId
-        )]
+        ).accept(this)
+
+        return {
+          pre: [...variable.pre, ...right.pre, ...tempVarSet.pre, tempVarSet.nodes[0] as CommandNode],
+          nodes: [new CommandCompositeNode([
+            'scoreboard players operation',
+            variable.nodes[0],
+            node.opType,
+            new TempVariableNode(tempVarName, node.sourceBlockId)
+          ], node.sourceBlockId)]
+        }
+      } else {
+        return {
+          pre: [...variable.pre, ...right.pre],
+          nodes: [new CommandCompositeNode([
+            'scoreboard players',
+            node.opType === '+=' ? 'add' : 'remove',
+            variable.nodes[0],
+            right.nodes[0]
+          ], node.sourceBlockId)]
+        }
       }
     }
 
     return {
       pre: [...variable.pre, ...right.pre],
-      nodes: [new VariableOperationNode(
-        variable.nodes[0] as VariableNode,
+      nodes: [new CommandCompositeNode([
+        'scoreboard players operation',
+        variable.nodes[0],
         node.opType,
-        right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>,
-        node.sourceBlockId
-      )]
+        right.nodes[0]
+      ], node.sourceBlockId)]
     }
   }
 

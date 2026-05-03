@@ -110,7 +110,7 @@ export class Emitter implements IrVisitor<string> {
     )
 
     const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('')
-    this.files.with(this.naming.internalMcfunctionFilePath('load')).append(bodyCode + '\n')
+    this.files.with(this.naming.internalMcfunctionFilePath('load')).append(bodyCode)
 
     return ''
   }
@@ -126,7 +126,7 @@ export class Emitter implements IrVisitor<string> {
     )
 
     const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('')
-    this.files.with(this.naming.internalMcfunctionFilePath('tick')).append(bodyCode + '\n')
+    this.files.with(this.naming.internalMcfunctionFilePath('tick')).append(bodyCode)
 
     return ''
   }
@@ -170,19 +170,11 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitVariableSet(node: VariableSetNode): string {
-    if (node.rightNode instanceof VariableNode) {
-      return `scoreboard players operation ${node.variableNode.accept(this)} = ${node.rightNode.accept(this)}\n`
-    }
-    return `scoreboard players set ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}\n`
+    this.disallow(node)
   }
 
   visitVariableOperation(node: VariableOperationNode): string {
-    if (node.rightNode instanceof LiteralIntNode) {
-      const op = node.opType as '+=' | '-=' // After lowering
-      return `scoreboard players ${op === '+=' ? 'add' : 'remove'} ${node.variableNode.accept(this)} ${node.rightNode.accept(this)}\n`
-    }
-
-    return `scoreboard players operation ${node.variableNode.accept(this)} ${node.opType} ${node.rightNode.accept(this)}\n`
+    this.disallow(node)
   }
 
   visitWhile(node: WhileNode): string {
