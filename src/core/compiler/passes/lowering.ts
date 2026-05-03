@@ -1,5 +1,4 @@
 import {
-  BooleanNode,
   CommandCompositeNode, CommandNode,
   DatapackNode,
   ExecuteNode,
@@ -391,13 +390,18 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
 
     if (right.nodes[0] instanceof LiteralIntNode) {
       const tempVarName = this.nextTempName()
+      const tempVarSet = new VariableSetNode(
+        new TempVariableNode(tempVarName, node.sourceBlockId),
+        right.nodes[0] as LiteralIntNode,
+        node.sourceBlockId
+      ).accept(this)
+
       return {
         pre: [
           ...variable.pre,
           ...right.pre,
-          new VariableSetNode(
-            new TempVariableNode(tempVarName, node.sourceBlockId), right.nodes[0] as LiteralIntNode, node.sourceBlockId
-          )
+          ...tempVarSet.pre,
+          tempVarSet.nodes[0] as CommandNode
         ],
         nodes: [
           new FragmentCompositeNode([
@@ -488,13 +492,37 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
 
   visitWhile(node: WhileNode): LoweredResult {
     const condition = node.conditionNode.accept(this)
+    const whileFuncName = this.naming.nextId('while')
+    const whileBodyFuncName = this.naming.nextId('while_body')
+
     return {
-      pre: condition.pre,
-      nodes: [new WhileNode(
-        condition.nodes[0] as BooleanNode,
-        this.lowerBody(node.bodyNodes),
-        node.sourceBlockId
-      )]
+      pre: [],
+      nodes: [
+        new FunctionDefinitionNode(
+          whileFuncName,
+          [
+            ...condition.pre,
+            new CommandCompositeNode([
+              'execute', 'if', condition.nodes[0],
+              'run', new FunctionCallNode(whileBodyFuncName, node.sourceBlockId)
+            ], node.sourceBlockId)
+          ],
+          node.sourceBlockId
+        ),
+        new FunctionDefinitionNode(
+          whileBodyFuncName,
+          [
+            ...this.lowerBody(node.bodyNodes),
+            new CommandCompositeNode([
+              new FunctionCallNode(whileFuncName, node.sourceBlockId)
+            ], node.sourceBlockId)
+          ],
+          node.sourceBlockId
+        ),
+        new CommandCompositeNode([
+          new FunctionCallNode(whileFuncName, node.sourceBlockId)
+        ], node.sourceBlockId)
+      ]
     }
   }
 }
