@@ -1,10 +1,9 @@
 import * as Blockly from 'blockly'
 import {generateDatapackIr} from './generator'
 import {Emitter} from './emitter'
-import {LoweringPass} from './passes'
+import {LoweringPass, AnnotationPass} from './passes'
 import {OutputFiles} from './outputFiles.ts'
 import type {ProjectConfig} from '../../stores'
-import {AnnotationPass} from './passes/annotation.ts'
 
 export function orchestrate(workspace: Blockly.WorkspaceSvg, projectConfig: ProjectConfig): OutputFiles {
   const datapackIr = generateDatapackIr(workspace)
