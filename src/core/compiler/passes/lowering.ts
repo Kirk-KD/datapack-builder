@@ -21,15 +21,15 @@ import type {ProjectConfig} from '../../../stores'
  * list.
  *
  * `pre` exists because some nodes produce setup commands as a side effect of
- * lowering — for example, a VariableCompareNode with a literal right side must
+ * lowering. For example, a VariableCompareNode with a literal right side must
  * initialize a temp scoreboard variable before the command that uses it.
  * Since commands cannot be inserted inside expressions, they are carried upward
  * through the tree via `pre` until they reach a command list that can consume them.
  *
- * ## Rules for implementing IrVisitor<LoweredResult>:
+ * ## Rules for implementing `IrVisitor<LoweredResult>`:
  *
  * **If a node visits CommandNode children (body lists):**
- * Call `lowerBody()` on the list. This is the only place `pre` is consumed —
+ * Call `lowerBody()` on the list. This is the only place `pre` is consumed;
  * each command's `pre` is inserted immediately before that command in the result.
  *
  * **If a node visits non-CommandNode children (conditions, fragments, clauses):**
@@ -37,7 +37,7 @@ import type {ProjectConfig} from '../../../stores'
  * It cannot be consumed here because there is no command list to insert into.
  *
  * **If a node has no children:**
- * Return `{ pre: [], nodes: [node] }` — nothing to visit, nothing to hoist.
+ * Return `{ pre: [], nodes: [node] }`: nothing to visit, nothing to hoist.
  *
  * `pre` must never be silently dropped. If a visit method calls `accept()` on any
  * child, it is responsible for either consuming or forwarding that child's `pre`.
@@ -52,8 +52,8 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
 
   /**
    * Returns the next temporary scoreboard variable name to be passed to `new TempVariableNode(...)`.
-   * It does not return the `TempVariableNode` reference itself because each IR node should be distinct.
-   * TODO maybe distinction doesn't matter because nodes are immutable?
+   * It does not return the `TempVariableNode` reference; it is the responsibility of this method's consumers to create
+   * the `TempVariableNode` and pass the correct source block ID.
    */
   nextTempName() {
     return this.naming.nextId('TEMP')
@@ -324,7 +324,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [],
       nodes: [
-        new FunctionDefinitionNode(this.naming.procedureName(node.procedureEntry.name), this.lowerBody(node.bodyNodes), node.sourceBlockId)
+        new FunctionDefinitionNode(
+          this.naming.procedureName(node.procedureEntry.name),
+          this.lowerBody(node.bodyNodes),
+          node.sourceBlockId
+        )
       ]
     }
   }

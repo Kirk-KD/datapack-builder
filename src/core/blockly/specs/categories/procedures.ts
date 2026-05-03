@@ -240,7 +240,8 @@ const procCallBlockSpec: BlockSpec = {
             block.id
           )
         })
-        .filter(e => e !== null)
+        .filter(e => e !== null),
+      block.id
     )
   }
 }
