@@ -17,8 +17,8 @@ import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
 
 /**
- * The result of a lowering pass visit on an IR node. Contains the transformed node
- * and any commands that must be inserted before it in the nearest enclosing command
+ * The result of a lowering pass visit on an IR node. Contains the transformed nodes
+ * and any commands that must be inserted before them in the nearest enclosing command
  * list.
  *
  * `pre` exists because some nodes produce setup commands as a side effect of
@@ -38,14 +38,14 @@ import type {ProjectConfig} from '../../../stores'
  * It cannot be consumed here because there is no command list to insert into.
  *
  * **If a node has no children:**
- * Return `{ pre: [], node }` — nothing to visit, nothing to hoist.
+ * Return `{ pre: [], nodes: [node] }` — nothing to visit, nothing to hoist.
  *
  * `pre` must never be silently dropped. If a visit method calls `accept()` on any
  * child, it is responsible for either consuming or forwarding that child's `pre`.
  */
 interface LoweredResult {
   pre: CommandNode[]
-  node: IrNode
+  nodes: IrNode[]
 }
 
 export class LoweringPass implements IrVisitor<LoweredResult> {
@@ -57,7 +57,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   }
 
   run(node: DatapackNode): DatapackNode {
-    return this.visitDatapack(node).node as DatapackNode
+    return this.visitDatapack(node).nodes[0] as DatapackNode
   }
 
   /**
@@ -82,7 +82,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     for (const cmd of commands) {
       const lowered = cmd.accept(this)
       result.push(...lowered.pre)
-      result.push(lowered.node as CommandNode)
+      result.push(...lowered.nodes as CommandNode[])
     }
     return result
   }
@@ -96,21 +96,24 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       } else {
         const lowered = part.accept(this)
         pre.push(...lowered.pre)
-        parts.push(lowered.node as FragmentNode)
+        parts.push(lowered.nodes[0] as FragmentNode)
       }
     }
     return {
       pre,
-      node: new CommandCompositeNode(parts, node.sourceBlockId)
+      nodes: [new CommandCompositeNode(parts, node.sourceBlockId)]
     }
   }
 
   visitDatapack(node: DatapackNode): LoweredResult {
+    const topLevelNodes: TopLevelNode[] = []
+    for (const topLevelNode of node.topLevelNodes) {
+      const lowered = topLevelNode.accept(this)
+      topLevelNodes.push(...lowered.nodes as TopLevelNode[])
+    }
     return {
       pre: [],
-      node: new DatapackNode(
-        node.topLevelNodes.map(n => n.accept(this).node as TopLevelNode)
-      )
+      nodes: [new DatapackNode(topLevelNodes)]
     }
   }
 
@@ -120,15 +123,15 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     for (const clause of node.clauseNodes) {
       const lowered = clause.accept(this)
       pre.push(...lowered.pre)
-      clauses.push(lowered.node as FragmentCompositeNode)
+      clauses.push(lowered.nodes[0] as FragmentCompositeNode)
     }
     return {
       pre,
-      node: new ExecuteNode(
+      nodes: [new ExecuteNode(
         clauses,
         this.lowerBody(node.bodyNodes),
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -141,12 +144,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       } else {
         const lowered = part.accept(this)
         pre.push(...lowered.pre)
-        parts.push(lowered.node as FragmentNode)
+        parts.push(lowered.nodes[0] as FragmentNode)
       }
     }
     return {
       pre,
-      node: new FragmentCompositeNode(parts, node.sourceBlockId)
+      nodes: [new FragmentCompositeNode(parts, node.sourceBlockId)]
     }
   }
 
@@ -154,21 +157,21 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const condition = node.conditionNode.accept(this)
     return {
       pre: condition.pre,
-      node: new IfNode(
-        condition.node as BooleanNode,
+      nodes: [new IfNode(
+        condition.nodes[0] as BooleanNode,
         this.lowerBody(node.trueBodyNodes),
         this.lowerBody(node.falseBodyNodes),
         node.sourceBlockId
-      )
+      )]
     }
   }
 
   visitItemStack(node: ItemStackNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitLiteralInt(node: LiteralIntNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitLiteralPosition(node: LiteralPositionNode): LoweredResult {
@@ -177,12 +180,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const z = node.zNode.accept(this)
     return {
       pre: [...x.pre, ...y.pre, ...z.pre],
-      node: new LiteralPositionNode(
-        x.node as LiteralStringNode,
-        y.node as LiteralStringNode,
-        z.node as LiteralStringNode,
+      nodes: [new LiteralPositionNode(
+        x.nodes[0] as LiteralStringNode,
+        y.nodes[0] as LiteralStringNode,
+        z.nodes[0] as LiteralStringNode,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -191,11 +194,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const max = node.maxNode.accept(this)
     return {
       pre: [...min.pre, ...max.pre],
-      node: new LiteralRangeNode(
-        min.node as LiteralIntNode,
-        max.node as LiteralIntNode,
+      nodes: [new LiteralRangeNode(
+        min.nodes[0] as LiteralIntNode,
+        max.nodes[0] as LiteralIntNode,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -204,52 +207,52 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const pitch = node.pitchNode.accept(this)
     return {
       pre: [...yaw.pre, ...pitch.pre],
-      node: new LiteralRotationNode(
-        yaw.node as LiteralStringNode,
-        pitch.node as LiteralStringNode,
+      nodes: [new LiteralRotationNode(
+        yaw.nodes[0] as LiteralStringNode,
+        pitch.nodes[0] as LiteralStringNode,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
   visitLiteralString(node: LiteralStringNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitOnLoad(node: OnLoadNode): LoweredResult {
     return {
       pre: [],
-      node: new OnLoadNode(
+      nodes: [new OnLoadNode(
         this.lowerBody(node.bodyNodes),
         node.sourceBlockId
-      )
+      )]
     }
   }
 
   visitOnTick(node: OnTickNode): LoweredResult {
     return {
       pre: [],
-      node: new OnTickNode(
+      nodes: [new OnTickNode(
         this.lowerBody(node.bodyNodes),
         node.sourceBlockId
-      )
+      )]
     }
   }
 
   visitProcedureCall(node: ProcedureCallNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitProcedureParameter(node: ProcedureParameterNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitTargetSelector(node: TargetSelectorNode): LoweredResult {
@@ -258,20 +261,20 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     for (const clause of node.clauseNodes) {
       const lowered = clause.accept(this)
       pre.push(...lowered.pre)
-      clauses.push(lowered.node as FragmentCompositeNode)
+      clauses.push(lowered.nodes[0] as FragmentCompositeNode)
     }
     return {
       pre,
-      node: new TargetSelectorNode(node.targetCategory, clauses, node.sourceBlockId)
+      nodes: [new TargetSelectorNode(node.targetCategory, clauses, node.sourceBlockId)]
     }
   }
 
   visitTempVariable(node: TempVariableNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitVariable(node: VariableNode): LoweredResult {
-    return { pre: [], node }
+    return { pre: [], nodes: [node] }
   }
 
   visitVariableSet(node: VariableSetNode): LoweredResult {
@@ -279,11 +282,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const right = node.rightNode.accept(this)
     return {
       pre: [...variable.pre, ...right.pre],
-      node: new VariableSetNode(
-        variable.node as VariableNode,
-        right.node as OrParameter<LiteralIntNode | VariableNode>,
+      nodes: [new VariableSetNode(
+        variable.nodes[0] as VariableNode,
+        right.nodes[0] as OrParameter<LiteralIntNode | VariableNode>,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -291,33 +294,33 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const variable = node.variableNode.accept(this)
     const right = node.rightNode.accept(this)
 
-    if (right.node instanceof LiteralIntNode) {
+    if (right.nodes[0] instanceof LiteralIntNode) {
       return {
         pre: [
           ...variable.pre,
           ...right.pre,
           new VariableSetNode(
             new TempVariableNode(),
-            right.node as OrParameter<VariableNode | LiteralIntNode>
+            right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>
           )
         ],
-        node: new VariableCompareNode(
-          variable.node as VariableNode,
+        nodes: [new VariableCompareNode(
+          variable.nodes[0] as VariableNode,
           node.op,
           new TempVariableNode(),
           node.sourceBlockId
-        )
+        )]
       }
     }
 
     return {
       pre: [...variable.pre, ...right.pre],
-      node: new VariableCompareNode(
-        variable.node as VariableNode,
+      nodes: [new VariableCompareNode(
+        variable.nodes[0] as VariableNode,
         node.op,
-        right.node as OrParameter<VariableNode | LiteralIntNode>,
+        right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -326,11 +329,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const range = node.rangeNode.accept(this)
     return {
       pre: [...variable.pre, ...range.pre],
-      node: new VariableMatchesNode(
-        variable.node as VariableNode,
-        range.node as LiteralRangeNode,
+      nodes: [new VariableMatchesNode(
+        variable.nodes[0] as VariableNode,
+        range.nodes[0] as LiteralRangeNode,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -338,26 +341,26 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const variable = node.variableNode.accept(this)
     const right = node.rightNode.accept(this)
 
-    if (right.node instanceof LiteralIntNode && (node.opType === '*=' || node.opType === '/=' || node.opType === '%=')) {
+    if (right.nodes[0] instanceof LiteralIntNode && (node.opType === '*=' || node.opType === '/=' || node.opType === '%=')) {
       return {
-        pre: [...variable.pre, ...right.pre, new VariableSetNode(new TempVariableNode(), right.node)],
-        node: new VariableOperationNode(
-          variable.node as VariableNode,
+        pre: [...variable.pre, ...right.pre, new VariableSetNode(new TempVariableNode(), right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>)],
+        nodes: [new VariableOperationNode(
+          variable.nodes[0] as VariableNode,
           node.opType,
           new TempVariableNode(),
           node.sourceBlockId
-        )
+        )]
       }
     }
 
     return {
       pre: [...variable.pre, ...right.pre],
-      node: new VariableOperationNode(
-        variable.node as VariableNode,
+      nodes: [new VariableOperationNode(
+        variable.nodes[0] as VariableNode,
         node.opType,
-        right.node as OrParameter<VariableNode | LiteralIntNode>,
+        right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>,
         node.sourceBlockId
-      )
+      )]
     }
   }
 
@@ -365,11 +368,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const condition = node.conditionNode.accept(this)
     return {
       pre: condition.pre,
-      node: new WhileNode(
-        condition.node as BooleanNode,
+      nodes: [new WhileNode(
+        condition.nodes[0] as BooleanNode,
         this.lowerBody(node.bodyNodes),
         node.sourceBlockId
-      )
+      )]
     }
   }
 }
