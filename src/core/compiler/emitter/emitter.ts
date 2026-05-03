@@ -162,12 +162,11 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitVariableCompare(node: VariableCompareNode): string {
-    const rightNode = node.rightNode as VariableNode
-    return `score ${node.variableNode.accept(this)} ${node.op} ${rightNode.accept(this)}`
+    this.disallow(node)
   }
 
   visitVariableMatches(node: VariableMatchesNode): string {
-    return `score ${node.variableNode.accept(this)} ${this.naming.variableObjectiveName()} matches ${node.rangeNode.accept(this)}`
+    this.disallow(node)
   }
 
   visitVariableSet(node: VariableSetNode): string {

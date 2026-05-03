@@ -334,27 +334,30 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           ...variable.pre,
           ...right.pre,
           new VariableSetNode(
-            new TempVariableNode(tempVarName),
-            right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>
+            new TempVariableNode(tempVarName, node.sourceBlockId), right.nodes[0] as LiteralIntNode, node.sourceBlockId
           )
         ],
-        nodes: [new VariableCompareNode(
-          variable.nodes[0] as VariableNode,
-          node.op,
-          new TempVariableNode(tempVarName),
-          node.sourceBlockId
-        )]
+        nodes: [
+          new FragmentCompositeNode([
+            'score',
+            variable.nodes[0] as VariableNode,
+            node.op as string,
+            new TempVariableNode(tempVarName, node.sourceBlockId)
+          ], node.sourceBlockId)
+        ]
       }
     }
 
     return {
       pre: [...variable.pre, ...right.pre],
-      nodes: [new VariableCompareNode(
-        variable.nodes[0] as VariableNode,
-        node.op,
-        right.nodes[0] as OrParameter<VariableNode | LiteralIntNode>,
-        node.sourceBlockId
-      )]
+      nodes: [
+        new FragmentCompositeNode([
+          'score',
+          variable.nodes[0] as VariableNode,
+          node.op as string,
+          right.nodes[0]
+        ], node.sourceBlockId)
+      ]
     }
   }
 
@@ -363,9 +366,13 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const range = node.rangeNode.accept(this)
     return {
       pre: [...variable.pre, ...range.pre],
-      nodes: [new VariableMatchesNode(
-        variable.nodes[0] as VariableNode,
-        range.nodes[0] as LiteralRangeNode,
+      nodes: [new FragmentCompositeNode(
+        [
+          'score',
+          variable.nodes[0] as VariableNode,
+          'matches',
+          range.nodes[0] as LiteralRangeNode,
+        ],
         node.sourceBlockId
       )]
     }
