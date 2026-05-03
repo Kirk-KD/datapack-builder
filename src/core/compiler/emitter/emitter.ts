@@ -8,7 +8,7 @@ import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
 import type {ProjectConfig} from '../../../stores'
 import {compileEditorState} from './emitEditorState.ts'
-import {SelectiveIrVisitor} from '../ir/visitor.ts'
+import {SelectiveIrVisitor} from '../ir'
 
 export class Emitter extends SelectiveIrVisitor<string> {
   readonly files: OutputFiles
@@ -26,7 +26,7 @@ export class Emitter extends SelectiveIrVisitor<string> {
     const res = node.parts.map(
       part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
     console.assert(res.indexOf('\n') === -1)
-    return res + '\n'
+    return node.prefix(res + '\n')
   }
 
   visitFragmentComposite(node: FragmentCompositeNode): string {

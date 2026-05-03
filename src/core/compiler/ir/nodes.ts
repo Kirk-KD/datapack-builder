@@ -76,7 +76,7 @@ export class FragmentCompositeNode extends FragmentNode {
 }
 
 // Only internal functions for now
-export class FunctionDefinitionNode extends CommandNode {
+export class FunctionDefinitionNode extends IrNode {
   readonly name: string
   readonly bodyNodes: CommandNode[]
 

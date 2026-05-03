@@ -4,7 +4,7 @@ deployable Minecraft datapack. It is organized into five sequential stages, each
 
 Data flow:
 ```
-Generators → High-Level IR → Lowering Pass → Low-Level IR → Emitter → OutputFiles
+Generators → High-Level IR → Lowering Pass → Low-Level IR → Annotation Pass → Emitter → OutputFiles
 ```
 
 ---
@@ -61,6 +61,12 @@ IR is available before any validation or transformation is applied.
 
 The lowering pass breaks down complex nodes into less complex ones by inserting commands before the encountered node.
 For example, a node with a different way of output for each type of input should not exist past the lowering pass.
+
+### Annotation Pass
+
+The annotation pass runs after lowering pass. It handles additional syntax requirements not handled by the lowering
+pass and without a clean way later in the emitter. An example is the prepending of "$" on lines containing 
+macros (`$(xyz)`).
 
 ## `emitter`
 
