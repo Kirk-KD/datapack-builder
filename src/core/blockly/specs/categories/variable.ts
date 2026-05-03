@@ -5,8 +5,7 @@ import {FieldDropdown} from "blockly";
 import {colours} from "../../colours.ts";
 import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
 import {variableRegistry, type VariableRegistryEntry} from "../../registry";
-import {VariableNode, VariableOperationNode, type VariableOpType, VariableSetNode} from '../../../compiler/ir'
-import {valueToIr} from '../../../compiler/generator'
+import {valueToIr, VariableNode, VariableOperationNode, type VariableOpType, VariableSetNode} from '../../../compiler'
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'

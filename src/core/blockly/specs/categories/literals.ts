@@ -1,13 +1,13 @@
 import type { BlockSpec } from '../types'
-import {setShadowState} from "../../extensions/shadows.ts";
+import {setShadowState} from "../../extensions/shadows.ts"
 import {
   LiteralRotationNode,
   LiteralIntNode,
   LiteralPositionNode,
   LiteralRangeNode,
-  LiteralStringNode
-} from '../../../compiler/ir'
-import {valueToIr} from '../../../compiler/generator'
+  LiteralStringNode,
+  valueToIr
+} from '../../../compiler'
 
 const FIELD_VALUE = 'VALUE'
 

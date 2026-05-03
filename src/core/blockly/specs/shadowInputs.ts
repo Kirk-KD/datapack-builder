@@ -1,7 +1,6 @@
 import * as Blockly from 'blockly'
 import type { BlockSpec, ShadowInputBlockValidatorFunction } from './types'
-import type {IrGeneratorFunction} from '../../compiler'
-import {LiteralIntNode, LiteralStringNode} from '../../compiler/ir'
+import {type IrGeneratorFunction, LiteralIntNode, LiteralStringNode} from '../../compiler'
 
 const INPUT_VALUE = 'VALUE'
 

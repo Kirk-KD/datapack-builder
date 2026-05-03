@@ -6,9 +6,10 @@ import {
   VariableCompareNode,
   type VariableCompareOpType,
   VariableMatchesNode,
-  WhileNode
-} from '../../../compiler/ir'
-import {statementToIr, valueToIr} from '../../../compiler/generator'
+  WhileNode,
+  statementToIr,
+  valueToIr
+} from '../../../compiler'
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'

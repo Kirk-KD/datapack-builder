@@ -2,10 +2,9 @@
 
 import type {BlockSpec} from '../types.ts'
 import * as Blockly from 'blockly'
-import {LiteralStringNode, TargetSelectorNode} from '../../../compiler/ir'
+import {valueToIr, LiteralStringNode, TargetSelectorNode} from '../../../compiler'
 import {colours} from '../../colours.ts'
 import {setShadowState} from '../../extensions/shadows.ts'
-import {valueToIr} from '../../../compiler/generator'
 
 export const selectorBlockSpecs: BlockSpec[] = [
   { // PLACEHOLDER

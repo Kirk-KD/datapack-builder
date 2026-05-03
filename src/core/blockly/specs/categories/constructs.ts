@@ -7,7 +7,7 @@ import * as Blockly from "blockly";
 import {colours} from "../../colours.ts";
 import {TextButton} from "../../fields/textButton.ts";
 import {getMinecraftItemByName} from "../../../catalog";
-import {ItemStackNode} from '../../../compiler/ir'
+import {ItemStackNode} from '../../../compiler'
 
 type ItemStackBlockState = {
   itemStackEditorState_: EditorState<ItemStackEditorResult>

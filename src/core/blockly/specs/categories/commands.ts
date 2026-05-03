@@ -4,8 +4,7 @@ import * as Blockly from "blockly"
 import {colours} from "../../colours.ts";
 import { createStateCheckbox, createStateDropdown } from "../dynamicFields.ts";
 import { bindExtraState } from "../extraState.ts";
-import {valueToIr} from '../../../compiler/generator'
-import {CommandCompositeNode} from '../../../compiler/ir'
+import {valueToIr, CommandCompositeNode} from '../../../compiler'
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_proc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 

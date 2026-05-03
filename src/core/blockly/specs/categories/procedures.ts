@@ -9,9 +9,10 @@ import {
   ProcedureCallArgumentNode,
   ProcedureCallNode,
   ProcedureDefinitionNode,
-  ProcedureParameterNode
-} from '../../../compiler/ir'
-import {blockToIr, nextBlocksToIr} from '../../../compiler/generator'
+  ProcedureParameterNode,
+  blockToIr,
+  nextBlocksToIr
+} from '../../../compiler'
 
 type ProcBlockState = {
   procedure: ProcedureRegistryEntry | null

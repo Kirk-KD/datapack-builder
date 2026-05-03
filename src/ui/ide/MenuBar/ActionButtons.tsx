@@ -7,7 +7,7 @@ import {IconsPillDivider} from "../../components/IconsPillDivider.tsx";
 import {IconButton, Tooltip} from "@mui/material";
 import {useIDEContext} from "../context/useIDEContext.ts";
 import {mapToOutputZip} from "../../../core/output-preview";
-import {orchestrate} from '../../../core/compiler/orchestrator.ts'
+import {orchestrate} from '../../../core/compiler'
 import {useProjectConfigStore} from '../../../stores'
 
 export function ActionButtons() {

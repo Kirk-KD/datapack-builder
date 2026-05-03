@@ -1,6 +1,5 @@
 import type { BlockSpec } from '../types'
-import {OnLoadNode, OnTickNode} from '../../../compiler/ir'
-import {nextBlocksToIr} from '../../../compiler/generator'
+import {CommandNode, OnLoadNode, OnTickNode, nextBlocksToIr} from '../../../compiler'
 
 export const eventBlockSpecs: BlockSpec[] = [
   {
@@ -14,7 +13,7 @@ export const eventBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       return new OnLoadNode(
-        nextBlocksToIr(block),
+        nextBlocksToIr(block) as CommandNode[],
         block.id
       )
     },
@@ -30,7 +29,7 @@ export const eventBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       return new OnTickNode(
-        nextBlocksToIr(block),
+        nextBlocksToIr(block) as CommandNode[],
         block.id
       )
     }

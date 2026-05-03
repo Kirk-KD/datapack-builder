@@ -8,9 +8,9 @@ import { literalBlockSpecs } from './categories/literals'
 import { procedureBlockSpecs } from './categories/procedures'
 import { selectorBlockSpecs } from './categories/selectors'
 import { variableBlockSpecs } from './categories/variable'
+import { shadowInputBlockSpecs } from "./shadowInputs.ts"
+import {registerBlockIrGenerator} from '../../compiler'
 import type { BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
-import {shadowInputBlockSpecs} from "./shadowInputs.ts";
-import {registerBlockIrGenerator} from '../../compiler/generator'
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
