@@ -1,3 +1,5 @@
+import JSZip from 'jszip'
+
 export class OutputFiles {
   readonly files: Map<string, OutputFile> = new Map<string, OutputFile>()
 
@@ -13,8 +15,27 @@ export class OutputFiles {
 
   toStringMap(): Map<string, string> {
     return new Map(
-      Array.from(this.files.entries()).map(([path, file]) => [path, file.content])
+      Array.from(this.files.entries())
+        .map(([path, file]) => [path, file.content])
     )
+  }
+
+  download(fileName: string) {
+    const zip = new JSZip()
+
+    for (const [path, content] of this.toStringMap().entries())
+      zip.file(path, content)
+
+    zip.generateAsync({ type: 'blob' }).then(blob => {
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+      link.href = url
+      link.download = `${fileName}.zip`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    })
   }
 }
 

@@ -40,7 +40,7 @@ export function MenuBar() {
               }
             },
             {
-              text: 'Load',
+              text: 'Open',
               onClick: () => {
                 if (!blocklyWorkspaceRef.current) return
                 // TODO proper dialogue

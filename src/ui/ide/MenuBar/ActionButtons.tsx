@@ -29,7 +29,18 @@ export function ActionButtons() {
       <IconsPillDivider/>
 
       <Tooltip title={'Build datapack'}>
-        <IconButton onClick={() => {}}>
+        <IconButton onClick={() => {
+          if (!blocklyWorkspaceRef.current) return
+
+          const outputFiles = orchestrate(
+            blocklyWorkspaceRef.current, useProjectConfigStore.getState().projectConfig)
+
+          // Replace namespace with readable name later
+          outputFiles.download(useProjectConfigStore.getState().projectConfig.namespace)
+
+          setCompiledOutput(mapToOutputZip(outputFiles.toStringMap(), new Date()))
+          setOutputViewerOpen(true)
+        }}>
           <HardwareIcon color={'success'}/>
         </IconButton>
       </Tooltip>
@@ -37,7 +48,11 @@ export function ActionButtons() {
       <Tooltip title={'Preview datapack'}>
         <IconButton onClick={() => {
           if (!blocklyWorkspaceRef.current) return
-          setCompiledOutput(mapToOutputZip(orchestrate(blocklyWorkspaceRef.current, useProjectConfigStore.getState().projectConfig).toStringMap(), new Date()))
+
+          const outputFiles = orchestrate(
+            blocklyWorkspaceRef.current, useProjectConfigStore.getState().projectConfig)
+
+          setCompiledOutput(mapToOutputZip(outputFiles.toStringMap(), new Date()))
           setOutputViewerOpen(true)
         }}><CodeIcon color={'success'}/></IconButton>
       </Tooltip>
