@@ -67,17 +67,17 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'X',
-          check: ['mc_param', 'tilde_caret']
+          check: ['mc_proc_param', 'tilde_caret']
         },
         {
           type: 'input_value',
           name: 'Y',
-          check: ['mc_param', 'tilde_caret']
+          check: ['mc_proc_param', 'tilde_caret']
         },
         {
           type: 'input_value',
           name: 'Z',
-          check: ['mc_param', 'tilde_caret']
+          check: ['mc_proc_param', 'tilde_caret']
         },
       ],
       output: 'mc_block_pos',
@@ -107,12 +107,12 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'MIN',
-          check: ['mc_param', 'number']
+          check: ['mc_proc_param', 'number']
         },
         {
           type: 'input_value',
           name: 'MAX',
-          check: ['mc_param', 'number']
+          check: ['mc_proc_param', 'number']
         },
       ],
       output: 'mc_range',
@@ -140,12 +140,12 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'YAW',
-          check: ['mc_param', 'angle']
+          check: ['mc_proc_param', 'angle']
         },
         {
           type: 'input_value',
           name: 'PITCH',
-          check: ['mc_param', 'angle']
+          check: ['mc_proc_param', 'angle']
         },
       ],
       output: 'mc_rotation',

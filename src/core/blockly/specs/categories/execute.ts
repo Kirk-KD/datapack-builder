@@ -126,7 +126,7 @@ const executeScoreModeOptions: [string, string][] = [
   ['matches', 'MATCHES'],
 ]
 
-const selectorLikeChecks = ['mc_string', 'mc_target_selector', 'mc_param']
+const selectorLikeChecks = ['mc_string', 'mc_target_selector', 'mc_proc_param']
 
 const scoreTargetArg: ExecuteConditionInputConfig = {
   kind: 'value',
@@ -137,7 +137,7 @@ const scoreTargetArg: ExecuteConditionInputConfig = {
 const scoreTargetObjectiveArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'TARGET_OBJECTIVE',
-  check: ['mc_string', 'mc_param'],
+  check: ['mc_string', 'mc_proc_param'],
 }
 
 const scoreSourceArg: ExecuteConditionInputConfig = {
@@ -149,7 +149,7 @@ const scoreSourceArg: ExecuteConditionInputConfig = {
 const scoreSourceObjectiveArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'SOURCE_OBJECTIVE',
-  check: ['mc_string', 'mc_param'],
+  check: ['mc_string', 'mc_proc_param'],
 }
 
 const scoreRangeArg: ExecuteConditionInputConfig = {
@@ -165,7 +165,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   biome: {
     message: 'at %1 is %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_input', name: 'BIOME', text: 'minecraft:plains' },
     ],
     partialGenerator(block) {
@@ -178,7 +178,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   block: {
     message: 'at %1 is %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_input', name: 'BLOCK', text: 'minecraft:stone' },
     ],
     partialGenerator(block) {
@@ -192,9 +192,9 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
     message: '',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_dropdown', name: 'SCAN_MODE', options: executeBlocksScanModeOptions },
     ],
     partialGenerator(block) {
@@ -256,7 +256,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   loaded: {
     message: 'at %1',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
     ],
     partialGenerator(block) {
       return new FragmentCompositeNode([valueToIr(block, 'POS')])
@@ -284,7 +284,7 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
   block: {
     message: 'at %1 has %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
@@ -330,9 +330,9 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     message: 'at %1 in %2 matching %3',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'SOURCE_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
-      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
+      { kind: 'value', name: 'SOURCE_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_proc_param'] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_proc_param'] },
     ],
     partialGenerator(block) {
       return new FragmentCompositeNode([
@@ -348,8 +348,8 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     inputsInline: false,
     args: [
       { kind: 'value', name: 'SOURCE', check: selectorLikeChecks },
-      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
-      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
+      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_proc_param'] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_proc_param'] },
     ],
     partialGenerator(block) {
       return new FragmentCompositeNode([
@@ -812,7 +812,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_facing',
     'facing %1',
-    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
+    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
     block => new FragmentCompositeNode(['facing', valueToIr(block, 'POS')], block.id),
     {},
     function(this: Blockly.Block) {
@@ -864,7 +864,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_positioned',
     'positioned %1',
-    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
+    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
     block => new FragmentCompositeNode(['positioned', valueToIr(block, 'POS')], block.id),
     {},
     function(this: Blockly.Block) {
@@ -899,7 +899,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_rotated',
     'rotated %1',
-    [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_param'] }],
+    [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_proc_param'] }],
     block => new FragmentCompositeNode(['rotated', valueToIr(block, 'ROTATION')], block.id),
     {},
     function(this: Blockly.Block) {

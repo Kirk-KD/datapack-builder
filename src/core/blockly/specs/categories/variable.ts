@@ -11,7 +11,7 @@ import {valueToIr} from '../../../compiler/generator'
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
 const INPUT_VALUE = 'VALUE'
-const VAR_SET_CHECKS = ['mc_int', 'mc_var_get', 'mc_param']
+const VAR_SET_CHECKS = ['mc_int', 'mc_var_get', 'mc_proc_param']
 
 type VarBlockStates = {
   variable?: VariableRegistryEntry
@@ -88,7 +88,7 @@ export const variableBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_VALUE,
-          check: ['mc_param', 'mc_int', 'mc_var_get'],
+          check: ['mc_proc_param', 'mc_int', 'mc_var_get'],
         },
       ],
       previousStatement: null,

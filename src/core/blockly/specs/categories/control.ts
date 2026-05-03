@@ -33,7 +33,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'RANGE',
-          check: ['mc_param', 'mc_range'],
+          check: ['mc_proc_param', 'mc_range'],
         },
       ],
       inputsInline: true,
@@ -77,7 +77,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_VAR_B,
-          check: ['mc_param', 'mc_int', 'mc_var_get'],
+          check: ['mc_proc_param', 'mc_int', 'mc_var_get'],
         },
       ],
       inputsInline: true,
@@ -111,7 +111,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: ['mc_param', 'MCCondition'],
+          check: ['mc_proc_param', 'MCCondition'],
         },
       ],
       message1: 'then %1',
@@ -143,7 +143,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: ['mc_param', 'MCCondition'],
+          check: ['mc_proc_param', 'MCCondition'],
         },
       ],
       message1: 'then %1',

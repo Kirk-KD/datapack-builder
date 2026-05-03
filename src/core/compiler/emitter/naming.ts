@@ -33,7 +33,7 @@ export class Naming {
   }
 
   procedureStoragePath(paramName: string) {
-    return `args."${paramName}"`
+    return `args.${paramName}` // Not using quotes around paramName; macro syntax won't allow non-alphanumeric characters anyway
   }
 
   initializedFlagName() {
