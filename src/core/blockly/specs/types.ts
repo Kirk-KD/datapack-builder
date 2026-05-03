@@ -1,4 +1,5 @@
 import * as Blockly from 'blockly'
+import type {IrGeneratorFunction} from '../../compiler'
 
 export type BlockSpecCategory =
   | 'commands'
@@ -11,8 +12,6 @@ export type BlockSpecCategory =
   | 'execute'
 
 export type BlockInitFunction = (this: Blockly.Block) => void
-export type BlockGeneratorResult = ReturnType<Blockly.CodeGenerator['blockToCode']>
-export type BlockGeneratorFunction = (block: Blockly.Block) => BlockGeneratorResult
 export type BlockJsonDefinition = Record<string, unknown> & { type: string }
 export type BlockShadowStatesFunction = (this: Blockly.Block) => void
 
@@ -23,7 +22,7 @@ export type BlockSpec = {
   category?: BlockSpecCategory
   json?: BlockJsonDefinition
   init?: BlockInitFunction
-  generator?: BlockGeneratorFunction
+  generator: IrGeneratorFunction
   tags?: string[],
   setShadowBlocks?: BlockShadowStatesFunction
 }

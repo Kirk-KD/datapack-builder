@@ -13,7 +13,7 @@ export function inferCompilerType(schema: EditorSchema): CompilerType {
   return schema.kind === 'reference' ? schema.ref : schema.kind
 }
 
-export default function compileEditorState(state: AnyEditorState, opt: CompilerOptions): string {
+export function compileEditorState(state: AnyEditorState, opt: CompilerOptions): string {
   assertState(state)
   switch (state.compiler) {
     case 'scalar': return compileScalar(state as EditorState<string | number | boolean>, opt)

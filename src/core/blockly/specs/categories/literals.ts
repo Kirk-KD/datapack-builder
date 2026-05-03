@@ -1,6 +1,13 @@
 import type { BlockSpec } from '../types'
-import { mcfunctionGenerator } from '../../../compiler'
-import {setShadowState} from "../../extensions/shadows.ts";
+import {setShadowState} from "../../extensions/shadows.ts"
+import {
+  LiteralRotationNode,
+  LiteralIntNode,
+  LiteralPositionNode,
+  LiteralRangeNode,
+  LiteralStringNode,
+  valueToIr
+} from '../../../compiler'
 
 const FIELD_VALUE = 'VALUE'
 
@@ -25,7 +32,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       extensions: ['mc_int_validator'],
     },
     generator(block) {
-      return [String(block.getFieldValue(FIELD_VALUE)), 0]
+      return new LiteralIntNode(block.getFieldValue(FIELD_VALUE), block.id)
     },
   },
   {
@@ -47,7 +54,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       output: 'mc_string',
     },
     generator(block) {
-      return [String(block.getFieldValue(FIELD_VALUE)), 0]
+      return new LiteralStringNode(block.getFieldValue(FIELD_VALUE), block.id)
     },
   },
   {
@@ -60,27 +67,29 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'X',
-          check: ['mc_param', 'tilde_caret']
+          check: ['mc_proc_param', 'tilde_caret']
         },
         {
           type: 'input_value',
           name: 'Y',
-          check: ['mc_param', 'tilde_caret']
+          check: ['mc_proc_param', 'tilde_caret']
         },
         {
           type: 'input_value',
           name: 'Z',
-          check: ['mc_param', 'tilde_caret']
+          check: ['mc_proc_param', 'tilde_caret']
         },
       ],
       output: 'mc_block_pos',
       inputsInline: true,
     },
     generator(block) {
-      const x = mcfunctionGenerator.valueToCode(block, 'X', 0)
-      const y = mcfunctionGenerator.valueToCode(block, 'Y', 0)
-      const z = mcfunctionGenerator.valueToCode(block, 'Z', 0)
-      return [`${x} ${y} ${z}`, 0]
+      return new LiteralPositionNode(
+        valueToIr(block, 'X'),
+        valueToIr(block, 'Y'),
+        valueToIr(block, 'Z'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'X', {type: 'tilde_caret'})
@@ -98,22 +107,23 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'MIN',
-          check: ['mc_param', 'number']
+          check: ['mc_proc_param', 'number']
         },
         {
           type: 'input_value',
           name: 'MAX',
-          check: ['mc_param', 'number']
+          check: ['mc_proc_param', 'number']
         },
       ],
       output: 'mc_range',
       inputsInline: true,
     },
     generator(block) {
-      const min = mcfunctionGenerator.valueToCode(block, 'MIN', 0)
-      const max = mcfunctionGenerator.valueToCode(block, 'MAX', 0)
-      if (min === '' && max === '') return ['', 0]
-      return [`${min}..${max}`, 0]
+      return new LiteralRangeNode(
+        valueToIr(block, 'MIN'),
+        valueToIr(block, 'MAX'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MIN', {type: 'number', fields: { VALUE: '' }})
@@ -130,21 +140,23 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'YAW',
-          check: ['mc_param', 'angle']
+          check: ['mc_proc_param', 'angle']
         },
         {
           type: 'input_value',
           name: 'PITCH',
-          check: ['mc_param', 'angle']
+          check: ['mc_proc_param', 'angle']
         },
       ],
       output: 'mc_rotation',
       inputsInline: true,
     },
     generator(block) {
-      const yaw = mcfunctionGenerator.valueToCode(block, 'YAW', 0)
-      const pitch = mcfunctionGenerator.valueToCode(block, 'PITCH', 0)
-      return [`${yaw} ${pitch}`, 0]
+      return new LiteralRotationNode(
+        valueToIr(block, 'YAW'),
+        valueToIr(block, 'PITCH'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, 'YAW', {type: 'angle'})

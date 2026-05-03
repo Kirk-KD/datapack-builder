@@ -1,7 +1,7 @@
 import type {AnyEditorState, AnyEditorStateCallback, EditorSchema} from "./types.ts"
 import {useEffect, useState} from "react";
 import {controller, loadFromSchema} from "../../ui/editor";
-import compileEditorState, {inferCompilerType} from "../compiler/editor/compileEditorState.ts";
+import {compileEditorState, inferCompilerType} from "../compiler";
 
 export function useTestString() {
   useTestEditor({

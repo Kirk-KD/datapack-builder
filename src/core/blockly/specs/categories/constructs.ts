@@ -4,10 +4,10 @@ import {loadFromSchema, controller} from "../../../../ui/editor";
 import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
 import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
 import * as Blockly from "blockly";
-import compileEditorState from "../../../compiler/editor/compileEditorState.ts";
 import {colours} from "../../colours.ts";
 import {TextButton} from "../../fields/textButton.ts";
 import {getMinecraftItemByName} from "../../../catalog";
+import {ItemStackNode} from '../../../compiler'
 
 type ItemStackBlockState = {
   itemStackEditorState_: EditorState<ItemStackEditorResult>
@@ -114,8 +114,7 @@ export const constructBlockSpecs: BlockSpec[] = [
     },
     generator(block: Blockly.Block) {
       const editorState = (block as ItemStackBlock).itemStackEditorState_
-      if (editorState.error || editorState.data === undefined) return ''
-      return [compileEditorState(editorState, { nbt: false }), 0]
+      return new ItemStackNode(editorState.data!, block.id)
     }
   }
 ]

@@ -1,5 +1,6 @@
 import * as Blockly from 'blockly'
 import type { BlockSpec, ShadowInputBlockValidatorFunction } from './types'
+import {type IrGeneratorFunction, LiteralIntNode, LiteralStringNode} from '../../compiler'
 
 const INPUT_VALUE = 'VALUE'
 
@@ -22,7 +23,7 @@ function registerValidatorExtension(type: string, validator: ShadowInputBlockVal
 /**
  * Creates a standard single-field shadow input BlockSpec with an attached validator.
  */
-function makeShadowInputBlockSpec(type: string, validator: ShadowInputBlockValidatorFunction, defaultValue?: string, message?: string): BlockSpec {
+function makeShadowInputBlockSpec(type: string, validator: ShadowInputBlockValidatorFunction, generator: IrGeneratorFunction, defaultValue?: string, message?: string): BlockSpec {
   registerValidatorExtension(type, validator)
   return {
     type,
@@ -41,7 +42,7 @@ function makeShadowInputBlockSpec(type: string, validator: ShadowInputBlockValid
       output: type,
       extensions: [getValidatorExtensionName(type)],
     },
-    generator: block => [block.getFieldValue(INPUT_VALUE), 0],
+    generator,
   }
 }
 
@@ -58,24 +59,56 @@ function validateCaret(input: string) {
 }
 
 export const shadowInputBlockSpecs: BlockSpec[] = [
-  makeShadowInputBlockSpec('number', input => {
-    if (input === '') return input
-    return validateNumber(input)
-  }, '0'),
-  makeShadowInputBlockSpec('tilde_caret', input => {
-    if (input === '') return input
-    return validateNumber(input) ?? validateTilde(input) ?? validateCaret(input)
-  }, '~'),
-  makeShadowInputBlockSpec('tilde', input => {
-    if (input === '') return input
-    return validateNumber(input) ?? validateTilde(input)
-  }, '~'),
-  makeShadowInputBlockSpec('swizzle', input => {
-    if (input === '') return input
-    return /^(?!.*(.).*\1)[xyz]{1,3}$/.test(input) ? input : null
-  }, 'xyz'),
-  makeShadowInputBlockSpec('angle', input => {
-    if (input === '') return input
-    return validateNumber(input) ?? validateTilde(input)
-  }, '~')
+  makeShadowInputBlockSpec(
+    'number',
+    input => {
+      if (input === '') return input
+      return validateNumber(input)
+    },
+    function(block: Blockly.Block) {
+      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE))) // TODO placeholder
+    },
+    '0'
+  ),
+  makeShadowInputBlockSpec(
+  'tilde_caret',
+    input => {
+      if (input === '') return input
+      return validateNumber(input) ?? validateTilde(input) ?? validateCaret(input)
+    },
+    function(block: Blockly.Block) {
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+    },
+    '~'
+  ),
+  makeShadowInputBlockSpec('tilde',
+    input => {
+      if (input === '') return input
+      return validateNumber(input) ?? validateTilde(input)
+    },
+    function(block: Blockly.Block) {
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+    },
+    '~'
+  ),
+  makeShadowInputBlockSpec('swizzle',
+    input => {
+      if (input === '') return input
+      return /^(?!.*(.).*\1)[xyz]{1,3}$/.test(input) ? input : null
+    },
+    function(block: Blockly.Block) {
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+    },
+    'xyz'
+  ),
+  makeShadowInputBlockSpec('angle',
+    input => {
+      if (input === '') return input
+      return validateNumber(input) ?? validateTilde(input)
+    },
+    function(block: Blockly.Block) {
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+    },
+    '~'
+  )
 ]

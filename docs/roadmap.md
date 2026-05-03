@@ -294,9 +294,9 @@ Complex:
 
 Procedures are currently modeled as no-return reusable command chains.
 Each procedure definition compiles to its own generated internal mcfunction file, and each call site emits a `function` call to that file.
-Parameters are represented as explicit `mc_param` references inside the procedure body, and arguments at the call site are passed either inline for simple literal-like values or through temporary storage setup when indirection is needed.
+Parameters are represented as explicit `mc_proc_param` references inside the procedure body, and arguments at the call site are passed either inline for simple literal-like values or through temporary storage setup when indirection is needed.
 
-For any block type accepted as an argument of a procedure, all inputs accepting that block type must also accept `mc_param`.
+For any block type accepted as an argument of a procedure, all inputs accepting that block type must also accept `mc_proc_param`.
 
 ## Subsystem Status
 
@@ -304,7 +304,7 @@ For any block type accepted as an argument of a procedure, all inputs accepting 
 
 ### Code Editor (Blockly workspace) UX `In progress`
 
-### File Output Preview UX `Complete`
+### File OutputFiles Preview UX `Complete`
 - Consider adding syntax highlighting in the future.
 - Consider adding jumping to source Block, but will require refactor of the Blockly compiler system.
 

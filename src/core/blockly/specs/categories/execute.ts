@@ -1,12 +1,9 @@
 import * as Blockly from 'blockly'
 import { colours } from '../../colours'
-import { addFile } from '../../../compiler/fileRegistry'
-import { mcfunctionGenerator } from '../../../compiler'
-import { nextId } from '../../../compiler/idGenerator'
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
-import { getInternalNamespace } from "../../../compiler/nameManager.ts"
-import { createStateDropdown } from "../dynamicFields.ts";
+import { createStateDropdown } from '../dynamicFields.ts'
+import { blockToIr, valueToIr, ExecuteNode, type IrNode, FragmentCompositeNode } from '../../../compiler'
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'
@@ -32,7 +29,7 @@ function executeModifierSpec(
   type: string,
   message0: string,
   args0: Record<string, unknown>[],
-  generator: (block: Blockly.Block) => string,
+  generator: (block: Blockly.Block) => FragmentCompositeNode,
   jsonExtras: Record<string, unknown> = {},
   setShadowBlocks?: (this: Blockly.Block) => void,
 ): BlockSpec {
@@ -97,9 +94,21 @@ type ExecuteConditionInputConfig =
 type ExecuteConditionConfig = {
   message: string
   args: ExecuteConditionInputConfig[]
-  partialGenerator: (block: Blockly.Block) => string
+  partialGenerator: (block: Blockly.Block) => FragmentCompositeNode
   customAppender?: (block: ExecuteConditionBlock, args: ExecuteConditionInputConfig[]) => void
   inputsInline?: boolean
+}
+
+function statementInputToIr<T extends IrNode>(block: Blockly.Block, name: string): T[] {
+  const nodes: T[] = []
+  let current = block.getInputTargetBlock(name)
+
+  while (current) {
+    nodes.push(blockToIr<T>(current))
+    current = current.getNextBlock()
+  }
+
+  return nodes
 }
 
 const executeBlocksScanModeOptions: [string, string][] = [
@@ -116,7 +125,7 @@ const executeScoreModeOptions: [string, string][] = [
   ['matches', 'MATCHES'],
 ]
 
-const selectorLikeChecks = ['mc_string', 'mc_target_selector', 'mc_param']
+const selectorLikeChecks = ['mc_string', 'mc_target_selector', 'mc_proc_param']
 
 const scoreTargetArg: ExecuteConditionInputConfig = {
   kind: 'value',
@@ -127,7 +136,7 @@ const scoreTargetArg: ExecuteConditionInputConfig = {
 const scoreTargetObjectiveArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'TARGET_OBJECTIVE',
-  check: ['mc_string', 'mc_param'],
+  check: ['mc_string', 'mc_proc_param'],
 }
 
 const scoreSourceArg: ExecuteConditionInputConfig = {
@@ -139,7 +148,7 @@ const scoreSourceArg: ExecuteConditionInputConfig = {
 const scoreSourceObjectiveArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'SOURCE_OBJECTIVE',
-  check: ['mc_string', 'mc_param'],
+  check: ['mc_string', 'mc_proc_param'],
 }
 
 const scoreRangeArg: ExecuteConditionInputConfig = {
@@ -155,42 +164,45 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   biome: {
     message: 'at %1 is %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_input', name: 'BIOME', text: 'minecraft:plains' },
     ],
     partialGenerator(block) {
-      return [
-        mcfunctionGenerator.valueToCode(block, 'POS', 0),
+      return new FragmentCompositeNode([
+        valueToIr(block, 'POS'),
         block.getFieldValue('BIOME')
-      ].join(' ')
+      ])
     },
   },
   block: {
     message: 'at %1 is %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_input', name: 'BLOCK', text: 'minecraft:stone' },
     ],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'POS', 0)} ${block.getFieldValue('BLOCK')}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'POS'),
+        block.getFieldValue('BLOCK'),
+      ])
     },
   },
   blocks: {
     message: '',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_dropdown', name: 'SCAN_MODE', options: executeBlocksScanModeOptions },
     ],
     partialGenerator(block) {
-      return [
-        mcfunctionGenerator.valueToCode(block, 'START_POS', 0),
-        mcfunctionGenerator.valueToCode(block, 'END_POS', 0),
-        mcfunctionGenerator.valueToCode(block, 'DEST_POS', 0),
+      return new FragmentCompositeNode([
+        valueToIr(block, 'START_POS'),
+        valueToIr(block, 'END_POS'),
+        valueToIr(block, 'DEST_POS'),
         block.getFieldValue('SCAN_MODE'),
-      ].join(' ')
+      ])
     },
     customAppender(block, args) {
       appendExecuteConditionArg(block, args[0], 'from')
@@ -203,7 +215,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
     message: '',
     args: [],
     partialGenerator() {
-      return ''
+      return new FragmentCompositeNode([])
     },
   },
   dimension: {
@@ -212,7 +224,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'DIMENSION', text: 'minecraft:overworld' },
     ],
     partialGenerator(block) {
-      return String(block.getFieldValue('DIMENSION'))
+      return new FragmentCompositeNode([String(block.getFieldValue('DIMENSION'))])
     },
   },
   entity: {
@@ -221,7 +233,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'value', name: INPUT_TARGET, check: selectorLikeChecks },
     ],
     partialGenerator(block) {
-      return mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0)
+      return new FragmentCompositeNode([valueToIr(block, INPUT_TARGET)])
     },
   },
   function: {
@@ -230,23 +242,23 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'FUNCTION', text: 'namespace:path' },
     ],
     partialGenerator(block) {
-      return block.getFieldValue('FUNCTION')
+      return new FragmentCompositeNode([block.getFieldValue('FUNCTION')])
     },
   },
   items: {
     message: '',
     args: [],
     partialGenerator() {
-      return ''
+      return new FragmentCompositeNode([])
     },
   },
   loaded: {
     message: 'at %1',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
     ],
     partialGenerator(block) {
-      return String(mcfunctionGenerator.valueToCode(block, 'POS', 0))
+      return new FragmentCompositeNode([valueToIr(block, 'POS')])
     },
   },
   predicate: {
@@ -255,14 +267,14 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
       { kind: 'field_input', name: 'PREDICATE', text: '{}' },
     ],
     partialGenerator(block) {
-      return block.getFieldValue('PREDICATE')
+      return new FragmentCompositeNode([block.getFieldValue('PREDICATE')])
     },
   },
   score: {
     message: '',
     args: [],
     partialGenerator() {
-      return ''
+      return new FragmentCompositeNode([])
     },
   },
 }
@@ -271,11 +283,15 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
   block: {
     message: 'at %1 has %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_param'] },
+      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
-      return `block ${mcfunctionGenerator.valueToCode(block, 'POS', 0)} ${block.getFieldValue('PATH')}`
+      return new FragmentCompositeNode([
+        'block',
+        valueToIr(block, 'POS'),
+        block.getFieldValue('PATH'),
+      ])
     },
   },
   entity: {
@@ -285,7 +301,11 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
-      return `entity ${mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0)} ${block.getFieldValue('PATH')}`
+      return new FragmentCompositeNode([
+        'entity',
+        valueToIr(block, INPUT_TARGET),
+        block.getFieldValue('PATH'),
+      ])
     },
   },
   storage: {
@@ -295,7 +315,11 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
-      return `storage ${block.getFieldValue('SOURCE')} ${block.getFieldValue('PATH')}`
+      return new FragmentCompositeNode([
+        'storage',
+        block.getFieldValue('SOURCE'),
+        block.getFieldValue('PATH'),
+      ])
     },
   },
 }
@@ -305,12 +329,17 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     message: 'at %1 in %2 matching %3',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'SOURCE_POS', check: ['mc_block_pos', 'mc_param'] },
-      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
-      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
+      { kind: 'value', name: 'SOURCE_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_proc_param'] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_proc_param'] },
     ],
     partialGenerator(block) {
-      return `block ${mcfunctionGenerator.valueToCode(block, 'SOURCE_POS', 0)} ${mcfunctionGenerator.valueToCode(block, 'SLOTS', 0)} ${mcfunctionGenerator.valueToCode(block, 'ITEM_PREDICATE', 0)}`
+      return new FragmentCompositeNode([
+        'block',
+        valueToIr(block, 'SOURCE_POS'),
+        valueToIr(block, 'SLOTS'),
+        valueToIr(block, 'ITEM_PREDICATE'),
+      ])
     },
   },
   entity: {
@@ -318,11 +347,16 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     inputsInline: false,
     args: [
       { kind: 'value', name: 'SOURCE', check: selectorLikeChecks },
-      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_param'] },
-      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_param'] },
+      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_proc_param'] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_proc_param'] },
     ],
     partialGenerator(block) {
-      return `entity ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SLOTS', 0)} ${mcfunctionGenerator.valueToCode(block, 'ITEM_PREDICATE', 0)}`
+      return new FragmentCompositeNode([
+        'entity',
+        valueToIr(block, 'SOURCE'),
+        valueToIr(block, 'SLOTS'),
+        valueToIr(block, 'ITEM_PREDICATE'),
+      ])
     },
   },
 }
@@ -333,7 +367,13 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} < ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'TARGET_OBJECTIVE'),
+        '<',
+        valueToIr(block, 'SOURCE'),
+        valueToIr(block, 'SOURCE_OBJECTIVE'),
+      ])
     },
   },
   LTE: {
@@ -341,7 +381,13 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} <= ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'TARGET_OBJECTIVE'),
+        '<=',
+        valueToIr(block, 'SOURCE'),
+        valueToIr(block, 'SOURCE_OBJECTIVE'),
+      ])
     },
   },
   EQ: {
@@ -349,7 +395,13 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} = ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'TARGET_OBJECTIVE'),
+        '=',
+        valueToIr(block, 'SOURCE'),
+        valueToIr(block, 'SOURCE_OBJECTIVE'),
+      ])
     },
   },
   GTE: {
@@ -357,7 +409,13 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} >= ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'TARGET_OBJECTIVE'),
+        '>=',
+        valueToIr(block, 'SOURCE'),
+        valueToIr(block, 'SOURCE_OBJECTIVE'),
+      ])
     },
   },
   GT: {
@@ -365,7 +423,13 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreSourceArg, scoreSourceObjectiveArg],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} > ${mcfunctionGenerator.valueToCode(block, 'SOURCE', 0)} ${mcfunctionGenerator.valueToCode(block, 'SOURCE_OBJECTIVE', 0)}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'TARGET_OBJECTIVE'),
+        '>',
+        valueToIr(block, 'SOURCE'),
+        valueToIr(block, 'SOURCE_OBJECTIVE'),
+      ])
     },
   },
   MATCHES: {
@@ -373,7 +437,12 @@ const executeConditionScoreModeConfigs: Record<ExecuteConditionScoreMode, Execut
     inputsInline: false,
     args: [scoreTargetArg, scoreTargetObjectiveArg, scoreRangeArg],
     partialGenerator(block) {
-      return `${mcfunctionGenerator.valueToCode(block, 'TARGET', 0)} ${mcfunctionGenerator.valueToCode(block, 'TARGET_OBJECTIVE', 0)} matches ${mcfunctionGenerator.valueToCode(block, 'RANGE', 0)}`
+      return new FragmentCompositeNode([
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'TARGET_OBJECTIVE'),
+        'matches',
+        valueToIr(block, 'RANGE'),
+      ])
     },
   },
 }
@@ -509,18 +578,11 @@ export const executeBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const modString = mcfunctionGenerator.statementToCode(block, INPUT_MODIFIER_STACK).trim()
-      const runString = mcfunctionGenerator.statementToCode(block, INPUT_RUN_STACK)
-      const internalNs = getInternalNamespace()
-      const id = nextId('execute')
-
-      addFile(`data/${internalNs}/function/${id}.mcfunction`, runString)
-
-      if (modString === '') {
-        return `function ${internalNs}:${id}\n`
-      }
-
-      return `execute ${modString} run function ${internalNs}:${id}\n`
+      return new ExecuteNode(
+        statementInputToIr<FragmentCompositeNode>(block, INPUT_MODIFIER_STACK),
+        statementInputToIr(block, INPUT_RUN_STACK),
+        block.id
+      )
     },
   },
   {
@@ -696,21 +758,21 @@ export const executeBlockSpecs: BlockSpec[] = [
     generator(block) {
       const conditionKind = block.getFieldValue(FIELD_CONDITION_KIND) as 'if' | 'unless'
       const mode = block.getFieldValue(FIELD_MODE) as ExecuteConditionMode
-      const suffix = mode === 'data'
+      const suffixNode = mode === 'data'
         ? executeConditionDataKindConfigs[(block as ExecuteConditionBlock).dataKind_].partialGenerator(block)
         : mode === 'items'
           ? executeConditionItemsKindConfigs[(block as ExecuteConditionBlock).itemsKind_].partialGenerator(block)
           : mode === 'score'
             ? executeConditionScoreModeConfigs[(block as ExecuteConditionBlock).scoreMode_].partialGenerator(block)
-        : executeConditionModeConfigs[mode].partialGenerator(block)
-      return `${conditionKind} ${mode} ${suffix} `
+            : executeConditionModeConfigs[mode].partialGenerator(block)
+      return new FragmentCompositeNode([conditionKind, mode, ...suffixNode.parts], block.id)
     }
   },
   executeModifierSpec(
     'execute_mod_align',
     'align %1',
     [{ type: 'input_value', name: 'AXES', check: ['swizzle'] }],
-    block => `align ${mcfunctionGenerator.valueToCode(block, 'AXES', 0)} `,
+    block => new FragmentCompositeNode(['align', valueToIr(block, 'AXES')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'AXES', { type: 'swizzle' })
@@ -724,13 +786,13 @@ export const executeBlockSpecs: BlockSpec[] = [
       name: 'ANCHOR',
       options: [['eyes', 'eyes'], ['feet', 'feet']],
     }],
-    block => `anchored ${block.getFieldValue('ANCHOR')} `,
+    block => new FragmentCompositeNode(['anchored', block.getFieldValue('ANCHOR')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_as',
     'as %1',
     [targetInput(selectorLikeChecks)],
-    block => `as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    block => new FragmentCompositeNode(['as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -740,7 +802,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_at',
     'at %1',
     [targetInput(selectorLikeChecks)],
-    block => `at ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    block => new FragmentCompositeNode(['at', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -749,8 +811,8 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_facing',
     'facing %1',
-    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
-    block => `facing ${mcfunctionGenerator.valueToCode(block, 'POS', 0)} `,
+    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
+    block => new FragmentCompositeNode(['facing', valueToIr(block, 'POS')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'POS', { type: 'mc_block_pos' })
@@ -767,7 +829,7 @@ export const executeBlockSpecs: BlockSpec[] = [
         options: [['eyes', 'eyes'], ['feet', 'feet']],
       },
     ],
-    block => `facing entity ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} ${block.getFieldValue('ANCHOR')} `,
+    block => new FragmentCompositeNode(['facing', 'entity', valueToIr(block, INPUT_TARGET), block.getFieldValue('ANCHOR')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -777,7 +839,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_in',
     'in %1',
     [{ type: 'field_input', name: 'DIMENSION', text: 'minecraft:overworld' }],
-    block => `in ${block.getFieldValue('DIMENSION')} `,
+    block => new FragmentCompositeNode(['in', block.getFieldValue('DIMENSION')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_on',
@@ -796,13 +858,13 @@ export const executeBlockSpecs: BlockSpec[] = [
         ['vehicle', 'vehicle'],
       ],
     }],
-    block => `on ${block.getFieldValue('RELATION')} `,
+    block => new FragmentCompositeNode(['on', block.getFieldValue('RELATION')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_positioned',
     'positioned %1',
-    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_param'] }],
-    block => `positioned ${mcfunctionGenerator.valueToCode(block, 'POS', 0)} `,
+    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
+    block => new FragmentCompositeNode(['positioned', valueToIr(block, 'POS')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'POS', { type: 'mc_block_pos' })
@@ -812,7 +874,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_positioned_as',
     'positioned as %1',
     [targetInput(selectorLikeChecks)],
-    block => `positioned as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    block => new FragmentCompositeNode(['positioned', 'as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -831,13 +893,13 @@ export const executeBlockSpecs: BlockSpec[] = [
         ['ocean_floor', 'ocean_floor'],
       ],
     }],
-    block => `positioned over ${block.getFieldValue('HEIGHTMAP')} `,
+    block => new FragmentCompositeNode(['positioned', 'over', block.getFieldValue('HEIGHTMAP')], block.id),
   ),
   executeModifierSpec(
     'execute_mod_rotated',
     'rotated %1',
-    [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_param'] }],
-    block => `rotated ${mcfunctionGenerator.valueToCode(block, 'ROTATION', 0)} `,
+    [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_proc_param'] }],
+    block => new FragmentCompositeNode(['rotated', valueToIr(block, 'ROTATION')], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, 'ROTATION', { type: 'mc_rotation' })
@@ -847,7 +909,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_rotated_as',
     'rotated as %1',
     [targetInput(selectorLikeChecks)],
-    block => `rotated as ${(mcfunctionGenerator.valueToCode(block, INPUT_TARGET, 0) || '').trim()} `,
+    block => new FragmentCompositeNode(['rotated', 'as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
       setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
@@ -857,6 +919,6 @@ export const executeBlockSpecs: BlockSpec[] = [
     'execute_mod_summon',
     'summon %1',
     [{ type: 'field_input', name: 'ENTITY', text: 'armor_stand' }],
-    block => `summon ${block.getFieldValue('ENTITY')} `,
+    block => new FragmentCompositeNode(['summon', block.getFieldValue('ENTITY')], block.id),
   ),
 ]

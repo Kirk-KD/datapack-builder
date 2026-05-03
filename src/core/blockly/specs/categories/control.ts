@@ -1,10 +1,15 @@
-import * as Blockly from 'blockly'
-import { addFile } from '../../../compiler/fileRegistry'
-import { mcfunctionGenerator } from '../../../compiler'
-import { nextId } from '../../../compiler/idGenerator'
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
-import {getInternalNamespace, getObjectiveName, getTempVarName, getVarName} from "../../../compiler/nameManager.ts";
+import {
+  CommandNode,
+  IfNode,
+  VariableCompareNode,
+  type VariableCompareOpType,
+  VariableMatchesNode,
+  WhileNode,
+  statementToIr,
+  valueToIr
+} from '../../../compiler'
 
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
@@ -12,27 +17,6 @@ const INPUT_VAR_B = 'VAR_B'
 const INPUT_CONDITION = 'CONDITION'
 const INPUT_DO = 'DO'
 const INPUT_ELSE = 'ELSE'
-
-const opMap: Record<string, string> = {
-  LT: '<',
-  LTE: '<=',
-  EQ: '=',
-  GTE: '>=',
-  GT: '>',
-}
-
-export function getConditionSetup(conditionBlock: Blockly.Block): string {
-  if (conditionBlock.type === 'mc_comp_score_compare') {
-    const valueBBlock = conditionBlock.getInputTargetBlock(INPUT_VAR_B)
-    if (valueBBlock?.type === 'mc_int') {
-      const num = valueBBlock.getFieldValue('VALUE')
-      const tempName = getTempVarName()
-      const obj = getObjectiveName()
-      return `scoreboard players set ${tempName} ${obj} ${num}\n`
-    }
-  }
-  return ''
-}
 
 export const controlBlockSpecs: BlockSpec[] = [
   {
@@ -50,17 +34,18 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'RANGE',
-          check: ['mc_param', 'mc_range'],
+          check: ['mc_proc_param', 'mc_range'],
         },
       ],
       inputsInline: true,
       output: 'MCCondition',
     },
     generator(block) {
-      const varName = mcfunctionGenerator.valueToCode(block, FIELD_VAR_NAME, 0)
-      const obj = getObjectiveName()
-      const range = mcfunctionGenerator.valueToCode(block, 'RANGE', 0) || ''
-      return [`score ${varName} ${obj} matches ${range}`, 0]
+      return new VariableMatchesNode(
+        valueToIr(block, FIELD_VAR_NAME),
+        valueToIr(block, 'RANGE'),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, FIELD_VAR_NAME, { type: 'mc_var_get' })
@@ -83,42 +68,29 @@ export const controlBlockSpecs: BlockSpec[] = [
           type: 'field_dropdown',
           name: FIELD_OP,
           options: [
-            ['<', 'LT'],
-            ['<=', 'LTE'],
-            ['=', 'EQ'],
-            ['>=', 'GTE'],
-            ['>', 'GT'],
-          ],
+            ['<', '<'],
+            ['<=', '<='],
+            ['=', '='],
+            ['>=', '>='],
+            ['>', '>'],
+          ] as [VariableCompareOpType, VariableCompareOpType][],
         },
         {
           type: 'input_value',
           name: INPUT_VAR_B,
-          check: ['mc_param', 'mc_int', 'mc_var_get'],
+          check: ['mc_proc_param', 'mc_int', 'mc_var_get'],
         },
       ],
       inputsInline: true,
       output: 'MCCondition',
     },
     generator(block) {
-      const varA = mcfunctionGenerator.valueToCode(block, FIELD_VAR_NAME, 0)
-      const obj = getObjectiveName()
-      const op = opMap[block.getFieldValue(FIELD_OP)]
-      const valueBBlock = block.getInputTargetBlock(INPUT_VAR_B)!
-
-      let fragment: string
-
-      if (valueBBlock.type === 'mc_int') {
-        const tempName = getTempVarName()
-        fragment = `score ${varA} ${obj} ${op} ${tempName} ${obj}`
-      } else if (valueBBlock.type === 'mc_var_get') {
-        const varB = mcfunctionGenerator.valueToCode(block, INPUT_VAR_B, 0)
-        fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
-      } else {
-        const varB = getVarName(valueBBlock.getField(FIELD_VAR_NAME)!.getText())
-        fragment = `score ${varA} ${obj} ${op} ${varB} ${obj}`
-      }
-
-      return [fragment, 0]
+      return new VariableCompareNode(
+        valueToIr(block, FIELD_VAR_NAME),
+        block.getFieldValue(FIELD_OP) as VariableCompareOpType,
+        valueToIr(block, INPUT_VAR_B),
+        block.id
+      )
     },
     setShadowBlocks(this) {
       setShadowState(this, FIELD_VAR_NAME, {
@@ -140,7 +112,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: ['mc_param', 'MCCondition'],
+          check: ['mc_proc_param', 'MCCondition'],
         },
       ],
       message1: 'then %1',
@@ -154,17 +126,12 @@ export const controlBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const id = nextId('if')
-      const conditionBlock = block.getInputTargetBlock(INPUT_CONDITION)!
-      const setup = getConditionSetup(conditionBlock)
-      const condition = mcfunctionGenerator.valueToCode(block, INPUT_CONDITION, 0)
-      const doCode = mcfunctionGenerator.statementToCode(block, INPUT_DO)
-      const internalNs = getInternalNamespace()
-
-      addFile(`data/${internalNs}/function/${id}_true.mcfunction`, doCode)
-
-      return setup
-        + `execute if ${condition} run function ${internalNs}:${id}_true\n`
+      return new IfNode(
+        valueToIr(block, INPUT_CONDITION),
+        statementToIr(block, INPUT_DO) as CommandNode[],
+        [],
+        block.id
+      )
     },
   },
   {
@@ -177,7 +144,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: ['mc_param', 'MCCondition'],
+          check: ['mc_proc_param', 'MCCondition'],
         },
       ],
       message1: 'then %1',
@@ -198,20 +165,12 @@ export const controlBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const id = nextId('if')
-      const conditionBlock = block.getInputTargetBlock(INPUT_CONDITION)!
-      const setup = getConditionSetup(conditionBlock)
-      const condition = mcfunctionGenerator.valueToCode(block, INPUT_CONDITION, 0)
-      const doCode = mcfunctionGenerator.statementToCode(block, INPUT_DO)
-      const elseCode = mcfunctionGenerator.statementToCode(block, INPUT_ELSE)
-      const internalNs = getInternalNamespace()
-
-      addFile(`data/${internalNs}/function/${id}_true.mcfunction`, doCode)
-      addFile(`data/${internalNs}/function/${id}_false.mcfunction`, elseCode)
-
-      return setup
-        + `execute if ${condition} run function ${internalNs}:${id}_true\n`
-        + `execute unless ${condition} run function ${internalNs}:${id}_false\n`
+      return new IfNode(
+        valueToIr(block, INPUT_CONDITION),
+        statementToIr(block, INPUT_DO) as CommandNode[],
+        statementToIr(block, INPUT_ELSE) as CommandNode[],
+        block.id
+      )
     },
   },
   {
@@ -238,24 +197,11 @@ export const controlBlockSpecs: BlockSpec[] = [
       nextStatement: null,
     },
     generator(block) {
-      const id = nextId('while')
-      const conditionBlock = block.getInputTargetBlock(INPUT_CONDITION)!
-      const setup = getConditionSetup(conditionBlock)
-      const condition = mcfunctionGenerator.valueToCode(block, INPUT_CONDITION, 0)
-      const bodyCode = mcfunctionGenerator.statementToCode(block, INPUT_DO)
-      const internalNs = getInternalNamespace()
-
-      addFile(
-        `data/${internalNs}/function/${id}.mcfunction`,
-        `execute if ${condition} run function ${internalNs}:${id}_body\n`,
+      return new WhileNode(
+        valueToIr(block, INPUT_CONDITION),
+        statementToIr(block, INPUT_DO) as CommandNode[],
+        block.id
       )
-
-      addFile(
-        `data/${internalNs}/function/${id}_body.mcfunction`,
-        bodyCode + setup + `function ${internalNs}:${id}\n`,
-      )
-
-      return setup + `function ${internalNs}:${id}\n`
     },
   },
 ]

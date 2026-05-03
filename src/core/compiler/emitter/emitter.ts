@@ -1,0 +1,141 @@
+import {
+  DatapackNode, ItemStackNode, LiteralRotationNode, LiteralIntNode,
+  LiteralPositionNode, LiteralRangeNode, LiteralStringNode,
+  ProcedureParameterNode, TargetSelectorNode, VariableNode, CommandCompositeNode,
+  FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode
+} from '../ir'
+import {OutputFiles} from '../outputFiles.ts'
+import {Naming} from './naming.ts'
+import type {ProjectConfig} from '../../../stores'
+import {compileEditorState} from './emitEditorState.ts'
+import {SelectiveIrVisitor} from '../ir'
+
+export class Emitter extends SelectiveIrVisitor<string> {
+  readonly files: OutputFiles
+  readonly naming: Naming
+  readonly projectConfig: ProjectConfig
+
+  constructor(outputFiles: OutputFiles, projectConfig: ProjectConfig) {
+    super()
+    this.files = outputFiles
+    this.projectConfig = projectConfig
+    this.naming = new Naming(this.projectConfig)
+  }
+
+  visitCommandComposite(node: CommandCompositeNode): string {
+    const res = node.parts.map(
+      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
+    console.assert(res.indexOf('\n') === -1)
+    return node.prefix(res + '\n')
+  }
+
+  visitFragmentComposite(node: FragmentCompositeNode): string {
+    const res = node.parts.map(
+      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
+    console.assert(res.indexOf('\n') === -1)
+    return res
+  }
+
+  visitFunctionDefinition(node: FunctionDefinitionNode): string {
+    this.files.with(this.naming.internalMcfunctionFilePath(node.name)).write(
+      node.bodyNodes.map(n => n.accept(this)).join('')
+    )
+    return ''
+  }
+
+  visitFunctionCall(node: FunctionCallNode): string {
+    return `function ${this.naming.internalNamespace()}:${node.name}`
+  }
+
+  visitDatapack(node: DatapackNode): string {
+    this.files.with('pack.mcmeta').write(
+      JSON.stringify({
+        pack: {
+          pack_format: this.projectConfig.packFormat,
+          description: this.projectConfig.description
+        }
+      }, null, 2)
+    )
+
+    // Nonsensical top-level nodes (e.g. nodes that aren't events or procedure definitions) are silently processed.
+    // Should prevent this in the future.
+    node.topLevelNodes.forEach(n => n.accept(this))
+
+    if (this.files.exists(this.naming.internalMcfunctionFilePath('tick'))) {
+      // By default, minecraft's execution order is "tick -> load -> tick -> tick -> ..."
+      // This checks an INIT flag to get rid of this behaviour.
+      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
+        `scoreboard players set ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} 1\n`
+      )
+      this.files.with(this.naming.internalMcfunctionFilePath('tick')).prepend(
+        `execute unless score ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} matches 1 run return fail\n`
+      )
+
+      // Only register tick tag if tick.mcfunction exists
+      this.files.with('data/minecraft/tags/function/tick.json').write(
+        JSON.stringify({
+          value: [`${this.naming.internalNamespace()}:tick`]
+        }, null, 2)
+      )
+    }
+
+    // Always initialize a dummy variable objective unless there are no top-level nodes.
+    // Could set a flag when variables are used but probably not worth it.
+    if (node.topLevelNodes.length) {
+      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
+        `scoreboard objectives add ${this.naming.variableObjectiveName()} dummy\n`
+      )
+
+      // Always register load tag due to needing to initialize the dummy objective.
+      this.files.with('data/minecraft/tags/function/load.json').write(
+        JSON.stringify({
+          value: [`${this.naming.internalNamespace()}:load`]
+        }, null, 2)
+      )
+    }
+
+    return ''
+  }
+
+  visitItemStack(node: ItemStackNode): string {
+    return compileEditorState({ compiler: 'item_stack', error: false, data: node.itemStackData }, {})
+  }
+
+  visitLiteralRotation(node: LiteralRotationNode): string {
+    return `${node.yawNode.accept(this)} ${node.pitchNode.accept(this)}`
+  }
+
+  visitLiteralInt(node: LiteralIntNode): string {
+    return `${node.value}`
+  }
+
+  visitLiteralPosition(node: LiteralPositionNode): string {
+    return `${node.xNode.accept(this)} ${node.yNode.accept(this)} ${node.zNode.accept(this)}`
+  }
+
+  visitLiteralRange(node: LiteralRangeNode): string {
+    return `${node.minNode.accept(this)}..${node.maxNode.accept(this)}`
+  }
+
+  visitLiteralString(node: LiteralStringNode): string {
+    return node.value
+  }
+
+  visitProcedureParameter(node: ProcedureParameterNode): string {
+    return `$(${node.parameterEntry.name})`
+  }
+
+  visitTargetSelector(node: TargetSelectorNode): string { // Placeholder; will switch to editor
+    let res = node.targetCategory
+    if (node.clauseNodes.length) res += `[${node.clauseNodes.map(n => n.accept(this)).join(',')}]`
+    return res
+  }
+
+  visitTempVariable(node: TempVariableNode): string {
+    return this.visitVariable(node)
+  }
+
+  visitVariable(node: VariableNode): string {
+    return `${this.naming.variableName(node.variableName)} ${this.naming.variableObjectiveName()}`
+  }
+}
