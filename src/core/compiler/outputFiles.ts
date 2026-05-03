@@ -7,6 +7,10 @@ export class OutputFiles {
     return file
   }
 
+  exists(path: string) {
+    return this.files.has(path)
+  }
+
   toStringMap(): Map<string, string> {
     return new Map(
       Array.from(this.files.entries()).map(([path, file]) => [path, file.content])

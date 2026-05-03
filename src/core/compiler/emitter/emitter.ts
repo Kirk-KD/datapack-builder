@@ -1,6 +1,6 @@
 import {
   DatapackNode, ItemStackNode, LiteralRotationNode, LiteralIntNode,
-  LiteralPositionNode, LiteralRangeNode, LiteralStringNode, OnLoadNode, OnTickNode,
+  LiteralPositionNode, LiteralRangeNode, LiteralStringNode,
   ProcedureParameterNode, TargetSelectorNode, VariableNode, CommandCompositeNode,
   FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode
 } from '../ir'
@@ -57,7 +57,42 @@ export class Emitter extends SelectiveIrVisitor<string> {
       }, null, 2)
     )
 
+    // Nonsensical top-level nodes (e.g. nodes that aren't events or procedure definitions) are silently processed.
+    // Should prevent this in the future.
     node.topLevelNodes.forEach(n => n.accept(this))
+
+    if (this.files.exists(this.naming.internalMcfunctionFilePath('tick'))) {
+      // By default, minecraft's execution order is "tick -> load -> tick -> tick -> ..."
+      // This checks an INIT flag to get rid of this behaviour.
+      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
+        `scoreboard players set ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} 1\n`
+      )
+      this.files.with(this.naming.internalMcfunctionFilePath('tick')).prepend(
+        `execute unless score ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} matches 1 run return fail\n`
+      )
+
+      // Only register tick tag if tick.mcfunction exists
+      this.files.with('data/minecraft/tags/function/tick.json').write(
+        JSON.stringify({
+          value: [`${this.naming.internalNamespace()}:tick`]
+        }, null, 2)
+      )
+    }
+
+    // Always initialize a dummy variable objective unless there are no top-level nodes.
+    // Could set a flag when variables are used but probably not worth it.
+    if (node.topLevelNodes.length) {
+      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
+        `scoreboard objectives add ${this.naming.variableObjectiveName()} dummy\n`
+      )
+
+      // Always register load tag due to needing to initialize the dummy objective.
+      this.files.with('data/minecraft/tags/function/load.json').write(
+        JSON.stringify({
+          value: [`${this.naming.internalNamespace()}:load`]
+        }, null, 2)
+      )
+    }
 
     return ''
   }
@@ -84,39 +119,6 @@ export class Emitter extends SelectiveIrVisitor<string> {
 
   visitLiteralString(node: LiteralStringNode): string {
     return node.value
-  }
-
-  visitOnLoad(node: OnLoadNode): string {
-    this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
-      `scoreboard objectives add ${this.naming.variableObjectiveName()} dummy\n`
-      + `scoreboard players set ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} 1\n`
-    )
-    this.files.with('data/minecraft/tags/function/load.json').write(
-      JSON.stringify({
-        value: [`${this.naming.internalNamespace()}:load`]
-      }, null, 2)
-    )
-
-    const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('')
-    this.files.with(this.naming.internalMcfunctionFilePath('load')).append(bodyCode)
-
-    return ''
-  }
-
-  visitOnTick(node: OnTickNode): string {
-    this.files.with(this.naming.internalMcfunctionFilePath('tick')).prepend(
-      `execute unless score ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} matches 1 run return fail\n`
-    )
-    this.files.with('data/minecraft/tags/function/tick.json').write(
-      JSON.stringify({
-        value: [`${this.naming.internalNamespace()}:tick`]
-      }, null, 2)
-    )
-
-    const bodyCode = node.bodyNodes.map(bodyNode => bodyNode.accept(this)).join('')
-    this.files.with(this.naming.internalMcfunctionFilePath('tick')).append(bodyCode)
-
-    return ''
   }
 
   visitProcedureParameter(node: ProcedureParameterNode): string {

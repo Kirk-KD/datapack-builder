@@ -245,20 +245,14 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   visitOnLoad(node: OnLoadNode): LoweredResult {
     return {
       pre: [],
-      nodes: [new OnLoadNode(
-        this.lowerBody(node.bodyNodes),
-        node.sourceBlockId
-      )]
+      nodes: [new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), node.sourceBlockId)]
     }
   }
 
   visitOnTick(node: OnTickNode): LoweredResult {
     return {
       pre: [],
-      nodes: [new OnTickNode(
-        this.lowerBody(node.bodyNodes),
-        node.sourceBlockId
-      )]
+      nodes: [new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), node.sourceBlockId)]
     }
   }
 
