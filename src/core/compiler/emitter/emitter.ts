@@ -4,7 +4,7 @@ import {
   ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode, ProcedureParameterNode,
   TargetSelectorNode, VariableCompareNode, VariableMatchesNode, VariableNode, VariableOperationNode, WhileNode,
   CommandCompositeNode,
-  FragmentCompositeNode, TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode
+  FragmentCompositeNode, TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
@@ -20,6 +20,10 @@ export class Emitter implements IrVisitor<string> {
     this.files = outputFiles
     this.projectConfig = projectConfig
     this.naming = new Naming(this.projectConfig)
+  }
+
+  private disallow(node: IrNode): never {
+    throw new Error(`Emitter should not encounter: ${node.constructor.name}`)
   }
 
   visitCommandComposite(node: CommandCompositeNode): string {
@@ -63,11 +67,11 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitExecute(node: ExecuteNode): string {
-    throw new Error(`Emitter should not encounter: ${node}`)
+    this.disallow(node)
   }
 
   visitIf(node: IfNode): string {
-    throw new Error(`Emitter should not encounter: ${node}`)
+    this.disallow(node)
   }
 
   visitItemStack(node: ItemStackNode): string {
@@ -128,7 +132,7 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitProcedureCall(node: ProcedureCallNode): string {
-    throw new Error(`Emitter should not encounter: ${node}`)
+    this.disallow(node)
   }
 
   visitProcedureCallArgument(node: ProcedureCallArgumentNode): string {
@@ -136,11 +140,7 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitProcedureDefinition(node: ProcedureDefinitionNode): string {
-    // this.files.with(this.naming.procedureMcfunctionFilePath(node.procedureEntry.name)).write(
-    //   node.bodyNodes.map(n => n.accept(this)).join('\n') + '\n'
-    // )
-    // return ''
-    throw new Error(`Emitter should not encounter: ${node}`)
+    this.disallow(node)
   }
 
   visitProcedureParameter(node: ProcedureParameterNode): string {
@@ -187,6 +187,6 @@ export class Emitter implements IrVisitor<string> {
   }
 
   visitWhile(node: WhileNode): string {
-    throw new Error(`Emitter should not encounter: ${node}`)
+    this.disallow(node)
   }
 }
