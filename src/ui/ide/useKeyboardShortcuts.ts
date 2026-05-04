@@ -1,30 +1,16 @@
 import {useIDEContext} from "./context/useIDEContext.ts"
-import {saveProject} from "../../core/save"
 import { useHotkeys } from 'react-hotkeys-hook'
+import {actions} from './actions.tsx'
 
 export function useKeyboardShortcuts() {
-  const {blocklyWorkspaceRef, setHasUnsavedFileChanges} = useIDEContext()
+  const ideContext = useIDEContext()
 
-  useHotkeys('mod+s', () => {
-    if (blocklyWorkspaceRef.current) {
-      saveProject({workspace: blocklyWorkspaceRef.current})
-      setHasUnsavedFileChanges(false)
-    }
-  })
+  useHotkeys('mod+s', () => actions.saveProject(ideContext), { preventDefault: true })
+  useHotkeys('mod+o', () => actions.openProject(ideContext), { preventDefault: true })
+  useHotkeys('mod+b', () => actions.buildDatapack(ideContext), { preventDefault: true })
+  useHotkeys('mod+i', () => actions.inspectOutput(ideContext), { preventDefault: true })
 
-  useHotkeys('mod+o', () => {
-    // TODO open project
-  })
-
-  useHotkeys('mod+n', () => {
-    // TODO new project
-  })
-
-  useHotkeys('mod+b', () => {
-    // TODO build project
-  })
-
-  useHotkeys('mod+i', () => {
-    // TODO inspect output
-  })
+  // `preventDefault` option not working while the others work; `window.addEventListener` doesn't work either.
+  // Tested on Firefox and Safari.
+  // useHotkeys('mod+n', () => actions.newProject(ideContext), { preventDefault: true })
 }
