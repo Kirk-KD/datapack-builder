@@ -5,7 +5,7 @@ import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
 import {useIDEContext} from "../context/useIDEContext.ts";
 import {ActionButtons} from "./ActionButtons.tsx";
 import {controller} from '../../editor'
-import {Confirmation} from '../WorkspaceDialogues'
+import {TextDialogue} from '../WorkspaceDialogues'
 
 export function MenuBar() {
   const {blocklyWorkspaceRef, setHasUnsavedFileChanges} = useIDEContext()
@@ -47,10 +47,10 @@ export function MenuBar() {
                 controller.openEditorModal({
                   title: 'Unsaved changes',
                   editor: (
-                    <Confirmation>
+                    <TextDialogue>
                       Unsaved changes will be lost when another project is opened. Proceed?<br/>
                       Save changes to your computer with <b>File {'>'} Save</b>.
-                    </Confirmation>
+                    </TextDialogue>
                   ),
                   mode: 'confirm',
                   onConfirm: () => {
@@ -68,10 +68,10 @@ export function MenuBar() {
                 controller.openEditorModal({
                   title: 'Unsaved changes',
                   editor: (
-                    <Confirmation>
+                    <TextDialogue>
                       Unsaved changes will be lost when a new project is created. Proceed?<br/>
                       Save changes to your computer with <b>File {'>'} Save</b>.
-                    </Confirmation>
+                    </TextDialogue>
                   ),
                   mode: 'confirm',
                   onConfirm: () => {
