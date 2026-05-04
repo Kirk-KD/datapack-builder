@@ -4,21 +4,21 @@ import * as React from "react";
 import type {AlertColor} from '@mui/material'
 
 export function SnackbarProvider({children}: { children: React.ReactNode }) {
-  const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarText, setSnackbarText] = useState('')
-  const [snackbarColor, setSnackbarColor] = useState<AlertColor>('info')
+  const [open, setOpen] = useState(false)
+  const [text, setText] = useState('')
+  const [severity, setSeverity] = useState<AlertColor>('info')
 
   const value = useMemo(() => ({
-    snackbarOpen,
-    setSnackbarOpen,
-    snackbarText,
-    setSnackbarText,
-    snackbarColor,
-    setSnackbarColor,
+    open,
+    setOpen,
+    text,
+    setText,
+    severity,
+    setSeverity,
   }), [
-    snackbarOpen,
-    snackbarText,
-    snackbarColor,
+    open,
+    text,
+    severity,
   ])
 
   return (
@@ -27,4 +27,3 @@ export function SnackbarProvider({children}: { children: React.ReactNode }) {
     </SnackbarContext.Provider>
   )
 }
-

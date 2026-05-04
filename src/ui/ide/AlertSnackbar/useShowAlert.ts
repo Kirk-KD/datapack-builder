@@ -2,11 +2,11 @@ import type {AlertColor} from '@mui/material'
 import {useSnackbarContext} from '../context/useSnackbarContext.ts'
 
 export function useShowAlert() {
-  const {setSnackbarOpen, setSnackbarText, setSnackbarColor} = useSnackbarContext()
+  const {setOpen, setText, setSeverity} = useSnackbarContext()
 
   return (text: string, color?: AlertColor) => {
-    setSnackbarText(text)
-    setSnackbarColor(color ?? 'info')
-    setSnackbarOpen(true)
+    setText(text)
+    setSeverity(color ?? 'info')
+    setOpen(true)
   }
 }

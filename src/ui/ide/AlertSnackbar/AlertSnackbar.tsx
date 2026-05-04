@@ -3,12 +3,12 @@ import {type SyntheticEvent} from 'react'
 import {useSnackbarContext} from '../context/useSnackbarContext.ts'
 
 export function AlertSnackbar() {
-  const {snackbarOpen, setSnackbarOpen, snackbarText, snackbarColor} = useSnackbarContext()
+  const {open, setOpen, text, severity} = useSnackbarContext()
 
   const handleClose = (
     _event: Event | SyntheticEvent<unknown, Event>, reason: SnackbarCloseReason
   ) => {
-    if (reason !== 'clickaway') setSnackbarOpen(false)
+    if (reason !== 'clickaway') setOpen(false)
   }
 
   return (
@@ -17,17 +17,17 @@ export function AlertSnackbar() {
         vertical: 'top',
         horizontal: 'center'
       }}
-      open={snackbarOpen}
+      open={open}
       onClose={handleClose}
       autoHideDuration={3000}
     >
       <Alert
-        onClose={() => setSnackbarOpen(false)}
+        onClose={() => setOpen(false)}
         sx={{ width: '100%' }}
         variant={'filled'}
-        color={snackbarColor}
+        severity={severity}
       >
-        {snackbarText}
+        {text}
       </Alert>
     </Snackbar>
   )
