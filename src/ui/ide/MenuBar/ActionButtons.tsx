@@ -5,11 +5,10 @@ import {IconsPill} from "../../components/IconsPill.tsx";
 import {controller, ProjectConfigEditor} from "../../editor";
 import {IconsPillDivider} from "../../components/IconsPillDivider.tsx";
 import {IconButton, Tooltip} from "@mui/material";
-import {useIDEContext} from "../context/useIDEContext.ts";
-import {actions} from '../actions.tsx'
+import {useActions} from "../useActions.tsx";
 
 export function ActionButtons() {
-  const ideContext = useIDEContext()
+  const actions = useActions()
 
   return (
     <IconsPill>
@@ -27,13 +26,13 @@ export function ActionButtons() {
       <IconsPillDivider/>
 
       <Tooltip title={'Build datapack'}>
-        <IconButton onClick={() => actions.buildDatapack(ideContext)}>
+        <IconButton onClick={() => actions.buildDatapack()}>
           <HardwareIcon color={'success'}/>
         </IconButton>
       </Tooltip>
 
       <Tooltip title={'Preview datapack'}>
-        <IconButton onClick={() => actions.inspectOutput(ideContext)}>
+        <IconButton onClick={() => actions.inspectOutput()}>
           <CodeIcon color={'success'}/>
         </IconButton>
       </Tooltip>
