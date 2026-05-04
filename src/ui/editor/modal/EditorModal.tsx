@@ -48,20 +48,20 @@ export function EditorModal() {
           overflow: 'hidden'
         }),
       }}>
-        <Stack direction={'row'} sx={{
-          flex: '0 0 auto',
-          backgroundColor: 'background.paper',
-          alignItems: 'center',
-          p: 1,
-          pl: 2,
-          borderTopLeftRadius: theme => theme.shape.surfaceBorderRadius,
-          borderTopRightRadius: theme => theme.shape.surfaceBorderRadius
-        }}>
-          <Typography variant={'h6'} sx={{
-            flex: 1,
-          }}>{payload.title}</Typography>
-          <MaximizeButton maximized={maximized}/>
-        </Stack>
+         <Stack direction={'row'} sx={{
+           flex: '0 0 auto',
+           backgroundColor: 'background.paper',
+           alignItems: 'center',
+           p: 1,
+           pl: 2,
+           borderTopLeftRadius: theme => theme.shape.surfaceBorderRadius,
+           borderTopRightRadius: theme => theme.shape.surfaceBorderRadius
+         }}>
+           <Typography variant={'h6'} sx={{
+             flex: 1,
+           }}>{payload.title}</Typography>
+           {!payload.noFullscreen && <MaximizeButton maximized={maximized}/>}
+         </Stack>
         <Box sx={{
           backgroundColor: 'background.paper',
           p: 1,

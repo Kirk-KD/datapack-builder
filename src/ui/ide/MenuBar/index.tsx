@@ -57,7 +57,8 @@ export function MenuBar() {
                     if (!blocklyWorkspaceRef.current) return
                     loadProject({workspace: blocklyWorkspaceRef.current})
                     setHasUnsavedFileChanges(false)
-                  }
+                  },
+                  noFullscreen: true
                 })
               }
             },
@@ -77,7 +78,8 @@ export function MenuBar() {
                     if (!blocklyWorkspaceRef.current) return
                     newProject(blocklyWorkspaceRef.current)
                     setHasUnsavedFileChanges(true) // A new project is not yet saved to computer.
-                  }
+                  },
+                  noFullscreen: true
                 })
               }
             }
