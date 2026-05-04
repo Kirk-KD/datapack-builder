@@ -1,6 +1,6 @@
 import {useMemo, useState} from "react";
 import {useAutosave} from "../useAutosave.ts";
-import useBlocklyWorkspace from "../WorkspacePanel/useBlocklyWorkspace.ts";
+import useBlocklyWorkspace from "../WorkspacePanel/useBlocklyWorkspace.tsx";
 import {IDEContext} from "./IDEContext.tsx";
 import * as React from "react";
 import type {OutputZip} from "../../../core/output-preview";
