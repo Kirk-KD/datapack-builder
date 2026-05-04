@@ -2,6 +2,7 @@ import {useMemo, useState} from "react";
 import {useAutosave} from "../useAutosave.ts";
 import useBlocklyWorkspace from "../WorkspacePanel/useBlocklyWorkspace.tsx";
 import {IDEContext} from "./IDEContext.tsx";
+import {SnackbarProvider} from "./SnackbarProvider.tsx";
 import * as React from "react";
 import type {OutputZip} from "../../../core/output-preview";
 
@@ -28,11 +29,20 @@ export function IDEProvider({children}: { children: React.ReactNode }) {
     setOutputViewerOpen,
     compiledOutput,
     setCompiledOutput
-  }), [blocklyDivRef, blocklyWorkspaceRef, hasUnsavedChanges, hasUnsavedFileChanges, outputViewerOpen, compiledOutput])
+  }), [
+    blocklyDivRef,
+    blocklyWorkspaceRef,
+    hasUnsavedChanges,
+    hasUnsavedFileChanges,
+    outputViewerOpen,
+    compiledOutput
+  ])
 
   return (
     <IDEContext.Provider value={value}>
-      {children}
+      <SnackbarProvider>
+        {children}
+      </SnackbarProvider>
     </IDEContext.Provider>
   )
 }

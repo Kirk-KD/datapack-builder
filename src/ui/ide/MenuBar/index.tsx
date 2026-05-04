@@ -1,12 +1,11 @@
 import {AppBar, Box, Stack, Toolbar} from "@mui/material";
 import {MenuButton} from "./MenuButton.tsx";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
-import {useIDEContext} from "../context/useIDEContext.ts";
 import {ActionButtons} from "./ActionButtons.tsx";
-import {actions} from '../actions.tsx'
+import {useActions} from "../useActions.tsx";
 
 export function MenuBar() {
-  const ideContext = useIDEContext()
+  const actions = useActions()
 
   return (
     <AppBar position={'relative'}>
@@ -33,15 +32,15 @@ export function MenuBar() {
           <MenuButton text={'File'} items={[
             {
               text: 'Save',
-              onClick: () => actions.saveProject(ideContext)
+              onClick: () => actions.saveProject()
             },
             {
               text: 'Open',
-              onClick: () => actions.openProject(ideContext)
+              onClick: () => actions.openProject()
             },
             {
               text: 'New',
-              onClick: () => actions.newProject(ideContext)
+              onClick: () => actions.newProject()
             }
           ]}/>
         </Stack>

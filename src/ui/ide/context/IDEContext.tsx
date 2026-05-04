@@ -14,6 +14,7 @@ export type IDEContextValue = {
   outputViewerOpen: boolean
   setOutputViewerOpen: React.Dispatch<React.SetStateAction<boolean>>
 
+
   compiledOutput: OutputZip | null
   setCompiledOutput: React.Dispatch<React.SetStateAction<OutputZip | null>>
 }
