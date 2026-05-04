@@ -1,9 +1,9 @@
 import {Alert, Snackbar, type SnackbarCloseReason} from '@mui/material'
 import {type SyntheticEvent} from 'react'
-import {useIDEContext} from '../context/useIDEContext.ts'
+import {useSnackbarContext} from '../context/useSnackbarContext.ts'
 
 export function AlertSnackbar() {
-  const {snackbarOpen, setSnackbarOpen, snackbarText, snackbarColor} = useIDEContext()
+  const {snackbarOpen, setSnackbarOpen, snackbarText, snackbarColor} = useSnackbarContext()
 
   const handleClose = (
     _event: Event | SyntheticEvent<unknown, Event>, reason: SnackbarCloseReason
