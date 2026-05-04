@@ -1,5 +1,5 @@
-import {SelectiveIrVisitor} from '../ir'
 import {
+  SelectiveIrVisitor,
   CommandCompositeNode,
   DatapackNode,
   FunctionDefinitionNode,
