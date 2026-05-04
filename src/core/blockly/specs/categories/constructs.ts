@@ -1,5 +1,7 @@
 import type { BlockSpec } from '../types'
 import type {EditorState, ItemStackEditorResult} from "../../../editor";
+// TODO: this violates `core/` -> `ui/` dependency direction
+// controller should be injected as a callback instead
 import {loadFromSchema, controller} from "../../../../ui/editor";
 import {bindExtraState, mutateExtraState, type StatefulBlock} from "../extraState.ts";
 import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
