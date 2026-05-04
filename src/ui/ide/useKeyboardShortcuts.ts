@@ -12,6 +12,7 @@ export function useKeyboardShortcuts() {
     // TODO inspect output
   }, { preventDefault: true })
 
-  // `preventDefault` not working while the others work; `window.addEventListener` for meta/ctrl+n doesn't work either.
+  // `preventDefault` option not working while the others work; `window.addEventListener` doesn't work either.
+  // Tested on Firefox and Safari.
   // useHotkeys('mod+n', () => actions.newProject(ideContext), { preventDefault: true })
 }
