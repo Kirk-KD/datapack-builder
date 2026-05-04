@@ -8,9 +8,7 @@ export function useKeyboardShortcuts() {
   useHotkeys('mod+s', () => actions.saveProject(ideContext), { preventDefault: true })
   useHotkeys('mod+o', () => actions.openProject(ideContext), { preventDefault: true })
   useHotkeys('mod+b', () => actions.buildDatapack(ideContext), { preventDefault: true })
-  useHotkeys('mod+i', () => {
-    // TODO inspect output
-  }, { preventDefault: true })
+  useHotkeys('mod+i', () => actions.inspectOutput(ideContext), { preventDefault: true })
 
   // `preventDefault` option not working while the others work; `window.addEventListener` doesn't work either.
   // Tested on Firefox and Safari.

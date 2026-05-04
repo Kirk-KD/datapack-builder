@@ -71,6 +71,14 @@ export const actions = {
     outputFiles.download(useProjectConfigStore.getState().projectConfig.namespace)
 
     viewOutputFiles(outputFiles, { setCompiledOutput, setOutputViewerOpen })
+  },
+  inspectOutput({ blocklyWorkspaceRef, setCompiledOutput, setOutputViewerOpen }: IDEContextValue) {
+    if (!blocklyWorkspaceRef.current) return
+
+    const outputFiles = orchestrate(
+      blocklyWorkspaceRef.current, useProjectConfigStore.getState().projectConfig)
+
+    viewOutputFiles(outputFiles, { setCompiledOutput, setOutputViewerOpen })
   }
 }
 
