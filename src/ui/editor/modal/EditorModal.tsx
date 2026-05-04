@@ -27,19 +27,29 @@ export function EditorModal() {
       <Stack sx={{
         position: 'absolute',
         outline: 'none',
+        display: 'flex',
+        flexDirection: 'column',
         ...(maximized ? {
-          width: '100%',
-          height: '100%'
+          top: 0,
+          left: 0,
+          transform: 'none',
+          width: '100vw',
+          height: '100vh',
+          maxWidth: '100vw',
+          maxHeight: '100vh'
         } : {
-          top: '45%',
+          top: theme => theme.spacing(3),
           left: '50%',
-          transform: 'translate(-50%, -45%)',
-          width: '50rem',
-          maxHeight: '90%',
-          height: '90%'
+          transform: 'translateX(-50%)',
+          width: 'fit-content',
+          height: 'fit-content',
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          overflow: 'hidden'
         }),
       }}>
         <Stack direction={'row'} sx={{
+          flex: '0 0 auto',
           backgroundColor: 'background.paper',
           alignItems: 'center',
           p: 1,
@@ -58,12 +68,16 @@ export function EditorModal() {
           width: '100%',
           flex: 1,
           minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
           overflow: 'hidden'
         }}>
           <Box sx={{
-            p: 1,
+            p: 2,
+            pl: 4,
+            pr: 4,
             width: '100%',
-            height: '100%',
+            flex: '1 1 auto',
             minWidth: 0,
             minHeight: 0,
             overflow: 'auto',
@@ -80,6 +94,7 @@ export function EditorModal() {
           </Box>
         </Box>
         <Stack direction={'row'} sx={{
+          flex: '0 0 auto',
           backgroundColor: 'background.paper',
           p: 1,
           gap: 1,

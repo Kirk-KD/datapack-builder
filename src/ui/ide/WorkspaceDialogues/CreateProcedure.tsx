@@ -105,8 +105,7 @@ export function CreateProcedure({ onChangeName, onChangeParams }: CreateProcedur
   return (
     <Stack spacing={1} sx={{
       width: '30rem',
-      height: '100%',
-      pt: 1,
+      height: 'auto',
     }}>
       <Stack direction={'row'} spacing={1} sx={{
         width: '100%',
