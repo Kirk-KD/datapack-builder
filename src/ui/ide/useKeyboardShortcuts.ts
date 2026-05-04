@@ -1,30 +1,19 @@
 import {useIDEContext} from "./context/useIDEContext.ts"
-import {saveProject} from "../../core/save"
 import { useHotkeys } from 'react-hotkeys-hook'
+import {actions} from './actions.tsx'
 
 export function useKeyboardShortcuts() {
-  const {blocklyWorkspaceRef, setHasUnsavedFileChanges} = useIDEContext()
+  const ideContext = useIDEContext()
 
-  useHotkeys('mod+s', () => {
-    if (blocklyWorkspaceRef.current) {
-      saveProject({workspace: blocklyWorkspaceRef.current})
-      setHasUnsavedFileChanges(false)
-    }
-  })
-
-  useHotkeys('mod+o', () => {
-    // TODO open project
-  })
-
-  useHotkeys('mod+n', () => {
-    // TODO new project
-  })
-
+  useHotkeys('mod+s', () => actions.saveProject(ideContext), { preventDefault: true })
+  useHotkeys('mod+o', () => actions.openProject(ideContext), { preventDefault: true })
   useHotkeys('mod+b', () => {
     // TODO build project
-  })
-
+  }, { preventDefault: true })
   useHotkeys('mod+i', () => {
     // TODO inspect output
-  })
+  }, { preventDefault: true })
+
+  // `preventDefault` not working while the others work; `window.addEventListener` for meta/ctrl+n doesn't work either.
+  // useHotkeys('mod+n', () => actions.newProject(ideContext), { preventDefault: true })
 }

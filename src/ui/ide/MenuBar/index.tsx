@@ -3,7 +3,7 @@ import {MenuButton} from "./MenuButton.tsx";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
 import {useIDEContext} from "../context/useIDEContext.ts";
 import {ActionButtons} from "./ActionButtons.tsx";
-import {actions} from '../actions.ts'
+import {actions} from '../actions.tsx'
 
 export function MenuBar() {
   const ideContext = useIDEContext()
