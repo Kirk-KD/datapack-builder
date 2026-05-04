@@ -8,6 +8,7 @@ import FolderZipIcon from '@mui/icons-material/FolderZip';
 import {useIDEContext} from "./context/useIDEContext.ts";
 import {useKeyboardShortcuts} from "./useKeyboardShortcuts.ts";
 import {HotkeysProvider} from 'react-hotkeys-hook'
+import {AlertSnackbar} from './AlertSnackbar/AlertSnackbar'
 
 export function IDE() {
   const { outputViewerOpen, setOutputViewerOpen } = useIDEContext()
@@ -27,6 +28,8 @@ export function IDE() {
         </SplitLayout>
         <EditorModal />
       </Stack>
+
+      <AlertSnackbar/>
     </HotkeysProvider>
   )
 }
