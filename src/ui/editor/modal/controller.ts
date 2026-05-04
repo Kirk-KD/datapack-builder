@@ -6,6 +6,7 @@ type Listener = () => void
 type EditorModalPayloadBase = {
   title: string
   editor: React.ReactNode
+  noFullscreen?: boolean
 }
 
 type EditorModalPayload =
