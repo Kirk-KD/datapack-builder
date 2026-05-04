@@ -11,6 +11,7 @@ import theme from "../../theme.ts"
 import getToolboxContents from "./getToolboxContents.ts";
 import {procedureRegistry, variableRegistry} from "./registry";
 import {subscribeListeners} from "./specs/categories/procedures.ts";
+import type {WorkspaceCallbacks} from './workspaceCallbacks.ts'
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -71,7 +72,7 @@ function injectWorkspace(workspaceDiv: HTMLDivElement) {
   })
 }
 
-function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
+function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCallbacks) {
   // Toolbox behaviors
   Blockly.VerticalFlyout.prototype.getFlyoutScale = () => 0.7
   // Do not override width of mutator flyouts
@@ -90,10 +91,12 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg) {
     variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'int'))
   })
 
-  // TODO proper procedure dialogue/editor
   workspace.registerButtonCallback('CREATE_PROCEDURE', () => {
-    const [procName, ...paramNames] = (prompt('Proc name & param names?') || 'proc').split(' ')
-    procedureRegistry.addProcedure(procName, paramNames.map(paramName => procedureRegistry.createParameter(paramName, 'int')))
+    callbacks.onCreateProcedure(({ name, params }) => {
+      procedureRegistry.addProcedure(
+        name, params.map(({ name, type }) => procedureRegistry.createParameter(name, type))
+      )
+    })
   })
 
   const unsubProcListeners = subscribeListeners(workspace)
