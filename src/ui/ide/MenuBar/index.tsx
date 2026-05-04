@@ -4,6 +4,8 @@ import {loadProject, newProject, saveProject} from "../../../core/save";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
 import {useIDEContext} from "../context/useIDEContext.ts";
 import {ActionButtons} from "./ActionButtons.tsx";
+import {controller} from '../../editor'
+import {Confirmation} from '../WorkspaceDialogues'
 
 export function MenuBar() {
   const {blocklyWorkspaceRef, setHasUnsavedFileChanges} = useIDEContext()
@@ -42,23 +44,41 @@ export function MenuBar() {
             {
               text: 'Open',
               onClick: () => {
-                if (!blocklyWorkspaceRef.current) return
-                // TODO proper dialogue
-                if (confirm('Unsaved changes will be lost when another project is opened. Proceed?')) {
-                  loadProject({workspace: blocklyWorkspaceRef.current})
-                  setHasUnsavedFileChanges(false)
-                }
+                controller.openEditorModal({
+                  title: 'Unsaved changes',
+                  editor: (
+                    <Confirmation>
+                      Unsaved changes will be lost when another project is opened. Proceed?<br/>
+                      Save changes to your computer with <b>File {'>'} Save</b>.
+                    </Confirmation>
+                  ),
+                  mode: 'confirm',
+                  onConfirm: () => {
+                    if (!blocklyWorkspaceRef.current) return
+                    loadProject({workspace: blocklyWorkspaceRef.current})
+                    setHasUnsavedFileChanges(false)
+                  }
+                })
               }
             },
             {
               text: 'New',
               onClick: () => {
-                if (!blocklyWorkspaceRef.current) return
-                // TODO proper dialogue
-                if (confirm('Unsaved changes will be lost when another project is created. Proceed?')) {
-                  newProject(blocklyWorkspaceRef.current)
-                  setHasUnsavedFileChanges(true) // A new project is not yet saved to computer.
-                }
+                controller.openEditorModal({
+                  title: 'Unsaved changes',
+                  editor: (
+                    <Confirmation>
+                      Unsaved changes will be lost when a new project is created. Proceed?<br/>
+                      Save changes to your computer with <b>File {'>'} Save</b>.
+                    </Confirmation>
+                  ),
+                  mode: 'confirm',
+                  onConfirm: () => {
+                    if (!blocklyWorkspaceRef.current) return
+                    newProject(blocklyWorkspaceRef.current)
+                    setHasUnsavedFileChanges(true) // A new project is not yet saved to computer.
+                  }
+                })
               }
             }
           ]}/>
