@@ -2,7 +2,7 @@ import {useEffect, useRef} from "react";
 import * as Blockly from "blockly";
 import {injectWorkspace, setupWorkspace} from "../../../core/blockly";
 import {controller} from '../../editor'
-import {CreateProcedure} from '../WorkspaceDialogues'
+import {CreateProcedure, CreateVariable} from '../WorkspaceDialogues'
 import type {VariableValueType} from '../../../core/blockly/registry'
 
 export default function useBlocklyWorkspace() {
@@ -30,6 +30,20 @@ export default function useBlocklyWorkspace() {
           editor: <CreateProcedure
             onChangeName={name => { procName = name }}
             onChangeParams={params => { procParams = params}}
+          />
+        })
+      },
+      onCreateVariable: onConfirm => {
+        let variableName = 'var'
+        let variableType: VariableValueType = 'int'
+
+        controller.openEditorModal({
+          title: 'Create Variable',
+          mode: 'confirm',
+          onConfirm: () => onConfirm({ name: variableName, valueType: variableType }),
+          editor: <CreateVariable
+            onChangeName={name => { variableName = name }}
+            onChangeType={type => { variableType = type }}
           />
         })
       }

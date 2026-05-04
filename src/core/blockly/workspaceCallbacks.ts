@@ -9,6 +9,12 @@ export type CreateProcedureData = {
   params: CreateParamData[]
 }
 
+export type CreateVariableData = {
+  name: string
+  valueType: VariableValueType
+}
+
 export interface WorkspaceCallbacks {
   onCreateProcedure(onConfirm: (data: CreateProcedureData) => void): void
+  onCreateVariable(onConfirm: (data: CreateVariableData) => void): void
 }

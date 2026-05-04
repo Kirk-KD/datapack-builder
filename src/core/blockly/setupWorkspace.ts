@@ -86,9 +86,10 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
   // Enable auto shadow conversion
   workspace.addChangeListener(shadowBlockConversionChangeListener)
 
-  // TODO proper variable dialogue/editor
   workspace.registerButtonCallback('CREATE_VARIABLE', () => {
-    variableRegistry.add(variableRegistry.createEntry(prompt('Var name?') || 'var', 'int'))
+    callbacks.onCreateVariable(({ name, valueType }) => {
+      variableRegistry.add(variableRegistry.createEntry(name, valueType))
+    })
   })
 
   workspace.registerButtonCallback('CREATE_PROCEDURE', () => {
