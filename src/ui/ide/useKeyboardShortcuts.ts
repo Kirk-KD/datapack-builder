@@ -7,9 +7,7 @@ export function useKeyboardShortcuts() {
 
   useHotkeys('mod+s', () => actions.saveProject(ideContext), { preventDefault: true })
   useHotkeys('mod+o', () => actions.openProject(ideContext), { preventDefault: true })
-  useHotkeys('mod+b', () => {
-    // TODO build project
-  }, { preventDefault: true })
+  useHotkeys('mod+b', () => actions.buildDatapack(ideContext), { preventDefault: true })
   useHotkeys('mod+i', () => {
     // TODO inspect output
   }, { preventDefault: true })

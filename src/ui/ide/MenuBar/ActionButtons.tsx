@@ -9,9 +9,11 @@ import {useIDEContext} from "../context/useIDEContext.ts";
 import {mapToOutputZip} from "../../../core/output-preview";
 import {orchestrate} from '../../../core/compiler'
 import {useProjectConfigStore} from '../../../stores'
+import {actions} from '../actions.tsx'
 
 export function ActionButtons() {
-  const {blocklyWorkspaceRef, setOutputViewerOpen, setCompiledOutput} = useIDEContext()
+  const ideContext = useIDEContext()
+  const {blocklyWorkspaceRef, setOutputViewerOpen, setCompiledOutput} = ideContext
 
   return (
     <IconsPill>
@@ -29,18 +31,7 @@ export function ActionButtons() {
       <IconsPillDivider/>
 
       <Tooltip title={'Build datapack'}>
-        <IconButton onClick={() => {
-          if (!blocklyWorkspaceRef.current) return
-
-          const outputFiles = orchestrate(
-            blocklyWorkspaceRef.current, useProjectConfigStore.getState().projectConfig)
-
-          // Replace namespace with readable name later
-          outputFiles.download(useProjectConfigStore.getState().projectConfig.namespace)
-
-          setCompiledOutput(mapToOutputZip(outputFiles.toStringMap(), new Date()))
-          setOutputViewerOpen(true)
-        }}>
+        <IconButton onClick={() => actions.buildDatapack(ideContext)}>
           <HardwareIcon color={'success'}/>
         </IconButton>
       </Tooltip>
