@@ -3,17 +3,14 @@ import {Box} from '@mui/material'
 
 type SegmentSpanProps = {
   segment: Segment
-  index: number
 }
-export function SegmentSpan({ segment, index }: SegmentSpanProps) {
+export function SegmentSpan({ segment }: SegmentSpanProps) {
   return (
     <Box
       onClick={() => console.log(segment.getSourceBlockId(), segment.getFunctionId())}
-      key={index}
       sx={{
         display: 'inline',
         whiteSpace: 'pre',
-        fontFamily: theme => theme.typography.mono
       }}
     >
       {segment.content}
