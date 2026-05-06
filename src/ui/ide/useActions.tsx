@@ -17,8 +17,9 @@ export function useActions() {
     try {
       outputFiles = orchestrate(ideContext.blocklyWorkspaceRef.current!, useProjectConfigStore.getState().projectConfig)
       showAlert('Datapack built.', 'success')
-    } catch {
+    } catch (e) {
       showAlert('Error building datapack.', 'error')
+      throw e
     }
 
     return outputFiles
