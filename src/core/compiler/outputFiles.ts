@@ -1,4 +1,5 @@
 import JSZip from 'jszip'
+import type {Segment} from './mapping.ts'
 
 export class OutputFiles {
   readonly files: Map<string, OutputFile> = new Map<string, OutputFile>()
@@ -16,7 +17,7 @@ export class OutputFiles {
   toStringMap(): Map<string, string> {
     return new Map(
       Array.from(this.files.entries())
-        .map(([path, file]) => [path, file.content])
+        .map(([path, file]) => [path, file.getStringContent()])
     )
   }
 
@@ -40,20 +41,24 @@ export class OutputFiles {
 }
 
 class OutputFile {
-  content: string = ''
+  content: Segment[] = []
 
-  write(content: string): OutputFile {
+  write(content: Segment[]): OutputFile {
     this.content = content
     return this
   }
 
-  prepend(content: string): OutputFile {
-    this.content = content + this.content
+  prepend(content: Segment[]): OutputFile {
+    this.content = content.concat(this.content)
     return this
   }
 
-  append(content: string): OutputFile {
-    this.content += content
+  append(content: Segment[]): OutputFile {
+    this.content.concat(content)
     return this
+  }
+
+  getStringContent(): string {
+    return this.content.map(segment => segment.content).join('')
   }
 }

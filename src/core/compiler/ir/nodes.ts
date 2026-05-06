@@ -5,6 +5,7 @@ import type {
   ProcedureRegistryEntry,
 } from "../../blockly/registry";
 import type {ItemStackEditorResult} from '../../editor'
+import {Segment} from '../mapping.ts'
 
 /**
  * An IR node specifies the semantic structure of the user's code while keeping a reference to its source whenever possible.
@@ -26,8 +27,9 @@ export abstract class IrNode {
 export abstract class CommandNode extends IrNode {
   isMacro: boolean = false
 
-  prefix(code: string) {
-    return (this.isMacro ? '$' : '') + code
+  prefix(segments: Segment[]) {
+    if (this.isMacro) return [new Segment('$')].concat(segments)
+    return segments
   }
 }
 
