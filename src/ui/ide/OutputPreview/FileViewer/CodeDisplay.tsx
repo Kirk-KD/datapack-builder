@@ -10,6 +10,8 @@ type CodeDisplayProps = {
 }
 
 export function CodeDisplay({ segments, setActivePath }: CodeDisplayProps) {
+  const [hoveredSegmentId, setHoveredSegmentId] = React.useState<{sourceBlockId?: string; filePath?: string} | null>(null)
+
   return (
     <Box sx={{
       flex: 1,
@@ -19,7 +21,15 @@ export function CodeDisplay({ segments, setActivePath }: CodeDisplayProps) {
       p: 1,
     }}>
       {segments.map((segment, index) => {
-        return <SegmentSpan key={`segment-${index}`} segment={segment} setActivePath={setActivePath}/>
+        return (
+          <SegmentSpan
+            key={`segment-${index}`}
+            segment={segment}
+            setActivePath={setActivePath}
+            hoveredSegmentId={hoveredSegmentId}
+            setHoveredSegmentId={setHoveredSegmentId}
+          />
+        )
       })}
     </Box>
   )
