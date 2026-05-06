@@ -1,5 +1,6 @@
 import {Box} from "@mui/material"
 import {useIDEContext} from "../../context/useIDEContext.ts"
+import {SegmentSpan} from './SegmentSpan.tsx'
 
 type FileViewerProps = {
   activePath: string[] | null
@@ -20,10 +21,9 @@ export function FileViewer({ activePath }: FileViewerProps) {
       height: '100%',
       maxHeight: '100%',
       overflow: 'hidden',
-      display: 'flex',
     }}>
       {/*TODO proper display*/}
-      {file.getStringContent().split('\n').map(line => <>{line}<br/></>)}
+      {file.content.map((segment, index) => <SegmentSpan segment={segment} index={index}/>)}
     </Box>
   )
 }
