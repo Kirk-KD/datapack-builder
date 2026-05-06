@@ -1,13 +1,17 @@
 import type {FilePathArray, OutputItem} from '../../../../core/folder-repr'
 import {getFolderContents, getItemType} from '../../../../core/folder-repr'
 import * as React from 'react'
-import {Box, Divider, Stack, Typography} from '@mui/material'
+import {Box, Divider, IconButton, Stack, Typography} from '@mui/material'
 import FolderIcon from '@mui/icons-material/Folder'
 import CodeIcon from '@mui/icons-material/Code'
 import {useIDEContext} from '../../context/useIDEContext.ts'
 import {FolderItem} from './FolderItem.tsx'
 import {useProjectConfigStore} from '../../../../stores'
 import {CompileTime} from "./CompileTime.tsx";
+import {IconsPill} from '../../../components/IconsPill.tsx'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
+import {IconsPillDivider} from '../../../components/IconsPillDivider.tsx'
 
 type FolderPanelProps = {
   activePath: FilePathArray
@@ -17,6 +21,47 @@ type FolderPanelProps = {
 export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
   const {compiledOutput} = useIDEContext()
   const namespace = useProjectConfigStore.getState().projectConfig.namespace
+
+  // Track navigation history
+  const [pathHistory, setPathHistory] = React.useState<FilePathArray[]>([null])
+  const [historyIndex, setHistoryIndex] = React.useState(0)
+
+  // Update history when activePath changes from external sources
+  React.useEffect(() => {
+    // Check if the new path already exists in future history (forward scenario)
+    const pathStr = activePath ? activePath.join('/') : 'null'
+    const existingIndex = pathHistory.findIndex(p => (p ? p.join('/') : 'null') === pathStr)
+
+    if (existingIndex !== -1 && existingIndex !== historyIndex) {
+      // Path exists in history, move to that position
+      setHistoryIndex(existingIndex)
+    } else if (existingIndex === -1) {
+      // New path, truncate future history and add new entry
+      const newHistory = pathHistory.slice(0, historyIndex + 1)
+      newHistory.push(activePath)
+      setPathHistory(newHistory)
+      setHistoryIndex(newHistory.length - 1)
+    }
+  }, [activePath, historyIndex, pathHistory])
+
+  const canGoBack = historyIndex > 0
+  const canGoForward = historyIndex < pathHistory.length - 1
+
+  function handleBack() {
+    if (canGoBack) {
+      const newIndex = historyIndex - 1
+      setHistoryIndex(newIndex)
+      setActivePath(pathHistory[newIndex])
+    }
+  }
+
+  function handleForward() {
+    if (canGoForward) {
+      const newIndex = historyIndex + 1
+      setHistoryIndex(newIndex)
+      setActivePath(pathHistory[newIndex])
+    }
+  }
 
   if (!compiledOutput) return null
 
@@ -55,18 +100,45 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
     ]
   }
 
-
   return (
     <Stack sx={{
       backgroundColor: 'background.paper',
       height: '100%',
-      minWidth: '10rem',
+      minWidth: '15rem',
       maxWidth: '20rem'
     }}>
       <Stack sx={{p: 1, flex: 1}}>
-        <Typography sx={{mb: 0.5}} noWrap>
-          <b>{folderPath ? folderPath[folderPath.length - 1] : namespace}</b>
-        </Typography>
+        <Stack direction={'row'} spacing={1} sx={{
+          alignItems: 'center',
+          mb: 0.5,
+        }}>
+          <IconsPill sx={{
+            flex: 1,
+            minWidth: 0
+          }}>
+            <Typography noWrap>
+              <b>{folderPath ? folderPath[folderPath.length - 1] : namespace}</b>
+            </Typography>
+          </IconsPill>
+
+          <IconsPill>
+            <IconButton 
+              size={'small'} 
+              onClick={handleBack}
+              disabled={!canGoBack}
+            >
+              <ArrowBackIosIcon fontSize={'small'} color={canGoBack ? 'inherit' : 'disabled'}/>
+            </IconButton>
+            <IconsPillDivider/>
+            <IconButton 
+              size={'small'} 
+              onClick={handleForward}
+              disabled={!canGoForward}
+            >
+              <ArrowForwardIosIcon fontSize={'small'} color={canGoForward ? 'inherit' : 'disabled'}/>
+            </IconButton>
+          </IconsPill>
+        </Stack>
         <Stack sx={{flex: 1}}>
           {renderFolderContents(folderContents)}
         </Stack>
