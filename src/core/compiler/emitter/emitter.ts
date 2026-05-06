@@ -9,8 +9,9 @@ import {Naming} from './naming.ts'
 import type {ProjectConfig} from '../../../stores'
 import {compileEditorState} from './emitEditorState.ts'
 import {SelectiveIrVisitor} from '../ir'
+import {Segment} from '../mapping.ts'
 
-export class Emitter extends SelectiveIrVisitor<string> {
+export class Emitter extends SelectiveIrVisitor<Segment[]> {
   readonly files: OutputFiles
   readonly naming: Naming
   readonly projectConfig: ProjectConfig
@@ -22,40 +23,58 @@ export class Emitter extends SelectiveIrVisitor<string> {
     this.naming = new Naming(this.projectConfig)
   }
 
-  visitCommandComposite(node: CommandCompositeNode): string {
-    const res = node.parts.map(
-      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
-    console.assert(res.indexOf('\n') === -1)
-    return node.prefix(res + '\n')
+  visitCommandComposite(node: CommandCompositeNode): Segment[] {
+    const res: Segment[] = []
+    for (let i = 0; i < node.parts.length; i++) {
+      if (i > 0) res.push(new Segment(' ', node))
+      const part = node.parts[i]
+      if (typeof part === 'string') {
+        res.push(new Segment(part, node))
+      } else {
+        res.push(...part.accept(this))
+      }
+    }
+    res.push(new Segment('\n', node))
+    return node.prefix(res)
   }
 
-  visitFragmentComposite(node: FragmentCompositeNode): string {
-    const res = node.parts.map(
-      part => (typeof part === 'string') ? part : part.accept(this)).join(' ')
-    console.assert(res.indexOf('\n') === -1)
+  visitFragmentComposite(node: FragmentCompositeNode): Segment[] {
+    const res: Segment[] = []
+    for (let i = 0; i < node.parts.length; i++) {
+      if (i > 0) res.push(new Segment(' ', node))
+      const part = node.parts[i]
+      if (typeof part === 'string') {
+        res.push(new Segment(part, node))
+      } else {
+        res.push(...part.accept(this))
+      }
+    }
     return res
   }
 
-  visitFunctionDefinition(node: FunctionDefinitionNode): string {
-    this.files.with(this.naming.internalMcfunctionFilePath(node.name)).write(
-      node.bodyNodes.map(n => n.accept(this)).join('')
-    )
-    return ''
+  visitFunctionDefinition(node: FunctionDefinitionNode): Segment[] {
+    const bodySegments = node.bodyNodes.flatMap(n => n.accept(this))
+    this.files.with(this.naming.internalMcfunctionFilePath(node.name)).write(bodySegments)
+    return []
   }
 
-  visitFunctionCall(node: FunctionCallNode): string {
-    return `function ${this.naming.internalNamespace()}:${node.name}`
+  visitFunctionCall(node: FunctionCallNode): Segment[] {
+    return [new Segment(
+      `function ${this.naming.internalNamespace()}:${node.name}`,
+      node,
+      this.naming.internalMcfunctionFilePath(node.name)
+    )]
   }
 
-  visitDatapack(node: DatapackNode): string {
-    this.files.with('pack.mcmeta').write(
+  visitDatapack(node: DatapackNode): Segment[] {
+    this.files.with('pack.mcmeta').write([new Segment(
       JSON.stringify({
         pack: {
           pack_format: this.projectConfig.packFormat,
           description: this.projectConfig.description
         }
       }, null, 2)
-    )
+    )])
 
     // Nonsensical top-level nodes (e.g. nodes that aren't events or procedure definitions) are silently processed.
     // Should prevent this in the future.
@@ -64,78 +83,100 @@ export class Emitter extends SelectiveIrVisitor<string> {
     if (this.files.exists(this.naming.internalMcfunctionFilePath('tick'))) {
       // By default, minecraft's execution order is "tick -> load -> tick -> tick -> ..."
       // This checks an INIT flag to get rid of this behaviour.
-      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
+      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend([new Segment(
         `scoreboard players set ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} 1\n`
-      )
-      this.files.with(this.naming.internalMcfunctionFilePath('tick')).prepend(
+      )])
+      this.files.with(this.naming.internalMcfunctionFilePath('tick')).prepend([new Segment(
         `execute unless score ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} matches 1 run return fail\n`
-      )
+      )])
 
       // Only register tick tag if tick.mcfunction exists
-      this.files.with('data/minecraft/tags/function/tick.json').write(
+      this.files.with('data/minecraft/tags/function/tick.json').write([new Segment(
         JSON.stringify({
           value: [`${this.naming.internalNamespace()}:tick`]
         }, null, 2)
-      )
+      )])
     }
 
     // Always initialize a dummy variable objective unless there are no top-level nodes.
     // Could set a flag when variables are used but probably not worth it.
     if (node.topLevelNodes.length) {
-      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend(
+      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend([new Segment(
         `scoreboard objectives add ${this.naming.variableObjectiveName()} dummy\n`
-      )
+      )])
 
       // Always register load tag due to needing to initialize the dummy objective.
-      this.files.with('data/minecraft/tags/function/load.json').write(
+      this.files.with('data/minecraft/tags/function/load.json').write([new Segment(
         JSON.stringify({
           value: [`${this.naming.internalNamespace()}:load`]
         }, null, 2)
-      )
+      )])
     }
 
-    return ''
+    return []
   }
 
-  visitItemStack(node: ItemStackNode): string {
-    return compileEditorState({ compiler: 'item_stack', error: false, data: node.itemStackData }, {})
+  visitItemStack(node: ItemStackNode): Segment[] {
+    const result = compileEditorState({ compiler: 'item_stack', error: false, data: node.itemStackData }, {})
+    return [new Segment(result, node)]
   }
 
-  visitLiteralRotation(node: LiteralRotationNode): string {
-    return `${node.yawNode.accept(this)} ${node.pitchNode.accept(this)}`
+  visitLiteralRotation(node: LiteralRotationNode): Segment[] {
+    return [
+      ...node.yawNode.accept(this),
+      new Segment(' ', node),
+      ...node.pitchNode.accept(this)
+    ]
   }
 
-  visitLiteralInt(node: LiteralIntNode): string {
-    return `${node.value}`
+  visitLiteralInt(node: LiteralIntNode): Segment[] {
+    return [new Segment(`${node.value}`, node)]
   }
 
-  visitLiteralPosition(node: LiteralPositionNode): string {
-    return `${node.xNode.accept(this)} ${node.yNode.accept(this)} ${node.zNode.accept(this)}`
+  visitLiteralPosition(node: LiteralPositionNode): Segment[] {
+    return [
+      ...node.xNode.accept(this),
+      new Segment(' ', node),
+      ...node.yNode.accept(this),
+      new Segment(' ', node),
+      ...node.zNode.accept(this)
+    ]
   }
 
-  visitLiteralRange(node: LiteralRangeNode): string {
-    return `${node.minNode.accept(this)}..${node.maxNode.accept(this)}`
+  visitLiteralRange(node: LiteralRangeNode): Segment[] {
+    return [
+      ...node.minNode.accept(this),
+      new Segment('..', node),
+      ...node.maxNode.accept(this)
+    ]
   }
 
-  visitLiteralString(node: LiteralStringNode): string {
-    return node.value
+  visitLiteralString(node: LiteralStringNode): Segment[] {
+    return [new Segment(node.value, node)]
   }
 
-  visitProcedureParameter(node: ProcedureParameterNode): string {
-    return `$(${node.parameterEntry.name})`
+  visitProcedureParameter(node: ProcedureParameterNode): Segment[] {
+    return [new Segment(`$(${node.parameterEntry.name})`, node)]
   }
 
-  visitTargetSelector(node: TargetSelectorNode): string { // Placeholder; will switch to editor
-    let res = node.targetCategory
-    if (node.clauseNodes.length) res += `[${node.clauseNodes.map(n => n.accept(this)).join(',')}]`
+  visitTargetSelector(node: TargetSelectorNode): Segment[] { // Placeholder; will switch to editor
+    const res = [new Segment(node.targetCategory, node)]
+    if (node.clauseNodes.length) {
+      res.push(new Segment('[', node))
+      for (let i = 0; i < node.clauseNodes.length; i++) {
+        if (i > 0) res.push(new Segment(',', node))
+        res.push(...node.clauseNodes[i].accept(this))
+      }
+      res.push(new Segment(']', node))
+    }
     return res
   }
 
-  visitTempVariable(node: TempVariableNode): string {
+  visitTempVariable(node: TempVariableNode): Segment[] {
     return this.visitVariable(node)
   }
 
-  visitVariable(node: VariableNode): string {
-    return `${this.naming.variableName(node.variableName)} ${this.naming.variableObjectiveName()}`
+  visitVariable(node: VariableNode): Segment[] {
+    return [new Segment(`${this.naming.variableName(node.variableName)} ${this.naming.variableObjectiveName()}`, node)]
   }
 }

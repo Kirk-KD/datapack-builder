@@ -1,14 +1,14 @@
 import {Divider, Stack} from "@mui/material";
 import {useEffect, useState} from "react";
-import type {Path} from "../../../core/output-preview";
-import {PathBar} from "./PathBar.tsx";
-import {FolderPanel} from "./FolderPanel.tsx";
+import type {FilePathArray} from "../../../core/folder-repr";
+import {PathBar} from "./PathBar";
+import {FolderPanel} from "./FolderPanel";
 import {useIDEContext} from "../context/useIDEContext.ts";
-import {FileViewer} from "./FileViewer.tsx";
+import {FileViewer} from "./FileViewer";
 
 export function OutputPreview() {
   const {compiledOutput} = useIDEContext()
-  const [activePath, setActivePath] = useState<Path>(null)
+  const [activePath, setActivePath] = useState<FilePathArray>(null)
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -28,7 +28,7 @@ export function OutputPreview() {
         minHeight: 0
       }}>
         <FolderPanel activePath={activePath} setActivePath={setActivePath}/>
-        <FileViewer activePath={activePath}/>
+        <FileViewer activePath={activePath} setActivePath={setActivePath}/>
       </Stack>
       <Divider/>
       <PathBar activePath={activePath} setActivePath={setActivePath}/>

@@ -4,7 +4,7 @@ import useBlocklyWorkspace from "../WorkspacePanel/useBlocklyWorkspace.tsx";
 import {IDEContext} from "./IDEContext.tsx";
 import {SnackbarProvider} from "./SnackbarProvider.tsx";
 import * as React from "react";
-import type {OutputZip} from "../../../core/output-preview";
+import type {OutputFiles} from "../../../core/compiler";
 
 export function IDEProvider({children}: { children: React.ReactNode }) {
   const {blocklyDivRef, blocklyWorkspaceRef} = useBlocklyWorkspace()
@@ -14,7 +14,7 @@ export function IDEProvider({children}: { children: React.ReactNode }) {
 
   const [outputViewerOpen, setOutputViewerOpen] = useState(false)
 
-  const [compiledOutput, setCompiledOutput] = useState<OutputZip | null>(null)
+  const [compiledOutput, setCompiledOutput] = useState<OutputFiles | null>(null)
 
   useAutosave(blocklyWorkspaceRef, setHasUnsavedChanges, setHasUnsavedFileChanges)
 

@@ -1,4 +1,4 @@
-import {useIDEContext} from "../context/useIDEContext.ts";
+import {useIDEContext} from "../../context/useIDEContext.ts";
 import {Typography} from "@mui/material";
 import HardwareIcon from "@mui/icons-material/Hardware";
 import {useEffect, useState} from "react";
@@ -10,8 +10,9 @@ export function CompileTime() {
   useEffect(() => {
     if (!compiledOutput) return
 
+    const timestamp = compiledOutput.timestamp
+
     function update() {
-      const timestamp = compiledOutput!.timestamp
       const now = new Date()
       const diffMs = now.getTime() - timestamp.getTime()
 

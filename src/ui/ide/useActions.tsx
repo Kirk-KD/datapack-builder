@@ -4,8 +4,8 @@ import {loadProject, newProject, saveProject} from '../../core/save'
 import {controller} from '../editor'
 import {TextDialogue} from './WorkspaceDialogues'
 import {orchestrate, type OutputFiles} from '../../core/compiler'
-import {mapToOutputZip} from '../../core/output-preview'
 import {useProjectConfigStore} from '../../stores'
+import {getFocusManager} from '../../core/blockly'
 
 export function useActions() {
   const ideContext = useIDEContext()
@@ -17,8 +17,9 @@ export function useActions() {
     try {
       outputFiles = orchestrate(ideContext.blocklyWorkspaceRef.current!, useProjectConfigStore.getState().projectConfig)
       showAlert('Datapack built.', 'success')
-    } catch {
+    } catch (e) {
       showAlert('Error building datapack.', 'error')
+      throw e
     }
 
     return outputFiles
@@ -99,6 +100,15 @@ export function useActions() {
         setCompiledOutput: ideContext.setCompiledOutput,
         setOutputViewerOpen: ideContext.setOutputViewerOpen
       })
+    },
+
+    focusOnBlockById(blockId: string) {
+      const workspace = ideContext.blocklyWorkspaceRef.current
+      if (!workspace) return
+
+      const block = workspace.getBlockById(blockId)
+      if (block) getFocusManager().focusNode(block)
+      else showAlert('Could not find that block.', 'error')
     }
   }
 }
@@ -107,6 +117,6 @@ function viewOutputFiles(
   outputFiles: OutputFiles,
   { setCompiledOutput, setOutputViewerOpen }: Pick<ReturnType<typeof useIDEContext>, 'setCompiledOutput' | 'setOutputViewerOpen'>
 ) {
-  setCompiledOutput(mapToOutputZip(outputFiles.toStringMap(), new Date()))
+  setCompiledOutput(outputFiles)
   setOutputViewerOpen(true)
 }

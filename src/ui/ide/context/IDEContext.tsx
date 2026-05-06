@@ -1,6 +1,6 @@
 import type {WorkspaceSvg} from "blockly";
 import * as React from "react";
-import type {OutputZip} from "../../../core/output-preview";
+import type {OutputFiles} from '../../../core/compiler';
 
 export type IDEContextValue = {
   blocklyDivRef: React.RefObject<HTMLDivElement | null>
@@ -14,9 +14,8 @@ export type IDEContextValue = {
   outputViewerOpen: boolean
   setOutputViewerOpen: React.Dispatch<React.SetStateAction<boolean>>
 
-
-  compiledOutput: OutputZip | null
-  setCompiledOutput: React.Dispatch<React.SetStateAction<OutputZip | null>>
+  compiledOutput: OutputFiles | null
+  setCompiledOutput: React.Dispatch<React.SetStateAction<OutputFiles | null>>
 }
 
 export const IDEContext = React.createContext<IDEContextValue | null>(null)

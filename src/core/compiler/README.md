@@ -82,6 +82,8 @@ The emitter has no knowledge of Blockly, blocks, or IR semantics. It treats the 
 its specification and serializes it faithfully. Any decision about *what* to emit was
 made upstream; the emitter only decides *how* to write it.
 
+The emitter is responsible for returning an array of `Segment`s of the source map.
+
 ### `/orchestrator.ts`
 
 The orchestrator is the single top-level function that owns the pipeline sequence. It:
@@ -92,9 +94,18 @@ The orchestrator is the single top-level function that owns the pipeline sequenc
 The orchestrator owns no logic of its own beyond sequencing. It is the authoritative
 definition of what "compiling a project" means.
 
+### `/mapping.ts`
+
+The source map maps generated code to its source block if applicable, or in case of mcfunction calls, the corresponding
+mcfunction file.
+The source map content is represented via a `Segment` object, with optional source information.
+
 ### `/outputFiles.ts`
 
 The output zip file structure of the compiler pipeline. 
+Each file will be represented via a `Segment` object of the source map.
+The `OutputFiles` class will provide a method for generating a download-friendly string-to-string `Map`, extracting
+only the string content of each each `Segment` object in each file.
 
 ## Adding New Nodes
 
