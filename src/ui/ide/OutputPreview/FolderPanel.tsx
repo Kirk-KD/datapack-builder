@@ -20,15 +20,25 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
 
   if (!compiledOutput) return null
 
+  function getActiveFolderPath(): FilePathArray {
+    if (!activePath) return null
+    const itemType = compiledOutput ? getItemType(compiledOutput, activePath) : undefined
+    const folderPath = itemType === 'file' ? activePath.slice(0, -1) : activePath
+    return folderPath.length === 0 ? null : folderPath
+  }
+
+  const folderPath = getActiveFolderPath()
+  const folderContents = compiledOutput ? getFolderContents(compiledOutput, folderPath) : []
+
   function renderFolderContents(items: OutputItem[]) {
     return [
-      (activePath && activePath.length > 0) ? (
+      (folderPath && folderPath.length > 0) ? (
         <FolderItem
           key={'..'}
           icon={<FolderIcon sx={{ color: 'grey' }}/>}
           name={'..'}
           onClick={() => {
-            const back = activePath.slice(0, -1)
+            const back = folderPath.slice(0, -1)
             setActivePath(back.length === 0 ? null : back)
           }}
         />
@@ -45,15 +55,6 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
     ]
   }
 
-  function getActiveFolderPath(): FilePathArray {
-    if (!activePath) return null
-    const itemType = compiledOutput ? getItemType(compiledOutput, activePath) : undefined
-    const folderPath = itemType === 'file' ? activePath.slice(0, -1) : activePath
-    return folderPath.length === 0 ? null : folderPath
-  }
-
-  const folderPath = getActiveFolderPath()
-  const folderContents = compiledOutput ? getFolderContents(compiledOutput, folderPath) : []
 
   return (
     <Stack sx={{
