@@ -1,14 +1,14 @@
-import type {FilePathArray} from "../../../core/folder-repr";
-import {getItemType} from "../../../core/folder-repr";
+import type {FilePathArray} from "../../../../core/folder-repr";
+import {getItemType} from "../../../../core/folder-repr";
 import * as React from "react";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
 import FolderIcon from '@mui/icons-material/Folder';
 import CodeIcon from '@mui/icons-material/Code';
 import {Stack} from "@mui/material";
-import {useProjectConfigStore} from "../../../stores";
+import {useProjectConfigStore} from "../../../../stores";
 import {PathItem} from "./PathItem.tsx";
-import {useIDEContext} from "../context/useIDEContext.ts";
+import {useIDEContext} from "../../context/useIDEContext.ts";
 import {useEffect, useRef} from "react";
 
 type PathBarProps = {

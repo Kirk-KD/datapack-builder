@@ -1,12 +1,12 @@
-import type {FilePathArray, OutputItem} from '../../../core/folder-repr'
-import {getFolderContents, getItemType} from '../../../core/folder-repr'
+import type {FilePathArray, OutputItem} from '../../../../core/folder-repr'
+import {getFolderContents, getItemType} from '../../../../core/folder-repr'
 import * as React from 'react'
 import {Box, Divider, Stack, Typography} from '@mui/material'
 import FolderIcon from '@mui/icons-material/Folder'
 import CodeIcon from '@mui/icons-material/Code'
-import {useIDEContext} from '../context/useIDEContext.ts'
+import {useIDEContext} from '../../context/useIDEContext.ts'
 import {FolderItem} from './FolderItem.tsx'
-import {useProjectConfigStore} from '../../../stores'
+import {useProjectConfigStore} from '../../../../stores'
 import {CompileTime} from "./CompileTime.tsx";
 
 type FolderPanelProps = {

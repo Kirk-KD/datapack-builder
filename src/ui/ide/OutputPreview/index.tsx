@@ -1,8 +1,8 @@
 import {Divider, Stack} from "@mui/material";
 import {useEffect, useState} from "react";
 import type {FilePathArray} from "../../../core/folder-repr";
-import {PathBar} from "./PathBar.tsx";
-import {FolderPanel} from "./FolderPanel.tsx";
+import {PathBar} from "./PathBar";
+import {FolderPanel} from "./FolderPanel";
 import {useIDEContext} from "../context/useIDEContext.ts";
 import {FileViewer} from "./FileViewer";
 

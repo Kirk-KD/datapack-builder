@@ -1,4 +1,4 @@
-import {useIDEContext} from "../context/useIDEContext.ts";
+import {useIDEContext} from "../../context/useIDEContext.ts";
 import {Typography} from "@mui/material";
 import HardwareIcon from "@mui/icons-material/Hardware";
 import {useEffect, useState} from "react";
