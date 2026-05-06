@@ -66,7 +66,7 @@ class OutputFile {
   }
 
   append(content: Segment[]): OutputFile {
-    this.content.concat(content)
+    this.content = this.content.concat(content)
     return this
   }
 
