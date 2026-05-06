@@ -1,19 +1,13 @@
-import {FunctionCallNode, IrNode} from './ir'
+import {IrNode} from './ir'
 
 export class Segment {
   readonly content: string
-  readonly node?: IrNode
+  readonly sourceBlockId?: string
+  readonly filePath?: string
 
-  constructor(content: string, node?: IrNode) {
+  constructor(content: string, node?: IrNode, filePath?: string) {
     this.content = content
-    this.node = node
-  }
-
-  getFunctionId(): string | null {
-    return this.node instanceof FunctionCallNode ? this.node.name : null
-  }
-
-  getSourceBlockId(): string | null {
-    return this.node?.sourceBlockId ?? null
+    this.sourceBlockId = node?.sourceBlockId ?? undefined
+    this.filePath = filePath
   }
 }

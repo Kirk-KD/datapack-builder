@@ -16,8 +16,7 @@ export function CodeDisplay({ segments }: CodeDisplayProps) {
       p: 1,
     }}>
       {segments.map((segment, index) => {
-        const key = segment.getSourceBlockId() ? `${segment.getSourceBlockId()}-${segment.getFunctionId()}-${index}` : `segment-${index}`
-        return <SegmentSpan key={key} segment={segment}/>
+        return <SegmentSpan key={`segment-${index}`} segment={segment}/>
       })}
     </Box>
   )

@@ -7,7 +7,7 @@ type SegmentSpanProps = {
 export function SegmentSpan({ segment }: SegmentSpanProps) {
   return (
     <Box
-      onClick={() => console.log(segment.getSourceBlockId(), segment.getFunctionId())}
+      onClick={() => console.log(segment.sourceBlockId, segment.filePath)}
       sx={{
         display: 'inline',
         whiteSpace: 'pre',

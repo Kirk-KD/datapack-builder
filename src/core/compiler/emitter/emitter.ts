@@ -59,7 +59,11 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
   }
 
   visitFunctionCall(node: FunctionCallNode): Segment[] {
-    return [new Segment(`function ${this.naming.internalNamespace()}:${node.name}`, node)]
+    return [new Segment(
+      `function ${this.naming.internalNamespace()}:${node.name}`,
+      node,
+      this.naming.internalMcfunctionFilePath(node.name)
+    )]
   }
 
   visitDatapack(node: DatapackNode): Segment[] {
