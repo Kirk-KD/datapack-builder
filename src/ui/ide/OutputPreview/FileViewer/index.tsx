@@ -3,12 +3,15 @@ import {useMemo} from "react"
 import {useIDEContext} from "../../context/useIDEContext.ts"
 import {LineNumbers} from './LineNumbers.tsx'
 import {CodeDisplay} from './CodeDisplay.tsx'
+import * as React from 'react'
+import type {FilePathArray} from '../../../../core/folder-repr'
 
 type FileViewerProps = {
-  activePath: string[] | null
+  activePath: FilePathArray,
+  setActivePath: React.Dispatch<React.SetStateAction<FilePathArray>>
 }
 
-export function FileViewer({ activePath }: FileViewerProps) {
+export function FileViewer({ activePath, setActivePath }: FileViewerProps) {
   const { compiledOutput } = useIDEContext()
 
   const file = activePath && compiledOutput ? compiledOutput.get(activePath.join('/')) : undefined
@@ -40,7 +43,7 @@ export function FileViewer({ activePath }: FileViewerProps) {
       lineHeight: '1.6'
     }}>
       <LineNumbers lineCount={lineCount} />
-      <CodeDisplay segments={file.content}/>
+      <CodeDisplay segments={file.content} setActivePath={setActivePath}/>
     </Box>
   )
 }

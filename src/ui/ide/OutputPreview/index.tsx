@@ -28,7 +28,7 @@ export function OutputPreview() {
         minHeight: 0
       }}>
         <FolderPanel activePath={activePath} setActivePath={setActivePath}/>
-        <FileViewer activePath={activePath}/>
+        <FileViewer activePath={activePath} setActivePath={setActivePath}/>
       </Stack>
       <Divider/>
       <PathBar activePath={activePath} setActivePath={setActivePath}/>

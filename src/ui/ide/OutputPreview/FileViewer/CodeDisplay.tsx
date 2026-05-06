@@ -1,12 +1,15 @@
 import {SegmentSpan} from './SegmentSpan.tsx'
 import {Box} from '@mui/material'
 import type {Segment} from '../../../../core/compiler/mapping.ts'
+import * as React from 'react'
+import type {FilePathArray} from '../../../../core/folder-repr'
 
 type CodeDisplayProps = {
   segments: Segment[]
+  setActivePath: React.Dispatch<React.SetStateAction<FilePathArray>>
 }
 
-export function CodeDisplay({ segments }: CodeDisplayProps) {
+export function CodeDisplay({ segments, setActivePath }: CodeDisplayProps) {
   return (
     <Box sx={{
       flex: 1,
@@ -16,7 +19,7 @@ export function CodeDisplay({ segments }: CodeDisplayProps) {
       p: 1,
     }}>
       {segments.map((segment, index) => {
-        return <SegmentSpan key={`segment-${index}`} segment={segment}/>
+        return <SegmentSpan key={`segment-${index}`} segment={segment} setActivePath={setActivePath}/>
       })}
     </Box>
   )
