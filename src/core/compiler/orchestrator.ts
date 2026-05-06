@@ -17,5 +17,8 @@ export function orchestrate(workspace: Blockly.WorkspaceSvg, projectConfig: Proj
   const emitter = new Emitter(outputFiles, projectConfig)
   emitter.visitDatapack(loweredIr)
 
+  // Final clean
+  outputFiles.clean()
+
   return outputFiles
 }
