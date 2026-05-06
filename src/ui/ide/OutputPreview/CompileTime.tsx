@@ -10,8 +10,9 @@ export function CompileTime() {
   useEffect(() => {
     if (!compiledOutput) return
 
+    const timestamp = compiledOutput.timestamp
+
     function update() {
-      const timestamp = compiledOutput!.timestamp
       const now = new Date()
       const diffMs = now.getTime() - timestamp.getTime()
 

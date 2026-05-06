@@ -3,6 +3,7 @@ import type {Segment} from './mapping.ts'
 
 export class OutputFiles {
   readonly files: Map<string, OutputFile> = new Map<string, OutputFile>()
+  readonly timestamp: Date = new Date()
 
   with(path: string) {
     const file = this.files.get(path) ?? new OutputFile()
@@ -12,6 +13,10 @@ export class OutputFiles {
 
   exists(path: string) {
     return this.files.has(path)
+  }
+
+  get(path: string) {
+    return this.files.get(path)
   }
 
   toStringMap(): Map<string, string> {

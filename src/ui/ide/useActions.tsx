@@ -4,7 +4,6 @@ import {loadProject, newProject, saveProject} from '../../core/save'
 import {controller} from '../editor'
 import {TextDialogue} from './WorkspaceDialogues'
 import {orchestrate, type OutputFiles} from '../../core/compiler'
-import {mapToOutputZip} from '../../core/output-preview'
 import {useProjectConfigStore} from '../../stores'
 
 export function useActions() {
@@ -108,6 +107,6 @@ function viewOutputFiles(
   outputFiles: OutputFiles,
   { setCompiledOutput, setOutputViewerOpen }: Pick<ReturnType<typeof useIDEContext>, 'setCompiledOutput' | 'setOutputViewerOpen'>
 ) {
-  setCompiledOutput(mapToOutputZip(outputFiles.toStringMap(), new Date()))
+  setCompiledOutput(outputFiles)
   setOutputViewerOpen(true)
 }

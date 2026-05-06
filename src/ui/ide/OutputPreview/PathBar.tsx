@@ -1,4 +1,5 @@
-import type {Path} from "../../../core/output-preview";
+import type {FilePathArray} from "../../../core/folder-repr";
+import {getItemType} from "../../../core/folder-repr";
 import * as React from "react";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderZipIcon from '@mui/icons-material/FolderZip';
@@ -11,8 +12,8 @@ import {useIDEContext} from "../context/useIDEContext.ts";
 import {useEffect, useRef} from "react";
 
 type PathBarProps = {
-  activePath: Path
-  setActivePath: React.Dispatch<React.SetStateAction<Path>>
+  activePath: FilePathArray
+  setActivePath: React.Dispatch<React.SetStateAction<FilePathArray>>
 }
 
 export function PathBar({ activePath, setActivePath }: PathBarProps) {
@@ -59,10 +60,10 @@ export function PathBar({ activePath, setActivePath }: PathBarProps) {
             pr: 2
           }}
         >
-          {activePath.map((name, index) => (
+           {activePath.map((name: string, index: number) => (
             <React.Fragment key={index}>
               <ChevronRightIcon fontSize={'small'} sx={{flexShrink: 0}}/>
-              {index === activePath.length - 1 && compiledOutput?.getItem(activePath)?.type === 'file' ? (
+               {index === activePath.length - 1 && compiledOutput && getItemType(compiledOutput, activePath) === 'file' ? (
                 <PathItem
                   icon={<CodeIcon/>}
                   name={name}
