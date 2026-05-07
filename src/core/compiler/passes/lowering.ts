@@ -147,7 +147,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       pre,
       nodes: [
         new FunctionDefinitionNode(bodyFuncName, this.lowerBody(node.bodyNodes), node.sourceBlockId),
-        new CommandCompositeNode(['execute', ...clauses, 'run', new FunctionCallNode(bodyFuncName, node.sourceBlockId)], node.sourceBlockId)
+        new CommandCompositeNode([
+          'execute',
+          ...clauses,
+          'run',
+          new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
+        ], node.sourceBlockId)
       ]
     }
   }
@@ -183,8 +188,18 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       nodes: [
         trueFuncName ? new FunctionDefinitionNode(trueFuncName, this.lowerBody(node.trueBodyNodes), node.sourceBlockId) : null,
         falseFuncName ? new FunctionDefinitionNode(falseFuncName, this.lowerBody(node.falseBodyNodes), node.sourceBlockId) : null,
-        trueFuncName ? new CommandCompositeNode(['execute', 'if', condition.nodes[0], 'run', new FunctionCallNode(trueFuncName, node.sourceBlockId)]) : null,
-        falseFuncName ? new CommandCompositeNode(['execute', 'unless', condition.nodes[0], 'run', new FunctionCallNode(falseFuncName, node.sourceBlockId)]) : null,
+        trueFuncName ? new CommandCompositeNode([
+          'execute if',
+          condition.nodes[0],
+          'run',
+          new FunctionCallNode(trueFuncName, null, node.sourceBlockId)
+        ]) : null,
+        falseFuncName ? new CommandCompositeNode([
+          'execute unless',
+          condition.nodes[0],
+          'run',
+          new FunctionCallNode(falseFuncName, null, node.sourceBlockId)
+        ]) : null,
       ].filter(n => n !== null)
     }
   }
@@ -267,7 +282,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       pre: [...pre],
       nodes: [
         new CommandCompositeNode([
-          new FunctionCallNode(this.naming.procedureName(node.procedureEntry.name), node.sourceBlockId),
+          new FunctionCallNode(this.naming.procedureName(node.procedureEntry.name), node.procedureEntry, node.sourceBlockId),
           ...(node.argumentNodes.length ? [
             'with storage',
             this.naming.procedureStorageName(node.procedureEntry.name)
@@ -503,7 +518,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
             ...condition.pre,
             new CommandCompositeNode([
               'execute', 'if', condition.nodes[0],
-              'run', new FunctionCallNode(whileBodyFuncName, node.sourceBlockId)
+              'run', new FunctionCallNode(whileBodyFuncName, null, node.sourceBlockId)
             ], node.sourceBlockId)
           ],
           node.sourceBlockId
@@ -513,13 +528,13 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           [
             ...this.lowerBody(node.bodyNodes),
             new CommandCompositeNode([
-              new FunctionCallNode(whileFuncName, node.sourceBlockId)
+              new FunctionCallNode(whileFuncName, null, node.sourceBlockId)
             ], node.sourceBlockId)
           ],
           node.sourceBlockId
         ),
         new CommandCompositeNode([
-          new FunctionCallNode(whileFuncName, node.sourceBlockId)
+          new FunctionCallNode(whileFuncName, null, node.sourceBlockId)
         ], node.sourceBlockId)
       ]
     }
