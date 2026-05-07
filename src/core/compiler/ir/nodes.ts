@@ -95,10 +95,12 @@ export class FunctionDefinitionNode extends IrNode {
 
 export class FunctionCallNode extends FragmentNode {
   readonly name: string
+  readonly procedure: ProcedureRegistryEntry | null
 
-  constructor(name: string, sourceBlockId?: string | null) {
+  constructor(name: string, procedure: ProcedureRegistryEntry | null, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.name = name
+    this.procedure = procedure
   }
 
   accept<T>(visitor: IrVisitor<T>): T {

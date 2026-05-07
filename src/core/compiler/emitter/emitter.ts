@@ -10,11 +10,14 @@ import type {ProjectConfig} from '../../../stores'
 import {compileEditorState} from './emitEditorState.ts'
 import {SelectiveIrVisitor} from '../ir'
 import {Segment} from '../mapping.ts'
+import type {ProcedureRegistryEntry} from '../../blockly/registry'
 
 export class Emitter extends SelectiveIrVisitor<Segment[]> {
   readonly files: OutputFiles
   readonly naming: Naming
   readonly projectConfig: ProjectConfig
+
+  private parentProcedure: ProcedureRegistryEntry | null = null
 
   constructor(outputFiles: OutputFiles, projectConfig: ProjectConfig) {
     super()
@@ -59,8 +62,20 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
   }
 
   visitFunctionCall(node: FunctionCallNode): Segment[] {
+    // We are currently:
+    // 1. Visiting a call to a generated mcfunction;
+    // 2. Within a user-defined procedure body;
+    // 3. The procedure has parameters,
+    // We must pass the same argument storage reference to the generated mcfunction.
+    let storage = ''
+    if (!node.procedure && this.parentProcedure?.parameters.length)
+      storage = ` with storage ${this.naming.procedureStorageName(this.parentProcedure.name)}`
+
+    // Update parent procedure to be this node's procedure if it is user-defined.
+    if (node.procedure) this.parentProcedure = node.procedure
+
     return [new Segment(
-      `function ${this.naming.internalNamespace()}:${node.name}`,
+      `function ${this.naming.internalNamespace()}:${node.name}` + storage,
       node,
       this.naming.internalMcfunctionFilePath(node.name)
     )]
