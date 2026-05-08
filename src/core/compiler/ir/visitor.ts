@@ -6,7 +6,7 @@ import {
   VariableNode,
   VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
   VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode,
-  TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode
+  TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode, OnPlayerMinesBlockNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
@@ -19,6 +19,7 @@ export interface IrVisitor<T> {
 
   visitOnLoad(node: OnLoadNode): T
   visitOnTick(node: OnTickNode): T
+  visitOnPlayerMinesBlock(node: OnPlayerMinesBlockNode): T
 
   visitLiteralInt(node: LiteralIntNode): T
   visitLiteralString(node: LiteralStringNode): T
@@ -157,6 +158,10 @@ export abstract class SelectiveIrVisitor<T> implements IrVisitor<T> {
   }
 
   visitWhile(node: WhileNode): T {
+    this.disallow(node)
+  }
+
+  visitOnPlayerMinesBlock(node: OnPlayerMinesBlockNode): T {
     this.disallow(node)
   }
 }

@@ -29,7 +29,7 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
   visitCommandComposite(node: CommandCompositeNode): Segment[] {
     const res: Segment[] = []
     for (let i = 0; i < node.parts.length; i++) {
-      if (i > 0) res.push(new Segment(' ', node))
+      if (i > 0 && !node.noSpace) res.push(new Segment(' ', node))
       const part = node.parts[i]
       if (typeof part === 'string') {
         res.push(new Segment(part, node))
@@ -44,7 +44,7 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
   visitFragmentComposite(node: FragmentCompositeNode): Segment[] {
     const res: Segment[] = []
     for (let i = 0; i < node.parts.length; i++) {
-      if (i > 0) res.push(new Segment(' ', node))
+      if (i > 0 && !node.noSpace) res.push(new Segment(' ', node))
       const part = node.parts[i]
       if (typeof part === 'string') {
         res.push(new Segment(part, node))
