@@ -51,12 +51,29 @@ export class DatapackNode extends IrNode {
   }
 }
 
+export class FunctionTagNode extends IrNode {
+  readonly tag: 'load' | 'tick'
+  readonly name: string
+
+  constructor(tag: "load" | "tick", name: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.tag = tag
+    this.name = name
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitFunctionTag(this)
+  }
+}
+
 export class CommandCompositeNode extends CommandNode {
   readonly parts: (FragmentNode | string)[]
+  readonly noSpace: boolean
 
-  constructor(parts: (FragmentNode | string)[], sourceBlockId?: string | null) {
+  constructor(parts: (FragmentNode | string)[], sourceBlockId?: string | null, noSpace?: boolean) {
     super(sourceBlockId)
     this.parts = parts
+    this.noSpace = noSpace ?? false
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
@@ -66,10 +83,12 @@ export class CommandCompositeNode extends CommandNode {
 
 export class FragmentCompositeNode extends FragmentNode {
   readonly parts: (FragmentNode | string)[]
+  readonly noSpace: boolean
 
-  constructor(parts: (FragmentNode | string)[], sourceBlockId?: string | null) {
+  constructor(parts: (FragmentNode | string)[], sourceBlockId?: string | null, noSpace?: boolean) {
     super(sourceBlockId)
     this.parts = parts
+    this.noSpace = noSpace ?? false
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
@@ -131,6 +150,21 @@ export class OnTickNode extends IrNode {
 
   accept<T>(visitor: IrVisitor<T>): T {
     return visitor.visitOnTick(this)
+  }
+}
+
+export class OnPlayerMinesBlockNode extends IrNode {
+  readonly blockPredicate: LiteralStringNode
+  readonly bodyNodes: CommandNode[]
+
+  constructor(blockPredicate: LiteralStringNode, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.blockPredicate = blockPredicate
+    this.bodyNodes = bodyNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitOnPlayerMinesBlock(this)
   }
 }
 

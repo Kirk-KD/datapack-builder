@@ -2,11 +2,11 @@ import {
   CommandCompositeNode, CommandNode,
   DatapackNode,
   ExecuteNode,
-  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode,
+  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode, FunctionTagNode,
   IfNode,
   IrNode,
   type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
-  LiteralStringNode, OnLoadNode, OnTickNode,
+  LiteralStringNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode,
   type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
   ProcedureParameterNode, TargetSelectorNode, TempVariableNode,
   type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
@@ -129,6 +129,13 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [],
       nodes: [new DatapackNode(topLevelNodes)]
+    }
+  }
+
+  visitFunctionTag(node: FunctionTagNode): LoweredResult {
+    return {
+      pre: [],
+      nodes: [node]
     }
   }
 
@@ -260,14 +267,60 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   visitOnLoad(node: OnLoadNode): LoweredResult {
     return {
       pre: [],
-      nodes: [new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), node.sourceBlockId)]
+      nodes: [
+        new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionTagNode('load', 'load', node.sourceBlockId)
+      ]
     }
   }
 
   visitOnTick(node: OnTickNode): LoweredResult {
     return {
       pre: [],
-      nodes: [new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), node.sourceBlockId)]
+      nodes: [
+        new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionTagNode('tick', 'tick', node.sourceBlockId)
+      ]
+    }
+  }
+
+  visitOnPlayerMinesBlock(node: OnPlayerMinesBlockNode): LoweredResult {
+    const baseName = this.naming.nextId('on_player_mines_block')
+
+    const minedObjName = `${baseName}_mined`
+
+    const loadFuncName = `${baseName}_load`
+    const bodyFuncName = `${baseName}_body`
+    const tickFuncName = `${baseName}_tick`
+
+    return {
+      pre: [],
+      nodes: [
+        // Initialize scoreboard objectives
+        new FunctionDefinitionNode(loadFuncName, [
+          new CommandCompositeNode([
+            `scoreboard objectives add ${minedObjName} minecraft.mined:minecraft.`, node.blockPredicate
+          ], node.sourceBlockId, true),
+        ], node.sourceBlockId),
+
+        // Define commands to run on block broken
+        new FunctionDefinitionNode(bodyFuncName, this.lowerBody(node.bodyNodes), node.sourceBlockId),
+
+        // A block was broken if objective isn't 0
+        new FunctionDefinitionNode(tickFuncName, [
+          new CommandCompositeNode([
+            `execute as @a[scores={${minedObjName}=1..}] run`,
+            new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
+          ], node.sourceBlockId),
+          new CommandCompositeNode([
+            `scoreboard players reset @a ${minedObjName}`
+          ], node.sourceBlockId),
+        ], node.sourceBlockId),
+
+        // Register function tags
+        new FunctionTagNode('load', loadFuncName, node.sourceBlockId),
+        new FunctionTagNode('tick', tickFuncName, node.sourceBlockId),
+      ]
     }
   }
 
