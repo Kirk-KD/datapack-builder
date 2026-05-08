@@ -309,7 +309,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
         // A block was broken if objective isn't 0
         new FunctionDefinitionNode(tickFuncName, [
           new CommandCompositeNode([
-            `execute as @a[scores={${minedObjName}=1..}] run`,
+            `execute as @a[scores={${minedObjName}=1..}] at @s run`, // Runs body commands as and at the player
             new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
           ], node.sourceBlockId),
           new CommandCompositeNode([
@@ -617,9 +617,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
 
         // Define raycast mcfunction (checks for hit and advances the ray)
         new FunctionDefinitionNode(raycastFuncName, [
-          // If hit: run body mcfunction (+ set hit flag)
           new CommandCompositeNode([
-            'execute as', ...target.nodes, 'run', new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
+            // Hit
+            'execute at', ...target.nodes,
+            // Run at hit position
+            'run', new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
           ], node.sourceBlockId),
 
           new CommandCompositeNode([
