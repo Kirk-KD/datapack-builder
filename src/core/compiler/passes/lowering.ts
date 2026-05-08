@@ -2,7 +2,7 @@ import {
   CommandCompositeNode, CommandNode,
   DatapackNode,
   ExecuteNode,
-  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode,
+  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode, FunctionTagNode,
   IfNode,
   IrNode,
   type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
@@ -129,6 +129,13 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [],
       nodes: [new DatapackNode(topLevelNodes)]
+    }
+  }
+
+  visitFunctionTag(node: FunctionTagNode): LoweredResult {
+    return {
+      pre: [],
+      nodes: [node]
     }
   }
 
@@ -260,14 +267,20 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   visitOnLoad(node: OnLoadNode): LoweredResult {
     return {
       pre: [],
-      nodes: [new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), node.sourceBlockId)]
+      nodes: [
+        new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionTagNode('load', 'load', node.sourceBlockId)
+      ]
     }
   }
 
   visitOnTick(node: OnTickNode): LoweredResult {
     return {
       pre: [],
-      nodes: [new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), node.sourceBlockId)]
+      nodes: [
+        new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionTagNode('tick', 'tick', node.sourceBlockId)
+      ]
     }
   }
 
@@ -314,7 +327,11 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           new CommandCompositeNode([
             `execute as @s run`, new FunctionCallNode(checkFuncName, null, node.sourceBlockId)
           ])
-        ])
+        ]),
+
+        // Register function tags
+        new FunctionTagNode('load', loadFuncName),
+        new FunctionTagNode('tick', tickFuncName),
       ]
     }
   }

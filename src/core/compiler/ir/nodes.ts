@@ -51,6 +51,21 @@ export class DatapackNode extends IrNode {
   }
 }
 
+export class FunctionTagNode extends IrNode {
+  readonly tag: 'load' | 'tick'
+  readonly name: string
+
+  constructor(tag: "load" | "tick", name: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.tag = tag
+    this.name = name
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitFunctionTag(this)
+  }
+}
+
 export class CommandCompositeNode extends CommandNode {
   readonly parts: (FragmentNode | string)[]
   readonly noSpace: boolean

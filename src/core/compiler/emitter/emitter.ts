@@ -2,7 +2,7 @@ import {
   DatapackNode, ItemStackNode, LiteralRotationNode, LiteralIntNode,
   LiteralPositionNode, LiteralRangeNode, LiteralStringNode,
   ProcedureParameterNode, TargetSelectorNode, VariableNode, CommandCompositeNode,
-  FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode
+  FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode, FunctionTagNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
@@ -18,6 +18,10 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
   readonly projectConfig: ProjectConfig
 
   private parentProcedure: ProcedureRegistryEntry | null = null
+
+  // Populated as the pass encounters `FunctionTagNode`s
+  private loadFunctionNames: string[] = []
+  private tickFunctionNames: string[] = []
 
   constructor(outputFiles: OutputFiles, projectConfig: ProjectConfig) {
     super()
@@ -95,38 +99,38 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
     // Should prevent this in the future.
     node.topLevelNodes.forEach(n => n.accept(this))
 
-    if (this.files.exists(this.naming.internalMcfunctionFilePath('tick'))) {
-      // By default, minecraft's execution order is "tick -> load -> tick -> tick -> ..."
-      // This checks an INIT flag to get rid of this behaviour.
-      this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend([new Segment(
-        `scoreboard players set ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} 1\n`
-      )])
-      this.files.with(this.naming.internalMcfunctionFilePath('tick')).prepend([new Segment(
-        `execute unless score ${this.naming.initializedFlagName()} ${this.naming.variableObjectiveName()} matches 1 run return fail\n`
-      )])
-
-      // Only register tick tag if tick.mcfunction exists
-      this.files.with('data/minecraft/tags/function/tick.json').write([new Segment(
-        JSON.stringify({
-          value: [`${this.naming.internalNamespace()}:tick`]
-        }, null, 2)
-      )])
-    }
-
     // Always initialize a dummy variable objective unless there are no top-level nodes.
     // Could set a flag when variables are used but probably not worth it.
     if (node.topLevelNodes.length) {
       this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend([new Segment(
         `scoreboard objectives add ${this.naming.variableObjectiveName()} dummy\n`
       )])
-
       // Always register load tag due to needing to initialize the dummy objective.
+      this.loadFunctionNames.push('load')
+    }
+
+    // Populate function tags
+    if (this.loadFunctionNames.length) {
       this.files.with('data/minecraft/tags/function/load.json').write([new Segment(
         JSON.stringify({
-          value: [`${this.naming.internalNamespace()}:load`]
+          value: Array.from(new Set(this.loadFunctionNames)).map(name => `${this.naming.internalNamespace()}:${name}`)
         }, null, 2)
       )])
     }
+    if (this.tickFunctionNames.length) {
+      this.files.with('data/minecraft/tags/function/tick.json').write([new Segment(
+        JSON.stringify({
+          value: Array.from(new Set(this.tickFunctionNames)).map(name => `${this.naming.internalNamespace()}:${name}`)
+        }, null, 2)
+      )])
+    }
+
+    return []
+  }
+
+  visitFunctionTag(node: FunctionTagNode): Segment[] {
+    if (node.tag === 'tick') this.tickFunctionNames.push(node.name)
+    else this.loadFunctionNames.push(node.name)
 
     return []
   }

@@ -14,7 +14,7 @@ import {
   VariableNode,
   FunctionCallNode,
   TempVariableNode,
-  ItemStackNode,
+  ItemStackNode, FunctionTagNode,
 } from '../ir'
 
 /**
@@ -90,6 +90,8 @@ export class AnnotationPass extends SelectiveIrVisitor<void> {
   visitVariable(_node: VariableNode): void {}
 
   visitFunctionCall(_node: FunctionCallNode): void {}
+
+  visitFunctionTag(_node: FunctionTagNode): void {}
 
   visitTempVariable(_node: TempVariableNode): void {}
 
