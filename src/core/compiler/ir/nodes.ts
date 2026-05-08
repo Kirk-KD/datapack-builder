@@ -461,3 +461,20 @@ export class ExecuteNode extends CommandNode {
     return visitor.visitExecute(this)
   }
 }
+
+export class RaycastEntityNode extends CommandNode {
+  readonly targetNode: TargetSelectorNode
+  readonly distanceNode: LiteralIntNode
+  readonly bodyNodes: CommandNode[]
+
+  constructor(targetNode: TargetSelectorNode, distanceNode: LiteralIntNode, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.targetNode = targetNode
+    this.distanceNode = distanceNode
+    this.bodyNodes = bodyNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitRaycastEntity(this)
+  }
+}

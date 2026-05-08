@@ -4,6 +4,7 @@ import {bindExtraState, type StatefulBlock} from '../extraState.ts'
 import {colours} from '../../colours.ts'
 import {setShadowState} from '../../extensions/shadows.ts'
 import {createStateDropdown} from '../dynamicFields.ts'
+import {CommandNode, RaycastEntityNode, statementToIr, valueToIr} from '../../../compiler'
 
 type RaycastBlockStates = { mode: 'entity' | 'block' }
 type RaycastBlock = StatefulBlock & RaycastBlockStates
@@ -55,11 +56,19 @@ export const utilityBlockSpecs: BlockSpec[] = [
       block.setTooltip('')
       block.setHelpUrl('')
       block.setInputsInline(true)
+      block.setPreviousStatement(true)
+      block.setNextStatement(true)
 
       block.updateShape_()
     },
     generator(block) {
-
+      return new RaycastEntityNode(
+        valueToIr(block, 'TARGET'),
+        valueToIr(block, 'DISTANCE'),
+        statementToIr(block, 'BODY') as CommandNode[],
+        block.id
+      )
+      // TODO handle block mode
     }
   }
 ]

@@ -8,7 +8,7 @@ import {
   type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
   LiteralStringNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode,
   type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
-  ProcedureParameterNode, TargetSelectorNode, TempVariableNode,
+  ProcedureParameterNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode,
   type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
   VariableOperationNode, VariableSetNode, WhileNode
 } from '../ir'
@@ -588,6 +588,61 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
         ),
         new CommandCompositeNode([
           new FunctionCallNode(whileFuncName, null, node.sourceBlockId)
+        ], node.sourceBlockId)
+      ]
+    }
+  }
+
+  visitRaycastEntity(node: RaycastEntityNode): LoweredResult {
+    const target = node.targetNode.accept(this)
+    const distance = node.distanceNode.accept(this)
+
+    const baseName = this.naming.nextId('raycast')
+    const bodyFuncName = `${baseName}_body`
+    const raycastFuncName = `${baseName}_cast`
+    const hitFlagName = this.naming.variableName(`${baseName}_hitFlag`)
+
+    return {
+      pre: [...target.pre, ...distance.pre],
+      nodes: [
+        // Define body mcfunction (runs on hit)
+        new FunctionDefinitionNode(bodyFuncName, [
+          // Set hit flag
+          new CommandCompositeNode([
+            'scoreboard players set', hitFlagName, this.naming.variableObjectiveName(), '1'
+          ], node.sourceBlockId),
+          // Execute body commands
+          ...this.lowerBody(node.bodyNodes)
+        ], node.sourceBlockId),
+
+        // Define raycast mcfunction (checks for hit and advances the ray)
+        new FunctionDefinitionNode(raycastFuncName, [
+          // If hit: run body mcfunction (+ set hit flag)
+          new CommandCompositeNode([
+            'execute as', ...target.nodes, 'run', new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
+          ], node.sourceBlockId),
+
+          new CommandCompositeNode([
+            // Not yet hit
+            `execute unless score ${hitFlagName} ${this.naming.variableObjectiveName()} matches 1 `,
+            // Advance by 0.25 blocks
+            'positioned ^ ^ ^0.25 ',
+            // Not out of range
+            'if entity @s[distance=..', ...distance.nodes, '] ',
+            // Recurse
+            'run ', new FunctionCallNode(raycastFuncName, null, node.sourceBlockId),
+          ], node.sourceBlockId, true)
+        ], node.sourceBlockId),
+
+        // Initialize hit flag
+        new CommandCompositeNode([
+          'scoreboard players set', hitFlagName, this.naming.variableObjectiveName(), '0'
+        ], node.sourceBlockId),
+
+        // Begin raycast
+        new CommandCompositeNode([
+          `execute anchored eyes positioned ^ ^ ^ run`,
+          new FunctionCallNode(raycastFuncName, null, node.sourceBlockId)
         ], node.sourceBlockId)
       ]
     }
