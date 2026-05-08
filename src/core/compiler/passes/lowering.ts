@@ -311,15 +311,15 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           new CommandCompositeNode([
             `execute as @a[scores={${minedObjName}=1..}] run`,
             new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
-          ]),
+          ], node.sourceBlockId),
           new CommandCompositeNode([
             `scoreboard players reset @a ${minedObjName}`
-          ])
-        ]),
+          ], node.sourceBlockId),
+        ], node.sourceBlockId),
 
         // Register function tags
-        new FunctionTagNode('load', loadFuncName),
-        new FunctionTagNode('tick', tickFuncName),
+        new FunctionTagNode('load', loadFuncName, node.sourceBlockId),
+        new FunctionTagNode('tick', tickFuncName, node.sourceBlockId),
       ]
     }
   }
