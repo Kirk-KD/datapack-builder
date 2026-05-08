@@ -288,12 +288,10 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     const baseName = this.naming.nextId('on_player_mines_block')
 
     const minedObjName = `${baseName}_mined`
-    const prevObjName = `${baseName}_prev`
 
     const loadFuncName = `${baseName}_load`
     const bodyFuncName = `${baseName}_body`
     const tickFuncName = `${baseName}_tick`
-    const checkFuncName = `${baseName}_check`
 
     return {
       pre: [],
@@ -303,29 +301,19 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           new CommandCompositeNode([
             `scoreboard objectives add ${minedObjName} minecraft.mined:minecraft.`, node.blockPredicate
           ], node.sourceBlockId, true),
-          new CommandCompositeNode([
-            `scoreboard objectives add ${prevObjName} dummy`
-          ], node.sourceBlockId)
         ], node.sourceBlockId),
 
         // Define commands to run on block broken
         new FunctionDefinitionNode(bodyFuncName, this.lowerBody(node.bodyNodes), node.sourceBlockId),
 
-        // Runs as a player; checks if the player mined a block. Calls body if yes
-        new FunctionDefinitionNode(checkFuncName, [
-          new CommandCompositeNode([
-            `execute if score @s ${minedObjName} > @s ${prevObjName} run`,
-            new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
-          ], node.sourceBlockId),
-          new CommandCompositeNode([
-            `scoreboard players operation @s ${prevObjName} = @s ${minedObjName}`
-          ], node.sourceBlockId)
-        ], node.sourceBlockId),
-
-        // Run check function every tick as each player
+        // A block was broken if objective isn't 0
         new FunctionDefinitionNode(tickFuncName, [
           new CommandCompositeNode([
-            `execute as @a run`, new FunctionCallNode(checkFuncName, null, node.sourceBlockId)
+            `execute as @a[scores={${minedObjName}=1..}] run`,
+            new FunctionCallNode(bodyFuncName, null, node.sourceBlockId)
+          ]),
+          new CommandCompositeNode([
+            `scoreboard players reset @a ${minedObjName}`
           ])
         ]),
 
