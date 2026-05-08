@@ -113,14 +113,14 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
     if (this.loadFunctionNames.length) {
       this.files.with('data/minecraft/tags/function/load.json').write([new Segment(
         JSON.stringify({
-          value: Array.from(new Set(this.loadFunctionNames)).map(name => `${this.naming.internalNamespace()}:${name}`)
+          values: Array.from(new Set(this.loadFunctionNames)).map(name => `${this.naming.internalNamespace()}:${name}`)
         }, null, 2)
       )])
     }
     if (this.tickFunctionNames.length) {
       this.files.with('data/minecraft/tags/function/tick.json').write([new Segment(
         JSON.stringify({
-          value: Array.from(new Set(this.tickFunctionNames)).map(name => `${this.naming.internalNamespace()}:${name}`)
+          values: Array.from(new Set(this.tickFunctionNames)).map(name => `${this.naming.internalNamespace()}:${name}`)
         }, null, 2)
       )])
     }
