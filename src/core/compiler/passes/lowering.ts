@@ -325,7 +325,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
         // Run check function every tick as each player
         new FunctionDefinitionNode(tickFuncName, [
           new CommandCompositeNode([
-            `execute as @s run`, new FunctionCallNode(checkFuncName, null, node.sourceBlockId)
+            `execute as @a run`, new FunctionCallNode(checkFuncName, null, node.sourceBlockId)
           ])
         ]),
 
