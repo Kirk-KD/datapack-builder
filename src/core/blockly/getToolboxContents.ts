@@ -18,6 +18,12 @@ export default function getToolboxContents() {
     },
     {
       kind: 'category',
+      name: 'Utility',
+      colour: colours.utility,
+      contents: getBlockTypesByCategory('utility').map(type => ({ kind: 'block', type }))
+    },
+    {
+      kind: 'category',
       name: 'Commands',
       colour: colours.commands,
       contents: getBlockTypesByCategory('commands').map(type => ({ kind: 'block', type }))

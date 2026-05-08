@@ -10,7 +10,7 @@ const colours: Record<string, string> = {
   variable: '#ff8c1a',
   procedures: '#ff6680',
   execute: '#4c97ff',
-  targetSelectors: '#5cb1d6',
+  utility: '#5cb1d6',
 }
 
 function applyColour(category: BlockSpecCategory) {
