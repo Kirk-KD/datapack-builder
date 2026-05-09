@@ -168,6 +168,32 @@ export class OnPlayerMinesBlockNode extends IrNode {
   }
 }
 
+export class NumberNode extends FragmentNode {
+  readonly value: number
+
+  constructor(value: number, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.value = value
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitNumber(this)
+  }
+}
+
+export class OptNumberNode extends FragmentNode {
+  readonly value: number | null
+
+  constructor(value: number | null, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.value = value
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitOptNumber(this)
+  }
+}
+
 export class LiteralIntNode extends FragmentNode {
   readonly value: number
 
@@ -194,12 +220,27 @@ export class LiteralStringNode extends FragmentNode {
   }
 }
 
-export class LiteralPositionNode extends FragmentNode {
-  readonly xNode: LiteralStringNode
-  readonly yNode: LiteralStringNode
-  readonly zNode: LiteralStringNode
+export class TildeCaretNode extends FragmentNode {
+  readonly prefix: '~' | '^' | null
+  readonly valueNode: OrParameter<NumberNode | OptNumberNode>
 
-  constructor(xNode: LiteralStringNode, yNode: LiteralStringNode, zNode: LiteralStringNode, sourceBlockId?: string | null) {
+  constructor(prefix: '~' | '^' | null, valueNode: OrParameter<NumberNode | OptNumberNode>, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.prefix = prefix
+    this.valueNode = valueNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitTildeCaret(this)
+  }
+}
+
+export class LiteralPositionNode extends FragmentNode {
+  readonly xNode: TildeCaretNode
+  readonly yNode: TildeCaretNode
+  readonly zNode: TildeCaretNode
+
+  constructor(xNode: TildeCaretNode, yNode: TildeCaretNode, zNode: TildeCaretNode, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.xNode = xNode
     this.yNode = yNode

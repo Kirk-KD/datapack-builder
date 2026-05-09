@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly'
 import type { BlockSpec, ShadowInputBlockValidatorFunction } from './types'
-import {type IrGeneratorFunction, LiteralIntNode, LiteralStringNode} from '../../compiler'
+import {type IrGeneratorFunction, LiteralStringNode, NumberNode, OptNumberNode} from '../../compiler'
 
 const INPUT_VALUE = 'VALUE'
 
@@ -57,7 +57,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return validateNumber(input)
     },
     function(block: Blockly.Block) {
-      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE))) // TODO placeholder
+      return new NumberNode(Number(block.getFieldValue(INPUT_VALUE)), block.id)
     },
     '0'
   ),
@@ -68,7 +68,10 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return validateNumber(input)
     },
     function(block: Blockly.Block) {
-      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE))) // TODO placeholder
+      const value = block.getFieldValue(INPUT_VALUE)
+      let n: number | null = value === '' ? null : Number(value)
+      if (Number.isNaN(n)) n = null
+      return new OptNumberNode(n, block.id)
     },
     ''
   ),
@@ -88,7 +91,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return /^(?!.*(.).*\1)[xyz]{1,3}$/.test(input) ? input : null
     },
     function(block: Blockly.Block) {
-      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE), block.id)
     },
     'xyz'
   ),
@@ -98,7 +101,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
       return validateNumber(input) ?? (/^~(?:-?\d*(?:\.\d+)?)?$/.test(input) ? input : null)
     },
     function(block: Blockly.Block) {
-      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE), block.id)
     },
     '~'
   )

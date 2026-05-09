@@ -6,9 +6,9 @@ import {
   IfNode,
   IrNode,
   type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
-  LiteralStringNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode,
+  LiteralStringNode, NumberNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode, OptNumberNode,
   type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
-  ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode,
+  ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode, TildeCaretNode,
   type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
   VariableOperationNode, VariableSetNode, WhileNode
 } from '../ir'
@@ -747,6 +747,31 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           `execute anchored eyes positioned ^ ^ ^ run`,
           new FunctionCallNode(raycastFuncName, null, node.sourceBlockId)
         ], node.sourceBlockId)
+      ]
+    }
+  }
+
+  visitNumber(node: NumberNode): LoweredResult {
+    return { pre: [], nodes: [node] }
+  }
+
+  visitOptNumber(node: OptNumberNode): LoweredResult {
+    return {
+      pre: [],
+      nodes: [node.value === null ? new FragmentCompositeNode(['']) : new NumberNode(node.value, node.sourceBlockId)]
+    }
+  }
+
+  visitTildeCaret(node: TildeCaretNode): LoweredResult {
+    const value = node.valueNode.accept(this)
+    return {
+      pre: [...value.pre],
+      nodes: [
+        new FragmentCompositeNode(
+          node.prefix ? [node.prefix, ...value.nodes] : [...value.nodes],
+          node.sourceBlockId,
+          true
+        )
       ]
     }
   }

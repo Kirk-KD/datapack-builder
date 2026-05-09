@@ -14,7 +14,7 @@ import {
   VariableNode,
   FunctionCallNode,
   TempVariableNode,
-  ItemStackNode, FunctionTagNode,
+  ItemStackNode, FunctionTagNode, NumberNode,
 } from '../ir'
 
 /**
@@ -82,6 +82,8 @@ export class AnnotationPass extends SelectiveIrVisitor<void> {
   }
 
   /* eslint-disable @typescript-eslint/no-unused-vars */
+
+  visitNumber(_node: NumberNode): void {}
 
   visitLiteralInt(_node: LiteralIntNode): void {}
 

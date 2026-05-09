@@ -9,7 +9,7 @@ import {
   LiteralPositionNode,
   LiteralRangeNode,
   LiteralStringNode,
-  valueToIr
+  valueToIr, TildeCaretNode
 } from '../../../compiler'
 
 const FIELD_VALUE = 'VALUE'
@@ -20,6 +20,15 @@ type TildeCaretBlockStates = {
   prefix: TildeCaretPrefix
 }
 type TildeCaretBlock = StatefulBlock & TildeCaretBlockStates
+
+function updateTildeCaretWarning(block: TildeCaretBlock) {
+  const valueBlock = block.getInput(FIELD_VALUE)?.connection?.targetBlock()
+  const hasEmptyUnprefixedOptNumber = block.prefix === null
+    && valueBlock?.type === 'opt_number'
+    && valueBlock.getFieldValue(FIELD_VALUE) === ''
+
+  block.setWarningText(hasEmptyUnprefixedOptNumber ? 'Missing value' : null)
+}
 
 function setTildeCaretPrefix(block: TildeCaretBlock, prefix: TildeCaretPrefix) {
   mutateExtraState(block, () => {
@@ -90,15 +99,22 @@ export const literalBlockSpecs: BlockSpec[] = [
 
         if (this.prefix === null) {
           if (prefixField) input.removeField(FIELD_PREFIX)
+          updateTildeCaretWarning(this)
           return
         }
 
         if (prefixField) {
           prefixField.setValue(this.prefix)
+          updateTildeCaretWarning(this)
           return
         }
 
         input.appendField(this.prefix, FIELD_PREFIX)
+        updateTildeCaretWarning(this)
+      }
+
+      block.onchange = function(this: TildeCaretBlock) {
+        updateTildeCaretWarning(this)
       }
 
       block.setColour(colours.literals)
@@ -110,7 +126,7 @@ export const literalBlockSpecs: BlockSpec[] = [
       block.updateShape_()
     },
     generator(block) {
-      return new LiteralStringNode('', block.id) // TODO placeholder
+      return new TildeCaretNode((block as TildeCaretBlock).prefix, valueToIr(block, FIELD_VALUE), block.id)
     },
     setShadowBlocks(this) {
       setShadowState(this, FIELD_VALUE, {type: 'opt_number'})
