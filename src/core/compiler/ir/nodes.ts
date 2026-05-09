@@ -478,3 +478,20 @@ export class RaycastEntityNode extends CommandNode {
     return visitor.visitRaycastEntity(this)
   }
 }
+
+export class RaycastBlockNode extends CommandNode {
+  readonly blockNode: LiteralStringNode
+  readonly distanceNode: LiteralIntNode
+  readonly bodyNodes: CommandNode[]
+
+  constructor(blockNode: LiteralStringNode, distanceNode: LiteralIntNode, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.blockNode = blockNode
+    this.distanceNode = distanceNode
+    this.bodyNodes = bodyNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitRaycastBlock(this)
+  }
+}
