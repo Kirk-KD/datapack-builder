@@ -388,6 +388,9 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
         // Initialize scoreboard objectives
         new FunctionDefinitionNode(loadFuncName, [
           new CommandCompositeNode([
+            `scoreboard objectives remove ${minedObjName}`
+          ], node.sourceBlockId),
+          new CommandCompositeNode([
             `scoreboard objectives add ${minedObjName} minecraft.mined:minecraft.`, node.blockPredicate
           ], node.sourceBlockId, true),
         ], node.sourceBlockId),

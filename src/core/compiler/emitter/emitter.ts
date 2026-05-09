@@ -103,6 +103,7 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
     // Could set a flag when variables are used but probably not worth it.
     if (node.topLevelNodes.length) {
       this.files.with(this.naming.internalMcfunctionFilePath('load')).prepend([new Segment(
+        `scoreboard objectives remove ${this.naming.variableObjectiveName()}\n` +
         `scoreboard objectives add ${this.naming.variableObjectiveName()} dummy\n`
       )])
       // Always register load tag due to needing to initialize the dummy objective.
