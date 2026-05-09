@@ -6,7 +6,6 @@ type ShadowBlock = {
 }
 
 export function setShadowState(block: Block, inputName: string, shadowBlock: ShadowBlock) {
-  if (!block.isInFlyout) return
   const connection = block.getInput(inputName)?.connection
   if (!connection || connection.targetBlock()) return
   connection.setShadowState(shadowBlock)
