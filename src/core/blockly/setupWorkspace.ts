@@ -12,6 +12,7 @@ import getToolboxContents from "./getToolboxContents.ts";
 import {procedureRegistry, variableRegistry} from "./registry";
 import {subscribeListeners} from "./specs/categories/procedures.ts";
 import type {WorkspaceCallbacks} from './workspaceCallbacks.ts'
+import {shadowBlockRevokeListener} from './shadowBlockRevokeListener.ts'
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -85,6 +86,8 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
 
   // Enable auto shadow conversion
   workspace.addChangeListener(shadowBlockConversionChangeListener)
+
+  workspace.addChangeListener(shadowBlockRevokeListener)
 
   workspace.registerButtonCallback('CREATE_VARIABLE', () => {
     callbacks.onCreateVariable(({ name, valueType }) => {
