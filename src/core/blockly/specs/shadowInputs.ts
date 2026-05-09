@@ -50,19 +50,10 @@ function validateNumber(input: string) {
   return /^-?(?:\d+\.\d+|\d+|\.\d+|\d+\.)$/.test(input) ? input : null
 }
 
-function validateTilde(input: string) {
-  return /^~(?:-?\d*(?:\.\d+)?)?$/.test(input) ? input : null
-}
-
-function validateCaret(input: string) {
-  return /^\^(?:-?\d*(?:\.\d+)?)?$/.test(input) ? input : null
-}
-
 export const shadowInputBlockSpecs: BlockSpec[] = [
   makeShadowInputBlockSpec(
     'number',
     input => {
-      if (input === '') return input
       return validateNumber(input)
     },
     function(block: Blockly.Block) {
@@ -71,15 +62,15 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
     '0'
   ),
   makeShadowInputBlockSpec(
-  'tilde_caret',
+    'opt_number',
     input => {
       if (input === '') return input
-      return validateNumber(input) ?? validateTilde(input) ?? validateCaret(input)
+      return validateNumber(input)
     },
     function(block: Blockly.Block) {
-      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+      return new LiteralIntNode(Number(block.getFieldValue(INPUT_VALUE))) // TODO placeholder
     },
-    '~'
+    ''
   ),
   // makeShadowInputBlockSpec('tilde',
   //   input => {
@@ -104,7 +95,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
   makeShadowInputBlockSpec('angle',
     input => {
       if (input === '') return input
-      return validateNumber(input) ?? validateTilde(input)
+      return validateNumber(input) ?? (/^~(?:-?\d*(?:\.\d+)?)?$/.test(input) ? input : null)
     },
     function(block: Blockly.Block) {
       return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))

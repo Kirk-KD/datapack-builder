@@ -1,5 +1,8 @@
 import type { BlockSpec } from '../types'
+import * as Blockly from 'blockly'
 import {setShadowState} from "../../extensions/shadows.ts"
+import {colours} from '../../colours.ts'
+import {bindExtraState, mutateExtraState, type StatefulBlock} from '../extraState.ts'
 import {
   LiteralRotationNode,
   LiteralIntNode,
@@ -10,6 +13,20 @@ import {
 } from '../../../compiler'
 
 const FIELD_VALUE = 'VALUE'
+const FIELD_PREFIX = 'PREFIX'
+
+type TildeCaretPrefix = '~' | '^' | null
+type TildeCaretBlockStates = {
+  prefix: TildeCaretPrefix
+}
+type TildeCaretBlock = StatefulBlock & TildeCaretBlockStates
+
+function setTildeCaretPrefix(block: TildeCaretBlock, prefix: TildeCaretPrefix) {
+  mutateExtraState(block, () => {
+    block.prefix = prefix
+  })
+  block.updateShape_?.()
+}
 
 export const literalBlockSpecs: BlockSpec[] = [
   {
@@ -55,6 +72,76 @@ export const literalBlockSpecs: BlockSpec[] = [
     },
     generator(block) {
       return new LiteralStringNode(block.getFieldValue(FIELD_VALUE), block.id)
+    },
+  },
+  {
+    type: 'tilde_caret',
+    category: 'literals',
+    init(this: Blockly.Block) {
+      const block = this as TildeCaretBlock
+      bindExtraState<TildeCaretBlock, TildeCaretBlockStates>(block, {
+        prefix: '~',
+      })
+
+      block.updateShape_ = function(this: TildeCaretBlock) {
+        const input = this.getInput(FIELD_VALUE) ?? this.appendValueInput(FIELD_VALUE)
+          .setCheck(['opt_number', 'mc_proc_param'])
+        const prefixField = this.getField(FIELD_PREFIX)
+
+        if (this.prefix === null) {
+          if (prefixField) input.removeField(FIELD_PREFIX)
+          return
+        }
+
+        if (prefixField) {
+          prefixField.setValue(this.prefix)
+          return
+        }
+
+        input.appendField(this.prefix, FIELD_PREFIX)
+      }
+
+      block.setColour(colours.literals)
+      block.setTooltip('')
+      block.setHelpUrl('')
+      block.setInputsInline(true)
+      block.setOutput(true, 'tilde_caret')
+
+      block.updateShape_()
+    },
+    generator(block) {
+      return new LiteralStringNode('', block.id) // TODO placeholder
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, FIELD_VALUE, {type: 'opt_number'})
+    },
+    contextMenu(options) {
+      const block = this as TildeCaretBlock
+      const scope = {block}
+
+      options.push(
+        {
+          text: 'make ^',
+          enabled: true,
+          scope,
+          weight: 0,
+          callback: () => setTildeCaretPrefix(block, '^'),
+        },
+        {
+          text: 'make ~',
+          enabled: true,
+          scope,
+          weight: 1,
+          callback: () => setTildeCaretPrefix(block, '~'),
+        },
+        {
+          text: 'clear prefix',
+          enabled: true,
+          scope,
+          weight: 2,
+          callback: () => setTildeCaretPrefix(block, null),
+        },
+      )
     },
   },
   {

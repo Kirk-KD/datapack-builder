@@ -58,7 +58,15 @@ export function bindExtraState<
 
   block.loadExtraState = function(savedState: Partial<TState> | null) {
     for (const key of keys) {
-      this[key as keyof TBlock] = (savedState?.[key] ?? loadDefaults[key as string] ?? defaults[key]) as unknown as TBlock[keyof TBlock]
+      const savedValue = savedState?.[key]
+      const loadDefault = loadDefaults[key as string]
+      const value = savedValue !== undefined
+        ? savedValue
+        : loadDefault !== undefined
+          ? loadDefault
+          : defaults[key]
+
+      this[key as keyof TBlock] = value as unknown as TBlock[keyof TBlock]
     }
     this.updateShape_?.()
   }
