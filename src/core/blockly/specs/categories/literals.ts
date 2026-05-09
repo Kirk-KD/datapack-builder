@@ -154,6 +154,7 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'X',
+          // Right now proc param is always int; might need to change in the future
           check: ['mc_proc_param', 'tilde_caret']
         },
         {

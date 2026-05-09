@@ -13,6 +13,6 @@ export function setShadowState(block: Block, inputName: string, shadowBlock: Sha
 
 export function revokeShadowState(block: Block, inputName: string) {
   const connection = block.getInput(inputName)?.connection
-  if (!connection || connection.targetBlock()) return
+  if (!connection || connection.targetBlock()?.isShadow()) return
   connection.setShadowState(null)
 }
