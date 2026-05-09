@@ -21,6 +21,9 @@ type TildeCaretBlockStates = {
 }
 type TildeCaretBlock = StatefulBlock & TildeCaretBlockStates
 
+const ROTATION_YAW_INPUT = 'YAW'
+const ROTATION_PITCH_INPUT = 'PITCH'
+
 function updateTildeCaretWarning(block: TildeCaretBlock) {
   const valueBlock = block.getInput(FIELD_VALUE)?.connection?.targetBlock()
   const hasEmptyUnprefixedOptNumber = block.prefix === null
@@ -28,6 +31,15 @@ function updateTildeCaretWarning(block: TildeCaretBlock) {
     && valueBlock.getFieldValue(FIELD_VALUE) === ''
 
   block.setWarningText(hasEmptyUnprefixedOptNumber ? 'Missing value' : null)
+}
+
+function updateRotationWarning(block: Blockly.Block) {
+  const hasCaretInput = [ROTATION_YAW_INPUT, ROTATION_PITCH_INPUT].some(inputName => {
+    const valueBlock = block.getInput(inputName)?.connection?.targetBlock() as TildeCaretBlock | null
+    return valueBlock?.type === 'tilde_caret' && valueBlock.prefix === '^'
+  })
+
+  block.setWarningText(hasCaretInput ? '^ cannot be used in rotation' : null)
 }
 
 function setTildeCaretPrefix(block: TildeCaretBlock, prefix: TildeCaretPrefix) {
@@ -237,34 +249,36 @@ export const literalBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_rotation',
     category: 'literals',
-    json: {
-      type: 'mc_rotation',
-      message0: 'yaw%1 pitch%2',
-      args0: [
-        {
-          type: 'input_value',
-          name: 'YAW',
-          check: ['mc_proc_param', 'angle']
-        },
-        {
-          type: 'input_value',
-          name: 'PITCH',
-          check: ['mc_proc_param', 'angle']
-        },
-      ],
-      output: 'mc_rotation',
-      inputsInline: true,
+    init(this: Blockly.Block) {
+      this.appendValueInput(ROTATION_YAW_INPUT)
+        .setCheck(['mc_proc_param', 'tilde_caret'])
+        .appendField('yaw')
+      this.appendValueInput(ROTATION_PITCH_INPUT)
+        .setCheck(['mc_proc_param', 'tilde_caret'])
+        .appendField('pitch')
+
+      this.setColour(colours.literals)
+      this.setTooltip('')
+      this.setHelpUrl('')
+      this.setInputsInline(true)
+      this.setOutput(true, 'mc_rotation')
+
+      this.onchange = function(this: Blockly.Block) {
+        updateRotationWarning(this)
+      }
+
+      updateRotationWarning(this)
     },
     generator(block) {
       return new LiteralRotationNode(
-        valueToIr(block, 'YAW'),
-        valueToIr(block, 'PITCH'),
+        valueToIr(block, ROTATION_YAW_INPUT),
+        valueToIr(block, ROTATION_PITCH_INPUT),
         block.id
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'YAW', {type: 'angle'})
-      setShadowState(this, 'PITCH', {type: 'angle'})
+      setShadowState(this, ROTATION_YAW_INPUT, {type: 'tilde_caret'})
+      setShadowState(this, ROTATION_PITCH_INPUT, {type: 'tilde_caret'})
     }
   },
 ]

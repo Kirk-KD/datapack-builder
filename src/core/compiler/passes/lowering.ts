@@ -306,9 +306,9 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [...x.pre, ...y.pre, ...z.pre],
       nodes: [new LiteralPositionNode(
-        x.nodes[0] as LiteralStringNode,
-        y.nodes[0] as LiteralStringNode,
-        z.nodes[0] as LiteralStringNode,
+        x.nodes[0] as TildeCaretNode,
+        y.nodes[0] as TildeCaretNode,
+        z.nodes[0] as TildeCaretNode,
         node.sourceBlockId
       )]
     }
