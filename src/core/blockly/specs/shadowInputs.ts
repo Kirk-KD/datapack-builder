@@ -81,16 +81,16 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
     },
     '~'
   ),
-  makeShadowInputBlockSpec('tilde',
-    input => {
-      if (input === '') return input
-      return validateNumber(input) ?? validateTilde(input)
-    },
-    function(block: Blockly.Block) {
-      return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
-    },
-    '~'
-  ),
+  // makeShadowInputBlockSpec('tilde',
+  //   input => {
+  //     if (input === '') return input
+  //     return validateNumber(input) ?? validateTilde(input)
+  //   },
+  //   function(block: Blockly.Block) {
+  //     return new LiteralStringNode(block.getFieldValue(INPUT_VALUE))
+  //   },
+  //   '~'
+  // ),
   makeShadowInputBlockSpec('swizzle',
     input => {
       if (input === '') return input
