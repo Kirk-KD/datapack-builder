@@ -475,5 +475,26 @@ export const commandBlockSpecs: BlockSpec[] = [
       setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
       setShadowState(this, 'ITEM', { type: 'mc_item_stack' })
     }
-  }
+  },
+  {
+    type: 'mc_raw_cmd',
+    category: 'commands',
+    json: {
+      type: 'mc_raw_cmd',
+      message0: 'raw command %1',
+      args0: [
+        {
+          type: 'field_input',
+          name: 'CMD',
+          text: '',
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+    },
+    generator(block) {
+      return new CommandCompositeNode([block.getFieldValue('CMD')], block.id)
+    },
+  },
 ]

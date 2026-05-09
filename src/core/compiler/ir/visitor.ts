@@ -7,7 +7,7 @@ import {
   VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
   VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode,
   TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode, OnPlayerMinesBlockNode,
-  FunctionTagNode
+  FunctionTagNode, RaycastEntityNode, RaycastBlockNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
@@ -48,6 +48,9 @@ export interface IrVisitor<T> {
   visitTargetSelector(node: TargetSelectorNode): T
 
   visitExecute(node: ExecuteNode): T
+
+  visitRaycastEntity(node: RaycastEntityNode): T
+  visitRaycastBlock(node: RaycastBlockNode): T
 }
 
 export abstract class SelectiveIrVisitor<T> implements IrVisitor<T> {
@@ -168,6 +171,14 @@ export abstract class SelectiveIrVisitor<T> implements IrVisitor<T> {
   }
 
   visitFunctionTag(node: FunctionTagNode): T {
+    this.disallow(node)
+  }
+
+  visitRaycastEntity(node: RaycastEntityNode): T {
+    this.disallow(node)
+  }
+
+  visitRaycastBlock(node: RaycastBlockNode): T {
     this.disallow(node)
   }
 }
