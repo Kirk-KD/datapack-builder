@@ -2,7 +2,7 @@ import {
   DatapackNode, ItemStackNode, LiteralRotationNode, LiteralIntNode,
   LiteralPositionNode, LiteralRangeNode, LiteralStringNode,
   ProcedureParameterNode, TargetSelectorNode, VariableNode, CommandCompositeNode,
-  FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode, FunctionTagNode
+  FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode, FunctionTagNode, NumberNode
 } from '../ir'
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
@@ -198,5 +198,9 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
 
   visitVariable(node: VariableNode): Segment[] {
     return [new Segment(`${this.naming.variableName(node.variableName)} ${this.naming.variableObjectiveName()}`, node)]
+  }
+
+  visitNumber(node: NumberNode): Segment[] {
+    return [new Segment(node.value.toString())]
   }
 }

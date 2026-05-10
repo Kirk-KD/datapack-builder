@@ -1,15 +1,53 @@
 import type { BlockSpec } from '../types'
+import * as Blockly from 'blockly'
 import {setShadowState} from "../../extensions/shadows.ts"
+import {colours} from '../../colours.ts'
+import {bindExtraState, mutateExtraState, type StatefulBlock} from '../extraState.ts'
 import {
   LiteralRotationNode,
   LiteralIntNode,
   LiteralPositionNode,
   LiteralRangeNode,
   LiteralStringNode,
-  valueToIr
+  valueToIr, TildeCaretNode
 } from '../../../compiler'
 
 const FIELD_VALUE = 'VALUE'
+const FIELD_PREFIX = 'PREFIX'
+
+type TildeCaretPrefix = '~' | '^' | null
+type TildeCaretBlockStates = {
+  prefix: TildeCaretPrefix
+}
+type TildeCaretBlock = StatefulBlock & TildeCaretBlockStates
+
+const ROTATION_YAW_INPUT = 'YAW'
+const ROTATION_PITCH_INPUT = 'PITCH'
+
+function updateTildeCaretWarning(block: TildeCaretBlock) {
+  const valueBlock = block.getInput(FIELD_VALUE)?.connection?.targetBlock()
+  const hasEmptyUnprefixedOptNumber = block.prefix === null
+    && valueBlock?.type === 'opt_number'
+    && valueBlock.getFieldValue(FIELD_VALUE) === ''
+
+  block.setWarningText(hasEmptyUnprefixedOptNumber ? 'Missing value' : null)
+}
+
+function updateRotationWarning(block: Blockly.Block) {
+  const hasCaretInput = [ROTATION_YAW_INPUT, ROTATION_PITCH_INPUT].some(inputName => {
+    const valueBlock = block.getInput(inputName)?.connection?.targetBlock() as TildeCaretBlock | null
+    return valueBlock?.type === 'tilde_caret' && valueBlock.prefix === '^'
+  })
+
+  block.setWarningText(hasCaretInput ? '^ cannot be used in rotation' : null)
+}
+
+function setTildeCaretPrefix(block: TildeCaretBlock, prefix: TildeCaretPrefix) {
+  mutateExtraState(block, () => {
+    block.prefix = prefix
+  })
+  block.updateShape_?.()
+}
 
 export const literalBlockSpecs: BlockSpec[] = [
   {
@@ -58,6 +96,83 @@ export const literalBlockSpecs: BlockSpec[] = [
     },
   },
   {
+    type: 'tilde_caret',
+    category: 'literals',
+    init(this: Blockly.Block) {
+      const block = this as TildeCaretBlock
+      bindExtraState<TildeCaretBlock, TildeCaretBlockStates>(block, {
+        prefix: '~',
+      })
+
+      block.updateShape_ = function(this: TildeCaretBlock) {
+        const input = this.getInput(FIELD_VALUE) ?? this.appendValueInput(FIELD_VALUE)
+          .setCheck(['opt_number', 'mc_proc_param'])
+        const prefixField = this.getField(FIELD_PREFIX)
+
+        if (this.prefix === null) {
+          if (prefixField) input.removeField(FIELD_PREFIX)
+          updateTildeCaretWarning(this)
+          return
+        }
+
+        if (prefixField) {
+          prefixField.setValue(this.prefix)
+          updateTildeCaretWarning(this)
+          return
+        }
+
+        input.appendField(this.prefix, FIELD_PREFIX)
+        updateTildeCaretWarning(this)
+      }
+
+      block.onchange = function(this: TildeCaretBlock) {
+        updateTildeCaretWarning(this)
+      }
+
+      block.setColour(colours.literals)
+      block.setTooltip('')
+      block.setHelpUrl('')
+      block.setInputsInline(true)
+      block.setOutput(true, 'tilde_caret')
+
+      block.updateShape_()
+    },
+    generator(block) {
+      return new TildeCaretNode((block as TildeCaretBlock).prefix, valueToIr(block, FIELD_VALUE), block.id)
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, FIELD_VALUE, {type: 'opt_number'})
+    },
+    contextMenu(options) {
+      const block = this as TildeCaretBlock
+      const scope = {block}
+
+      options.push(
+        {
+          text: 'make ^',
+          enabled: true,
+          scope,
+          weight: 0,
+          callback: () => setTildeCaretPrefix(block, '^'),
+        },
+        {
+          text: 'make ~',
+          enabled: true,
+          scope,
+          weight: 1,
+          callback: () => setTildeCaretPrefix(block, '~'),
+        },
+        {
+          text: 'clear prefix',
+          enabled: true,
+          scope,
+          weight: 2,
+          callback: () => setTildeCaretPrefix(block, null),
+        },
+      )
+    },
+  },
+  {
     type: 'mc_block_pos',
     category: 'literals',
     json: {
@@ -67,6 +182,7 @@ export const literalBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'X',
+          // Right now proc param is always int; might need to change in the future
           check: ['mc_proc_param', 'tilde_caret']
         },
         {
@@ -133,34 +249,36 @@ export const literalBlockSpecs: BlockSpec[] = [
   {
     type: 'mc_rotation',
     category: 'literals',
-    json: {
-      type: 'mc_rotation',
-      message0: 'yaw%1 pitch%2',
-      args0: [
-        {
-          type: 'input_value',
-          name: 'YAW',
-          check: ['mc_proc_param', 'angle']
-        },
-        {
-          type: 'input_value',
-          name: 'PITCH',
-          check: ['mc_proc_param', 'angle']
-        },
-      ],
-      output: 'mc_rotation',
-      inputsInline: true,
+    init(this: Blockly.Block) {
+      this.appendValueInput(ROTATION_YAW_INPUT)
+        .setCheck(['mc_proc_param', 'tilde_caret'])
+        .appendField('yaw')
+      this.appendValueInput(ROTATION_PITCH_INPUT)
+        .setCheck(['mc_proc_param', 'tilde_caret'])
+        .appendField('pitch')
+
+      this.setColour(colours.literals)
+      this.setTooltip('')
+      this.setHelpUrl('')
+      this.setInputsInline(true)
+      this.setOutput(true, 'mc_rotation')
+
+      this.onchange = function(this: Blockly.Block) {
+        updateRotationWarning(this)
+      }
+
+      updateRotationWarning(this)
     },
     generator(block) {
       return new LiteralRotationNode(
-        valueToIr(block, 'YAW'),
-        valueToIr(block, 'PITCH'),
+        valueToIr(block, ROTATION_YAW_INPUT),
+        valueToIr(block, ROTATION_PITCH_INPUT),
         block.id
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'YAW', {type: 'angle'})
-      setShadowState(this, 'PITCH', {type: 'angle'})
+      setShadowState(this, ROTATION_YAW_INPUT, {type: 'tilde_caret'})
+      setShadowState(this, ROTATION_PITCH_INPUT, {type: 'tilde_caret'})
     }
   },
 ]

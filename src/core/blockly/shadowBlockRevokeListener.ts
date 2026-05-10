@@ -1,5 +1,8 @@
 import * as Blockly from 'blockly'
 import {revokeShadowState} from './extensions/shadows.ts'
+import {shadowInputBlockSpecs} from './specs/shadowInputs.ts'
+
+const shadowInputBlockTypes = new Set(shadowInputBlockSpecs.map(spec => spec.type))
 
 export function shadowBlockRevokeListener(e: Blockly.Events.Abstract) {
   if (e.type !== Blockly.Events.BLOCK_CREATE) return
@@ -14,12 +17,12 @@ export function shadowBlockRevokeListener(e: Blockly.Events.Abstract) {
 }
 
 function revokeShadows(block: Blockly.Block) {
-  if (block.isShadow()) block.setShadow(false)
+  if (block.isShadow() && !shadowInputBlockTypes.has(block.type)) block.setShadow(false)
 
   block.inputList.forEach(inp => {
-    revokeShadowState(block, inp.name)
-
     const connBlock = inp.connection?.targetBlock()
     if (connBlock) revokeShadows(connBlock)
+
+    revokeShadowState(block, inp.name)
   })
 }

@@ -66,14 +66,38 @@ function getShadowExtensionName(type: string) {
   return `shadows_${type}`
 }
 
+/**
+ * Returns the extension name used to attach a spec's context menu hook.
+ */
+function getContextMenuExtensionName(type: string) {
+  return `context_menu_${type}`
+}
+
+function applySpecContextMenu(block: Blockly.Block, spec: BlockSpec) {
+  const blockSvg = block as Blockly.BlockSvg
+  blockSvg.customContextMenu = function(options) {
+    options.length = 0
+    spec.contextMenu?.call(this, options as Blockly.ContextMenuRegistry.ContextMenuOption[])
+  }
+}
+
 export function registerBlockSpecs() {
   const jsonBlocks = allBlockSpecs
     .flatMap(spec => {
       if (!spec.json) return []
-      if (!spec.setShadowBlocks) return [spec.json]
+      const extensions = [
+        ...((spec.json.extensions as string[] | undefined) ?? []),
+        getContextMenuExtensionName(spec.type),
+      ]
+      if (!spec.setShadowBlocks) {
+        return [{
+          ...spec.json,
+          extensions,
+        }]
+      }
       return [{
         ...spec.json,
-        extensions: [...((spec.json.extensions as string[] | undefined) ?? []), getShadowExtensionName(spec.type)],
+        extensions: [...extensions, getShadowExtensionName(spec.type)],
       }]
     })
 
@@ -87,9 +111,14 @@ export function registerBlockSpecs() {
         init() {
           spec.init!.call(this)
           spec.setShadowBlocks?.call(this)
+          applySpecContextMenu(this, spec)
         },
       }
     }
+
+    Blockly.Extensions.register(getContextMenuExtensionName(spec.type), function(this: Blockly.Block) {
+      applySpecContextMenu(this, spec)
+    })
 
     if (spec.setShadowBlocks) {
       Blockly.Extensions.register(getShadowExtensionName(spec.type), spec.setShadowBlocks)

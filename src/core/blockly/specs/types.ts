@@ -15,6 +15,8 @@ export type BlockSpecCategory =
 export type BlockInitFunction = (this: Blockly.Block) => void
 export type BlockJsonDefinition = Record<string, unknown> & { type: string }
 export type BlockShadowStatesFunction = (this: Blockly.Block) => void
+export type BlockContextMenuOption = Blockly.ContextMenuRegistry.ContextMenuOption
+export type BlockContextMenuFunction = (this: Blockly.BlockSvg, options: BlockContextMenuOption[]) => void
 
 export type ShadowInputBlockValidatorFunction = (value: string) => string | null
 
@@ -26,4 +28,5 @@ export type BlockSpec = {
   generator: IrGeneratorFunction
   tags?: string[],
   setShadowBlocks?: BlockShadowStatesFunction
+  contextMenu?: BlockContextMenuFunction
 }

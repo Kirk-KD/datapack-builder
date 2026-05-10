@@ -7,7 +7,7 @@ import {
   VariableOperationNode, ExecuteNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode, TargetSelectorNode,
   VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode,
   TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode, OnPlayerMinesBlockNode,
-  FunctionTagNode, RaycastEntityNode, RaycastBlockNode
+  FunctionTagNode, RaycastEntityNode, RaycastBlockNode, TildeCaretNode, NumberNode, OptNumberNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
@@ -23,11 +23,14 @@ export interface IrVisitor<T> {
   visitOnTick(node: OnTickNode): T
   visitOnPlayerMinesBlock(node: OnPlayerMinesBlockNode): T
 
+  visitNumber(node: NumberNode): T
+  visitOptNumber(node: OptNumberNode): T
   visitLiteralInt(node: LiteralIntNode): T
   visitLiteralString(node: LiteralStringNode): T
   visitLiteralPosition(node: LiteralPositionNode): T
   visitLiteralRange(node: LiteralRangeNode): T
   visitLiteralRotation(node: LiteralRotationNode): T
+  visitTildeCaret(node: TildeCaretNode): T
 
   visitVariableMatches(node: VariableMatchesNode): T
   visitVariableCompare(node: VariableCompareNode): T
@@ -179,6 +182,18 @@ export abstract class SelectiveIrVisitor<T> implements IrVisitor<T> {
   }
 
   visitRaycastBlock(node: RaycastBlockNode): T {
+    this.disallow(node)
+  }
+
+  visitTildeCaret(node: TildeCaretNode): T {
+    this.disallow(node)
+  }
+
+  visitNumber(node: NumberNode): T {
+    this.disallow(node)
+  }
+
+  visitOptNumber(node: OptNumberNode): T {
     this.disallow(node)
   }
 }
