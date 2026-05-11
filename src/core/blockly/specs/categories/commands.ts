@@ -120,7 +120,6 @@ export const commandBlockSpecs: BlockSpec[] = [
     },
     setShadowBlocks(this) {
       setShadowState(this, 'SELECTOR', { type: 'mc_target_selector' })
-      setShadowState(this, 'TARGET', { type: 'mc_block_pos' })
     },
   },
   {
@@ -328,11 +327,9 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         this.appendValueInput(CLONE_BEGIN_NAME)
           .setCheck(['mc_proc_param', 'mc_block_pos'])
-        setShadowState(this, CLONE_BEGIN_NAME, { type: 'mc_block_pos' })
 
         this.appendValueInput(CLONE_END_NAME)
           .setCheck(['mc_proc_param', 'mc_block_pos'])
-        setShadowState(this, CLONE_END_NAME, { type: 'mc_block_pos' })
 
         this.appendDummyInput('2')
           .appendField('in dimension?')
@@ -347,7 +344,6 @@ export const commandBlockSpecs: BlockSpec[] = [
         this.appendValueInput(CLONE_DESTINATION_NAME)
           .setCheck(['mc_proc_param', 'mc_block_pos'])
           .appendField('to')
-        setShadowState(this, CLONE_DESTINATION_NAME, { type: 'mc_block_pos' })
 
         this.appendDummyInput('3')
           .appendField('in dimension?')
