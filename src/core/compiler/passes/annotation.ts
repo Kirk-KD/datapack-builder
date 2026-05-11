@@ -14,7 +14,9 @@ import {
   VariableNode,
   FunctionCallNode,
   TempVariableNode,
-  ItemStackNode, FunctionTagNode, NumberNode,
+  ItemStackNode,
+  FunctionTagNode,
+  NumberNode,
 } from '../ir'
 
 /**

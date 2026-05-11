@@ -8,9 +8,9 @@ import {
   type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
   LiteralStringNode, NumberNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode, OptNumberNode,
   type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
-  ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode, TildeCaretNode,
+  ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode, TildeNode, CaretNode,
   type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
-  VariableOperationNode, VariableSetNode, WhileNode
+  VariableOperationNode, VariableSetNode, WhileNode, type PositionComponentNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -306,9 +306,9 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [...x.pre, ...y.pre, ...z.pre],
       nodes: [new LiteralPositionNode(
-        x.nodes[0] as TildeCaretNode,
-        y.nodes[0] as TildeCaretNode,
-        z.nodes[0] as TildeCaretNode,
+        x.nodes[0] as OrParameter<PositionComponentNode>,
+        y.nodes[0] as OrParameter<PositionComponentNode>,
+        z.nodes[0] as OrParameter<PositionComponentNode>,
         node.sourceBlockId
       )]
     }
@@ -762,13 +762,27 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     }
   }
 
-  visitTildeCaret(node: TildeCaretNode): LoweredResult {
+  visitTilde(node: TildeNode): LoweredResult {
     const value = node.valueNode.accept(this)
     return {
       pre: [...value.pre],
       nodes: [
         new FragmentCompositeNode(
-          node.prefix ? [node.prefix, ...value.nodes] : [...value.nodes],
+          ['~', ...value.nodes],
+          node.sourceBlockId,
+          true
+        )
+      ]
+    }
+  }
+
+  visitCaret(node: CaretNode): LoweredResult {
+    const value = node.valueNode.accept(this)
+    return {
+      pre: [...value.pre],
+      nodes: [
+        new FragmentCompositeNode(
+          ['^', ...value.nodes],
           node.sourceBlockId,
           true
         )
