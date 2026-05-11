@@ -1,7 +1,7 @@
 import { createAssetCatalog } from './createAssetCatalog'
 import { createCatalog } from './createCatalog'
 
-const spriteModuleLoaders = import.meta.glob('../data/minecraft/item_sprites/*.png', {
+const spriteModuleLoaders = import.meta.glob('../data/minecraft/_item_sprites/*.png', {
   import: 'default',
 }) as Record<string, () => Promise<string>>
 
@@ -12,7 +12,7 @@ export type MinecraftItemEntry = {
 
 const itemCatalog = createCatalog({
   loadRaw: () =>
-    import('../../data/minecraft/item_sprite_lookup.json').then(({ default: lookup }) => lookup),
+    import('../../data/minecraft/_item_sprite_lookup.json').then(({ default: lookup }) => lookup),
   toEntries: (lookup) =>
     Object.entries(lookup).map(([name, spriteFileName]) => ({
       name,

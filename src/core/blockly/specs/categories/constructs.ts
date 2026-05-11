@@ -86,7 +86,7 @@ export const constructBlockSpecs: BlockSpec[] = [
                   })
                   const spriteField = this.getField(ITEM_SPRITE_FIELD_NAME)
                   if (spriteField) {
-                    spriteField.setValue(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined)
+                    spriteField.setValue(this.itemSpriteSrc_ ? `src/data/minecraft/_item_sprites/${this.itemSpriteSrc_}` : undefined)
                   }
                 })
                 else {
@@ -107,7 +107,7 @@ export const constructBlockSpecs: BlockSpec[] = [
         }
 
         this.appendDummyInput('input')
-          .appendField(new ItemSpriteField(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined), ITEM_SPRITE_FIELD_NAME)
+          .appendField(new ItemSpriteField(this.itemSpriteSrc_ ? `src/data/minecraft/_item_sprites/${this.itemSpriteSrc_}` : undefined), ITEM_SPRITE_FIELD_NAME)
           .appendField(new TextButton(
             getItemStackButtonText(this), openEditor), ITEM_STACK_EDITOR_FIELD_NAME)
       }

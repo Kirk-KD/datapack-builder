@@ -8,7 +8,7 @@ export type DataComponentSchemaEntry = {
 
 const dataComponentSchemaCatalog = createCatalog({
   loadRaw: () =>
-    import('../../data/minecraft/data_component_schema.json').then(
+    import('../../data/editor-schema/data_component_schema.json').then(
       ({ default: schema }) => schema as DataComponentSchemaEntry[],
     ),
   toEntries: (schema) => schema,
