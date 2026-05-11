@@ -12,6 +12,7 @@ import getToolboxContents from "./getToolboxContents.ts";
 import {procedureRegistry, variableRegistry} from "./registry";
 import {subscribeListeners} from "./specs/categories/procedures.ts";
 import type {WorkspaceCallbacks} from './workspaceCallbacks.ts'
+import {states} from './states.ts'
 
 const customTheme = Blockly.Theme.defineTheme('customDark', {
   base: DarkTheme,
@@ -101,6 +102,11 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
         name, params.map(({ name, type }) => procedureRegistry.createParameter(name, type))
       )
     })
+  })
+
+  // `deserializing` flag is set to true by `deserialize()` in `serialization.ts`
+  workspace.addChangeListener((e) => {
+    if (e.type === Blockly.Events.FINISHED_LOADING) states.deserializing = false
   })
 
   const unsubProcListeners = subscribeListeners(workspace)
