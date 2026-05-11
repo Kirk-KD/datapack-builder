@@ -1,19 +1,21 @@
 import {
-  getMinecraftItemByName,
-  loadMinecraftItemCatalog,
-  type MinecraftItemEntry
-} from '../../../../core/catalog'
+  getItemRegistry,
+  getItemSpritePath
+} from '../../../../core/minecraft'
+import type { MinecraftRegistry } from '../../../../core/minecraft/registry'
+import type { ItemEntry } from '../../../../core/minecraft'
 import type { EditorBaseProps } from '../../../../core/editor'
 import {useState, useEffect, useRef} from 'react'
 import ItemSprite from '../../components/ItemSprite.tsx'
-import ItemSearchList from './ItemSearchList.tsx'
+import ItemSearchList, {type ItemSearchEntry} from './ItemSearchList.tsx'
 import {Box} from "@mui/material";
 import TextInput from "../../components/TextInput.tsx";
 
 const DEFAULT_ITEM = 'cobblestone'
 
 export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Record<string, unknown>, string>) {
-  const [items, setItems] = useState<readonly MinecraftItemEntry[] | null>(null)
+  const [items, setItems] = useState<readonly ItemSearchEntry[] | null>(null)
+  const [registry, setRegistry] = useState<MinecraftRegistry<ItemEntry> | null>(null)
   const [searchString, setSearchString] = useState(DEFAULT_ITEM)
   const [selectedItemSrc, setSelectedItemSrc] = useState<string | null>(null)
   const [searchListVisible, setSearchListVisible] = useState(false)
@@ -21,9 +23,9 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
   const inputRef = useRef<HTMLInputElement>(null)
   const searchListAnchorRef = useRef<HTMLDivElement>(null)
 
-  const selectItem = ({name, spriteFileName}: {name: string, spriteFileName: string | null}) => {
+  const selectItem = ({name, spritePath}: {name: string, spritePath: string | null}) => {
     setSearchString(name)
-    setSelectedItemSrc(spriteFileName)
+    setSelectedItemSrc(spritePath)
     setState({
       compiler: 'item',
       error: false,
@@ -31,11 +33,10 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
     })
   }
 
-  const setDefaultItem = () => {
+  const setDefaultItem = (nextRegistry: MinecraftRegistry<ItemEntry>) => {
     setSearchString(DEFAULT_ITEM)
-    getMinecraftItemByName(DEFAULT_ITEM).then(item => {
-      if (item) setSelectedItemSrc(item.spriteFileName)
-    })
+    const hasDefault = nextRegistry.get(DEFAULT_ITEM)
+    setSelectedItemSrc(hasDefault ? getItemSpritePath(DEFAULT_ITEM) : null)
     setState({
       compiler: 'item',
       error: false,
@@ -44,14 +45,21 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
   }
 
   useEffect(() => {
-    loadMinecraftItemCatalog().then(catalog => {
-      setItems(catalog)
-      if (state.data === undefined) setDefaultItem()
-      else getMinecraftItemByName(state.data)
-        .then(item => selectItem({
-          name: state.data as string,
-          spriteFileName: item?.spriteFileName ?? null
-        }))
+    getItemRegistry().then(nextRegistry => {
+      setRegistry(nextRegistry)
+      setItems(nextRegistry.getAll().map(id => ({
+        name: id,
+        spritePath: getItemSpritePath(id)
+      })))
+      if (state.data === undefined) setDefaultItem(nextRegistry)
+      else {
+        const itemName = state.data as string
+        const hasItem = nextRegistry.get(itemName)
+        selectItem({
+          name: itemName,
+          spritePath: hasItem ? getItemSpritePath(itemName) : null
+        })
+      }
     })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -78,8 +86,10 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
               setState({ ...state, error: true })
               return
             }
-            getMinecraftItemByName(itemName).then(item => {
-              selectItem({name: itemName, spriteFileName: item?.spriteFileName ?? null})
+            const hasItem = registry?.get(itemName)
+            selectItem({
+              name: itemName,
+              spritePath: hasItem ? getItemSpritePath(itemName) : null
             })
           }}
           onFocus={() => setSearchListVisible(true)}
@@ -99,8 +109,8 @@ export default function ItemSelectorEditor({state, setState}: EditorBaseProps<Re
           searchString={searchString}
           open={searchListVisible}
           anchorEl={searchListAnchorRef}
-          onClickItem={({name, spriteFileName}) => {
-            selectItem({name, spriteFileName})
+          onClickItem={({name, spritePath}) => {
+            selectItem({name, spritePath})
             setSearchListVisible(false)
             inputRef.current?.blur()
           }}

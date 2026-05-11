@@ -23,10 +23,12 @@ const itemCatalog = createCatalog({
 
 const spriteCatalog = createAssetCatalog(spriteModuleLoaders)
 
+/** @deprecated Use getItemRegistry from src/core/minecraft instead. */
 export function loadMinecraftItemCatalog() {
   return itemCatalog.loadEntries()
 }
 
+/** @deprecated Use getItemRegistry/getItemSpritePath from src/core/minecraft instead. */
 export async function getMinecraftItemByName(name: string) {
   return itemCatalog.getByKey(name)
 }

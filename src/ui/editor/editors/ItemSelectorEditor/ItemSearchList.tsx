@@ -1,14 +1,13 @@
 import ItemSprite from "../../components/ItemSprite.tsx";
-import type {MinecraftItemEntry} from "../../../../core/catalog";
 import {memo, useMemo, useRef, useEffect} from "react";
 import { useVirtualizer } from '@tanstack/react-virtual'
 import {Box, Popper, Paper, Stack, Typography, ButtonBase} from "@mui/material";
 import * as React from "react";
 
-const ItemEntry = memo(({ name, src, onClick }: { name: string, src: string, onClick: (item: MinecraftItemEntry) => void }) => {
+const ItemEntry = memo(({ name, spritePath, onClick }: { name: string, spritePath: string, onClick: (item: ItemSearchEntry) => void }) => {
   return (
     <ButtonBase
-      onClick={() => onClick({name, spriteFileName: src})}
+      onClick={() => onClick({name, spritePath})}
       onMouseDown={e => e.preventDefault()}
       sx={{
         width: '100%',
@@ -29,16 +28,21 @@ const ItemEntry = memo(({ name, src, onClick }: { name: string, src: string, onC
 
         }}
       >
-        <ItemSprite size={25} src={src}/>
+        <ItemSprite size={25} src={spritePath}/>
         <Typography>{name}</Typography>
       </Stack>
     </ButtonBase>
   )
 })
 
+export type ItemSearchEntry = {
+  name: string
+  spritePath: string
+}
+
 type ItemSearchListProps = {
-  items: readonly MinecraftItemEntry[]
-  onClickItem: (item: MinecraftItemEntry) => void
+  items: readonly ItemSearchEntry[]
+  onClickItem: (item: ItemSearchEntry) => void
   open: boolean
   searchString: string
   anchorEl: React.RefObject<HTMLElement | null>
@@ -95,7 +99,7 @@ export default function ItemSearchList({items, onClickItem, open, searchString, 
           >
             <Box sx={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
               {virtualizer.getVirtualItems().map(virtualItem => {
-                const { name, spriteFileName } = filtered[virtualItem.index]
+                const { name, spritePath } = filtered[virtualItem.index]
                 return (
                   <Box
                     key={name}
@@ -106,7 +110,7 @@ export default function ItemSearchList({items, onClickItem, open, searchString, 
                       transform: `translateY(${virtualItem.start}px)`,
                     }}
                   >
-                    <ItemEntry name={name} src={spriteFileName} onClick={onClickItem} />
+                    <ItemEntry name={name} spritePath={spritePath} onClick={onClickItem} />
                   </Box>
                 )
               })}

@@ -7,7 +7,7 @@ type ItemSpriteProps = {
 }
 
 export default function ItemSprite({src, size, showSlot}: ItemSpriteProps) {
-  const padding = showSlot ? 8 : 0
+  const padding = showSlot ? 4 : 0
   return (
     <Box sx={{
       ...(showSlot ? {
@@ -22,7 +22,7 @@ export default function ItemSprite({src, size, showSlot}: ItemSpriteProps) {
       alignItems: 'center',
       justifyContent: 'center'
     }}>
-      {src && <img src={`src/data/minecraft/_item_sprites/${src}`} width={size-padding} height={size-padding} alt={''}/>}
+      {src && <img src={src} width={size - padding} height={size - padding} alt={''}/>}
     </Box>
   )
 }
