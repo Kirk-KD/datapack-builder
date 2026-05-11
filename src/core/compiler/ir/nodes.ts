@@ -220,27 +220,45 @@ export class LiteralStringNode extends FragmentNode {
   }
 }
 
-export class TildeCaretNode extends FragmentNode {
-  readonly prefix: '~' | '^' | null
-  readonly valueNode: OrParameter<NumberNode | OptNumberNode>
+export class TildeNode extends FragmentNode {
+  readonly valueNode: OrParameter<OptNumberNode>
 
-  constructor(prefix: '~' | '^' | null, valueNode: OrParameter<NumberNode | OptNumberNode>, sourceBlockId?: string | null) {
+  constructor(valueNode: OrParameter<OptNumberNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
-    this.prefix = prefix
     this.valueNode = valueNode
   }
 
   accept<T>(visitor: IrVisitor<T>): T {
-    return visitor.visitTildeCaret(this)
+    return visitor.visitTilde(this)
   }
 }
 
-export class LiteralPositionNode extends FragmentNode {
-  readonly xNode: TildeCaretNode
-  readonly yNode: TildeCaretNode
-  readonly zNode: TildeCaretNode
+export class CaretNode extends FragmentNode {
+  readonly valueNode: OrParameter<OptNumberNode>
 
-  constructor(xNode: TildeCaretNode, yNode: TildeCaretNode, zNode: TildeCaretNode, sourceBlockId?: string | null) {
+  constructor(valueNode: OrParameter<OptNumberNode>, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.valueNode = valueNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitCaret(this)
+  }
+}
+
+export type PositionComponentNode = NumberNode | TildeNode | CaretNode | FragmentCompositeNode
+
+export class LiteralPositionNode extends FragmentNode {
+  readonly xNode: OrParameter<PositionComponentNode>
+  readonly yNode: OrParameter<PositionComponentNode>
+  readonly zNode: OrParameter<PositionComponentNode>
+
+  constructor(
+    xNode: OrParameter<PositionComponentNode>,
+    yNode: OrParameter<PositionComponentNode>,
+    zNode: OrParameter<PositionComponentNode>,
+    sourceBlockId?: string | null
+  ) {
     super(sourceBlockId)
     this.xNode = xNode
     this.yNode = yNode

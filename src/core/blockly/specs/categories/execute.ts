@@ -112,8 +112,8 @@ function statementInputToIr<T extends IrNode>(block: Blockly.Block, name: string
 }
 
 const executeBlocksScanModeOptions: [string, string][] = [
-  ['all blockly', 'all'],
-  ['non-air blockly', 'masked'],
+  ['all blocks', 'all'],
+  ['non-air blocks', 'masked'],
 ]
 
 const executeScoreModeOptions: [string, string][] = [
@@ -682,24 +682,14 @@ export const executeBlockSpecs: BlockSpec[] = [
           appendScoreModeInputs(this, scoreModeField, this.scoreMode_)
         }
 
-        if (this.mode_ === 'biome' || this.mode_ === 'block' || this.mode_ === 'loaded') {
-          setShadowState(this, 'POS', { type: 'mc_block_pos' })
-        } else if (this.mode_ === 'blocks') {
-          setShadowState(this, 'START_POS', { type: 'mc_block_pos' })
-          setShadowState(this, 'END_POS', { type: 'mc_block_pos' })
-          setShadowState(this, 'DEST_POS', { type: 'mc_block_pos' })
-        } else if (this.mode_ === 'entity') {
+        if (this.mode_ === 'entity') {
           setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
         } else if (this.mode_ === 'data') {
-          if (this.dataKind_ === 'block') {
-            setShadowState(this, 'POS', { type: 'mc_block_pos' })
-          } else if (this.dataKind_ === 'entity') {
+          if (this.dataKind_ === 'entity') {
             setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
           }
         } else if (this.mode_ === 'items') {
-          if (this.itemsKind_ === 'block') {
-            setShadowState(this, 'SOURCE_POS', { type: 'mc_block_pos' })
-          } else if (this.itemsKind_ === 'entity') {
+          if (this.itemsKind_ === 'entity') {
             setShadowState(this, 'SOURCE', { type: 'mc_target_selector' })
           }
           setShadowState(this, 'SLOTS', {
@@ -814,9 +804,6 @@ export const executeBlockSpecs: BlockSpec[] = [
     [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
     block => new FragmentCompositeNode(['facing', valueToIr(block, 'POS')], block.id),
     {},
-    function(this: Blockly.Block) {
-      setShadowState(this, 'POS', { type: 'mc_block_pos' })
-    },
   ),
   executeModifierSpec(
     'execute_mod_facing_entity',
@@ -866,9 +853,6 @@ export const executeBlockSpecs: BlockSpec[] = [
     [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
     block => new FragmentCompositeNode(['positioned', valueToIr(block, 'POS')], block.id),
     {},
-    function(this: Blockly.Block) {
-      setShadowState(this, 'POS', { type: 'mc_block_pos' })
-    },
   ),
   executeModifierSpec(
     'execute_mod_positioned_as',
@@ -901,9 +885,6 @@ export const executeBlockSpecs: BlockSpec[] = [
     [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_proc_param'] }],
     block => new FragmentCompositeNode(['rotated', valueToIr(block, 'ROTATION')], block.id),
     {},
-    function(this: Blockly.Block) {
-      setShadowState(this, 'ROTATION', { type: 'mc_rotation' })
-    },
   ),
   executeModifierSpec(
     'execute_mod_rotated_as',
