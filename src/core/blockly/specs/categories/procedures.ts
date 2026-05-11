@@ -65,6 +65,18 @@ function syncProcedureParameterState(block: ProcParamBlock) {
   if (!block.disposed && block.updateShape_) block.updateShape_()
 }
 
+function getPreviousInputConnections(block: Blockly.Block) {
+  const previousConnections = new Map<string, Blockly.Block>()
+  for (const input of block.inputList) {
+    if (!input.name) continue
+    const targetBlock = input.connection?.targetBlock()
+    if (targetBlock) {
+      previousConnections.set(input.name, targetBlock)
+    }
+  }
+  return previousConnections
+}
+
 function createProcedureParameterBlock(
   workspace: Blockly.WorkspaceSvg,
   procedure: ProcedureRegistryEntry,
@@ -116,14 +128,7 @@ const procDefBlockSpec: BlockSpec = {
     block.setInputsInline(true)
 
     block.updateShape_ = function(this: ProcDefBlock) {
-      const previousConnections = new Map<string, Blockly.Block>()
-      for (const input of this.inputList) {
-        if (!input.name) continue
-        const targetBlock = input.connection?.targetBlock()
-        if (targetBlock) {
-          previousConnections.set(input.name, targetBlock)
-        }
-      }
+      const previousConnections = getPreviousInputConnections(this)
 
       this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
@@ -200,6 +205,8 @@ const procCallBlockSpec: BlockSpec = {
     block.setInputsInline(true)
 
     block.updateShape_ = function(this: ProcCallBlock) {
+      const previousConnections = getPreviousInputConnections(this)
+
       this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
       if (!this.procedure) {
@@ -212,8 +219,14 @@ const procCallBlockSpec: BlockSpec = {
           .appendField(this.procedure.name)
 
         this.procedure.parameters.forEach(parameter => {
-          this.appendValueInput(`ARG_${parameter.id}`)
+          const inputName = `ARG_${parameter.id}`
+          this.appendValueInput(inputName)
             .appendField(`${parameter.name}:`)
+
+          const previousBlock = previousConnections.get(inputName)
+          if (previousBlock?.outputConnection) {
+            this.getInput(inputName)?.connection?.connect(previousBlock.outputConnection)
+          }
         })
       }
     }
