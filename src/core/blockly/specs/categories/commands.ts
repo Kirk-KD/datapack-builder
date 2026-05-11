@@ -4,7 +4,7 @@ import * as Blockly from "blockly"
 import {colours} from "../../colours.ts";
 import { createStateCheckbox, createStateDropdown } from "../dynamicFields.ts";
 import { bindExtraState } from "../extraState.ts";
-import {valueToIr, CommandCompositeNode} from '../../../compiler'
+import {valueToIr, CommandCompositeNode, LiteralStringNode} from '../../../compiler'
 
 const sayChecks = ['mc_string', 'mc_int', 'mc_proc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
 
@@ -57,6 +57,10 @@ type CloneBlock = Blockly.BlockSvg & {
   cloneMode_: CloneCloneMode,
   updateShape_: (this: CloneBlock) => void,
 }
+
+const SUMMON_ENTITY_NAME = 'ENTITY'
+const SUMMON_POS_NAME = 'POS'
+const SUMMON_NBT_NAME = 'NBT'
 
 export const commandBlockSpecs: BlockSpec[] = [
   {
@@ -121,6 +125,51 @@ export const commandBlockSpecs: BlockSpec[] = [
     setShadowBlocks(this) {
       setShadowState(this, 'SELECTOR', { type: 'mc_target_selector' })
     },
+  },
+  {
+    type: 'mc_summon',
+    category: 'commands',
+    json: {
+      type: 'mc_summon',
+      message0: 'summon %1 %2 nbt: %3',
+      args0: [
+        {
+          type: 'input_value',
+          name: SUMMON_ENTITY_NAME,
+          check: ['mc_string'],
+        },
+        {
+          type: 'input_value',
+          name: SUMMON_POS_NAME,
+          check: ['mc_block_pos'],
+        },
+        {
+          type: 'input_value',
+          name: SUMMON_NBT_NAME,
+          check: ['mc_string'],
+        }
+      ],
+      inputsInline: true,
+      tooltip: 'Summons an entity with position and NBT data',
+      previousStatement: null,
+      nextStatement: null,
+    },
+    generator(block) {
+      const entity = valueToIr(block, SUMMON_ENTITY_NAME)
+      const posTarget = block.getInputTargetBlock(SUMMON_POS_NAME)
+      const pos = posTarget ? valueToIr(block, SUMMON_POS_NAME) : null
+      const nbtTarget = block.getInputTargetBlock(SUMMON_NBT_NAME)
+      let nbt = nbtTarget ? valueToIr(block, SUMMON_NBT_NAME) : null
+      if (nbt instanceof LiteralStringNode && nbt.value.trim() === '') nbt = null
+      return new CommandCompositeNode(
+        ['summon', entity, pos, nbt].filter(e => e !== null),
+        block.id
+      )
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, SUMMON_ENTITY_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:pig' } })
+      setShadowState(this, SUMMON_NBT_NAME, { type: 'mc_string', fields: { VALUE: '' } })
+    }
   },
   {
     type: 'mc_advancement',

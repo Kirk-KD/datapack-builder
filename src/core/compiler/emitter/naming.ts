@@ -13,7 +13,7 @@ export class Naming {
   }
 
   internalMcfunctionFilePath(name: string) {
-    return `data/${this.internalNamespace()}/function/${name}.mcfunction`
+    return `data/${this.internalNamespace()}/function/${name.toLowerCase()}.mcfunction`
   }
 
   variableObjectiveName() {
@@ -25,15 +25,15 @@ export class Naming {
   }
 
   procedureName(name: string) {
-    return 'proc_' + name
+    return 'proc_' + name.toLowerCase()
   }
 
   procedureStorageName(name: string) {
-    return `${this.internalNamespace()}:${this.procedureName(name)}_ARGS`
+    return `${this.internalNamespace()}:${this.procedureName(name)}_args`
   }
 
   procedureStoragePath(paramName: string) {
-    return `args.${paramName}` // Not using quotes around paramName; macro syntax won't allow non-alphanumeric characters anyway
+    return `${paramName.toLowerCase()}` // Not using quotes around paramName; macro syntax won't allow non-alphanumeric characters anyway
   }
 
   initializedFlagName() {
