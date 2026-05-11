@@ -13,6 +13,7 @@ import {
   blockToIr,
   nextBlocksToIr
 } from '../../../compiler'
+import {states} from '../../states.ts'
 
 type ProcBlockState = {
   procedure: ProcedureRegistryEntry | null
@@ -346,6 +347,8 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
   ]
 
   workspace.addChangeListener((e: Blockly.Events.Abstract)=> {
+    if (states.deserializing) return
+
     if (e.type === Blockly.Events.BLOCK_DELETE) {
       const blockDeleteEvent = e as Blockly.Events.BlockDelete
       const blockData = blockDeleteEvent.oldJson

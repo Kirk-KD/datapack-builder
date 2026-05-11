@@ -2,6 +2,7 @@ import type {BlocklyRegistryData, BlocklyWorkspaceData, ProjectSave, Serializati
 import * as Blockly from "blockly";
 import {useProjectConfigStore} from "../../stores";
 import {procedureRegistry, variableRegistry} from "../blockly/registry";
+import {states} from '../blockly'
 
 export function serialize({ workspace }: SerializationOptions): ProjectSave {
   const blocklyWorkspace: BlocklyWorkspaceData = Blockly.serialization.workspaces.save(workspace)
@@ -20,8 +21,13 @@ export function serialize({ workspace }: SerializationOptions): ProjectSave {
 }
 
 export function deserialize({ save, workspace }: SerializationOptions & { save: ProjectSave }) {
+  states.deserializing = true
+
   variableRegistry.replace(save.blocklyRegistry.variableEntries)
   procedureRegistry.replace(save.blocklyRegistry.procedureEntries)
   Blockly.serialization.workspaces.load(save.blocklyWorkspace, workspace)
+
   useProjectConfigStore.getState().replaceConfig(save.projectConfig)
+
+  // states.deserializing = false
 }
