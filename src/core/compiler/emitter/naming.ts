@@ -29,11 +29,11 @@ export class Naming {
   }
 
   procedureStorageName(name: string) {
-    return `${this.internalNamespace()}:${this.procedureName(name)}_ARGS`
+    return `${this.internalNamespace()}:${this.procedureName(name)}_args`
   }
 
   procedureStoragePath(paramName: string) {
-    return `args.${paramName}` // Not using quotes around paramName; macro syntax won't allow non-alphanumeric characters anyway
+    return `${paramName}_args` // Not using quotes around paramName; macro syntax won't allow non-alphanumeric characters anyway
   }
 
   initializedFlagName() {
