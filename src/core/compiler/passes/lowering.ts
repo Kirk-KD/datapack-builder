@@ -188,7 +188,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     }
     return {
       pre,
-      nodes: [new CommandCompositeNode(parts, node.sourceBlockId)]
+      nodes: [new CommandCompositeNode(parts, node.sourceBlockId, node.noSpace)]
     }
   }
 
@@ -258,7 +258,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     }
     return {
       pre,
-      nodes: [new FragmentCompositeNode(parts, node.sourceBlockId)]
+      nodes: [new FragmentCompositeNode(parts, node.sourceBlockId, node.noSpace)]
     }
   }
 
