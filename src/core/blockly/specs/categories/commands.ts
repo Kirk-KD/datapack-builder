@@ -473,6 +473,52 @@ export const commandBlockSpecs: BlockSpec[] = [
     }
   },
   {
+    type: 'mc_setblock',
+    category: 'commands',
+    json: {
+      type: 'mc_setblock',
+      message0: 'setblock %1 %2 %3',
+      args0: [
+        {
+          type: 'input_value',
+          name: 'POS',
+          check: ['mc_block_pos'],
+        },
+        {
+          type: 'input_value',
+          name: 'BLOCK',
+          check: ['mc_string'],
+        },
+        {
+          type: 'field_dropdown',
+          name: 'MODE',
+          options: [
+            ['destroy', 'destroy'],
+            ['keep', 'keep'],
+            ['replace', 'replace'],
+            ['strict', 'strict'],
+          ],
+        },
+      ],
+      inputsInline: true,
+      tooltip: 'Sets a block at the given position',
+      previousStatement: null,
+      nextStatement: null,
+    },
+    generator(block) {
+      const pos = valueToIr(block, 'POS')
+      const blockName = valueToIr(block, 'BLOCK')
+      const mode = block.getFieldValue('MODE')
+      return new CommandCompositeNode(
+        ['setblock', pos, blockName, mode],
+        block.id
+      )
+    },
+    setShadowBlocks(this) {
+      setShadowState(this, 'BLOCK', { type: 'mc_string', fields: { VALUE: 'air' } })
+    },
+  },
+  {
     type: 'mc_raw_cmd',
     category: 'commands',
     json: {
