@@ -60,7 +60,11 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
   }
 
   visitFunctionDefinition(node: FunctionDefinitionNode): Segment[] {
+    // Update parent procedure to be this node's procedure if it is user-defined.
+    if (node.procedure) this.parentProcedure = node.procedure
     const bodySegments = node.bodyNodes.flatMap(n => n.accept(this))
+    if (node.procedure) this.parentProcedure = null
+
     this.files.with(this.naming.internalMcfunctionFilePath(node.name)).write(bodySegments)
     return []
   }
@@ -74,9 +78,6 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
     let storage = ''
     if (!node.procedure && this.parentProcedure?.parameters.length)
       storage = ` with storage ${this.naming.procedureStorageName(this.parentProcedure.name)}`
-
-    // Update parent procedure to be this node's procedure if it is user-defined.
-    if (node.procedure) this.parentProcedure = node.procedure
 
     return [new Segment(
       `function ${this.naming.internalNamespace()}:${node.name}` + storage,

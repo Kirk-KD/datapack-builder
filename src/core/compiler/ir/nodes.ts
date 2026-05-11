@@ -100,11 +100,13 @@ export class FragmentCompositeNode extends FragmentNode {
 export class FunctionDefinitionNode extends IrNode {
   readonly name: string
   readonly bodyNodes: CommandNode[]
+  readonly procedure: ProcedureRegistryEntry | null
 
-  constructor(name: string, bodyNodes: CommandNode[], sourceBlockId?: string | null) {
+  constructor(name: string, bodyNodes: CommandNode[], procedure: ProcedureRegistryEntry | null, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.name = name
     this.bodyNodes = bodyNodes
+    this.procedure = procedure
   }
 
   accept<T>(visitor: IrVisitor<T>): T {

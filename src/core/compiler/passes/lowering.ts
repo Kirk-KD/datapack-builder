@@ -137,7 +137,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           ], options.sourceBlockId),
           // Execute body commands
           ...this.lowerBody(options.bodyNodes)
-        ], options.sourceBlockId),
+        ], null, options.sourceBlockId),
 
         // Define raycast mcfunction (checks for hit and advances the ray)
         new FunctionDefinitionNode(raycastFuncName, [
@@ -158,7 +158,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
             // Recurse
             'run ', new FunctionCallNode(raycastFuncName, null, options.sourceBlockId),
           ], options.sourceBlockId, true)
-        ], options.sourceBlockId),
+        ], null, options.sourceBlockId),
 
         // Initialize hit flag
         new CommandCompositeNode([
@@ -233,7 +233,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre,
       nodes: [
-        new FunctionDefinitionNode(bodyFuncName, this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionDefinitionNode(bodyFuncName, this.lowerBody(node.bodyNodes), null, node.sourceBlockId),
         new CommandCompositeNode([
           'execute',
           ...clauses,
@@ -273,8 +273,8 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: condition.pre,
       nodes: [
-        trueFuncName ? new FunctionDefinitionNode(trueFuncName, this.lowerBody(node.trueBodyNodes), node.sourceBlockId) : null,
-        falseFuncName ? new FunctionDefinitionNode(falseFuncName, this.lowerBody(node.falseBodyNodes), node.sourceBlockId) : null,
+        trueFuncName ? new FunctionDefinitionNode(trueFuncName, this.lowerBody(node.trueBodyNodes), null, node.sourceBlockId) : null,
+        falseFuncName ? new FunctionDefinitionNode(falseFuncName, this.lowerBody(node.falseBodyNodes), null, node.sourceBlockId) : null,
         trueFuncName ? new CommandCompositeNode([
           'execute if',
           condition.nodes[0],
@@ -348,7 +348,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [],
       nodes: [
-        new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionDefinitionNode('load', this.lowerBody(node.bodyNodes), null, node.sourceBlockId),
         new FunctionTagNode('load', 'load', node.sourceBlockId)
       ]
     }
@@ -358,7 +358,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [],
       nodes: [
-        new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), node.sourceBlockId),
+        new FunctionDefinitionNode('tick', this.lowerBody(node.bodyNodes), null, node.sourceBlockId),
         new FunctionTagNode('tick', 'tick', node.sourceBlockId)
       ]
     }
@@ -393,10 +393,10 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           new CommandCompositeNode([
             `scoreboard objectives add ${minedObjName} minecraft.mined:minecraft.`, node.blockPredicate
           ], node.sourceBlockId, true),
-        ], node.sourceBlockId),
+        ], null, node.sourceBlockId),
 
         // Define a wrapper function for raycast
-        new FunctionDefinitionNode(raycastFuncName, raycast.nodes as CommandNode[], node.sourceBlockId),
+        new FunctionDefinitionNode(raycastFuncName, raycast.nodes as CommandNode[], null, node.sourceBlockId),
 
         // A block was broken if objective isn't 0
         new FunctionDefinitionNode(tickFuncName, [
@@ -408,7 +408,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           new CommandCompositeNode([
             `scoreboard players reset @a ${minedObjName}`
           ], node.sourceBlockId),
-        ], node.sourceBlockId),
+        ], null, node.sourceBlockId),
 
         // Register function tags
         new FunctionTagNode('load', loadFuncName, node.sourceBlockId),
@@ -482,6 +482,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
         new FunctionDefinitionNode(
           this.naming.procedureName(node.procedureEntry.name),
           this.lowerBody(node.bodyNodes),
+          node.procedureEntry,
           node.sourceBlockId
         )
       ]
@@ -667,6 +668,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
               'run', new FunctionCallNode(whileBodyFuncName, null, node.sourceBlockId)
             ], node.sourceBlockId)
           ],
+          null,
           node.sourceBlockId
         ),
         new FunctionDefinitionNode(
@@ -677,6 +679,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
               new FunctionCallNode(whileFuncName, null, node.sourceBlockId)
             ], node.sourceBlockId)
           ],
+          null,
           node.sourceBlockId
         ),
         new CommandCompositeNode([
@@ -716,7 +719,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           ], node.sourceBlockId),
           // Execute body commands
           ...this.lowerBody(node.bodyNodes)
-        ], node.sourceBlockId),
+        ], null, node.sourceBlockId),
 
         // Define raycast mcfunction (checks for hit and advances the ray)
         new FunctionDefinitionNode(raycastFuncName, [
@@ -735,7 +738,7 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
             // Recurse
             'run ', new FunctionCallNode(raycastFuncName, null, node.sourceBlockId),
           ], node.sourceBlockId, true)
-        ], node.sourceBlockId),
+        ], null, node.sourceBlockId),
 
         // Initialize hit flag
         new CommandCompositeNode([
