@@ -1,9 +1,8 @@
-import {AppBar, Box, Button, Stack, Toolbar} from "@mui/material";
+import {AppBar, Box, Stack, Toolbar} from "@mui/material";
 import {MenuButton} from "./MenuButton.tsx";
 import {ProjectNameDisplay} from "./ProjectNameDisplay.tsx";
 import {ActionButtons} from "./ActionButtons.tsx";
 import {useActions} from "../useActions.tsx";
-import {getItemRegistry, getItemSpritePath} from '../../../core/minecraft'
 
 export function MenuBar() {
   const actions = useActions()
@@ -44,21 +43,6 @@ export function MenuBar() {
               onClick: () => actions.newProject()
             }
           ]}/>
-          {/* TODO DEBUG BUTTON, REMOVE LATER */}
-          <Button onClick={() => {
-            getItemRegistry().then(async reg => {
-              const ids = reg.getAll()
-              const results = await Promise.all(
-                ids.map(async id => ({
-                  id,
-                  exists: await fetch(getItemSpritePath(id), { method: 'HEAD' }).then(r => r.ok)
-                }))
-              )
-              const missing = results.filter(r => !r.exists).map(r => r.id)
-              console.log('Missing:', missing)
-              console.log(`${missing.length} / ${ids.length} missing`)
-            })
-          }}>DEBUG</Button>
         </Stack>
 
         <Stack direction={'row-reverse'} sx={{
