@@ -1,12 +1,12 @@
 import DropdownInput from "../../components/DropdownInput.tsx";
 import ItemComponentContainer from "./ItemComponentContainer.tsx";
 import type {AnyEditorState, AnyEditorStateCallback, EditorSchema, ItemComponent} from "../../../../core/editor";
-import {type SetStateAction, useEffect, useState} from "react";
-import {loadDataComponentSchemas} from "../../../../core/catalog";
+import {loadDataComponentSchemas} from "../../../../core/editor";
 import {loadFromSchema} from "../../loadFromSchema.tsx";
 import {inferCompilerType} from "../../../../core/compiler";
 import {Stack, Typography} from "@mui/material";
 import EditorButton from "../../components/EditorButton.tsx";
+import {type SetStateAction, useEffect, useState} from "react";
 
 type ItemComponentListProps = {
   itemComponents: ItemComponent[]

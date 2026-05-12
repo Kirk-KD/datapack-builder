@@ -8,7 +8,7 @@ import {ItemSpriteField} from "../../fields/itemSpriteField.ts";
 import * as Blockly from "blockly";
 import {colours} from "../../colours.ts";
 import {TextButton} from "../../fields/textButton.ts";
-import {getMinecraftItemByName} from "../../../catalog";
+import {getItemRegistry, getItemSpritePath} from "../../../minecraft";
 import {ItemStackNode} from '../../../compiler'
 
 type ItemStackBlockState = {
@@ -80,16 +80,18 @@ export const constructBlockSpecs: BlockSpec[] = [
                 }
 
                 const itemName = this.itemStackEditorState_.data?.item.data
-                if (itemName) getMinecraftItemByName(itemName).then(result => {
-                  mutateExtraState(this, () => {
-                    this.itemSpriteSrc_ = result?.spriteFileName || null
+                if (itemName) {
+                  getItemRegistry().then(registry => {
+                    const hasItem = registry.get(itemName)
+                    mutateExtraState(this, () => {
+                      this.itemSpriteSrc_ = hasItem ? getItemSpritePath(itemName) : null
+                    })
+                    const spriteField = this.getField(ITEM_SPRITE_FIELD_NAME)
+                    if (spriteField) {
+                      spriteField.setValue(this.itemSpriteSrc_ ?? undefined)
+                    }
                   })
-                  const spriteField = this.getField(ITEM_SPRITE_FIELD_NAME)
-                  if (spriteField) {
-                    spriteField.setValue(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined)
-                  }
-                })
-                else {
+                } else {
                   mutateExtraState(this, () => {
                     this.itemSpriteSrc_ = null
                   })
@@ -107,7 +109,7 @@ export const constructBlockSpecs: BlockSpec[] = [
         }
 
         this.appendDummyInput('input')
-          .appendField(new ItemSpriteField(this.itemSpriteSrc_ ? `src/data/minecraft/item_sprites/${this.itemSpriteSrc_}` : undefined), ITEM_SPRITE_FIELD_NAME)
+          .appendField(new ItemSpriteField(this.itemSpriteSrc_ ?? undefined), ITEM_SPRITE_FIELD_NAME)
           .appendField(new TextButton(
             getItemStackButtonText(this), openEditor), ITEM_STACK_EDITOR_FIELD_NAME)
       }
