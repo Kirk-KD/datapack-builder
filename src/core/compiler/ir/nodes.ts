@@ -223,9 +223,9 @@ export class LiteralStringNode extends FragmentNode {
 }
 
 export class TildeNode extends FragmentNode {
-  readonly valueNode: OrParameter<OptNumberNode>
+  readonly valueNode: OrParameter<OptNumberNode | LiteralIntNode>
 
-  constructor(valueNode: OrParameter<OptNumberNode>, sourceBlockId?: string | null) {
+  constructor(valueNode: OrParameter<OptNumberNode | LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.valueNode = valueNode
   }
@@ -236,9 +236,9 @@ export class TildeNode extends FragmentNode {
 }
 
 export class CaretNode extends FragmentNode {
-  readonly valueNode: OrParameter<OptNumberNode>
+  readonly valueNode: OrParameter<OptNumberNode | LiteralIntNode>
 
-  constructor(valueNode: OrParameter<OptNumberNode>, sourceBlockId?: string | null) {
+  constructor(valueNode: OrParameter<OptNumberNode | LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.valueNode = valueNode
   }
@@ -248,7 +248,9 @@ export class CaretNode extends FragmentNode {
   }
 }
 
-export type PositionComponentNode = NumberNode | TildeNode | CaretNode | FragmentCompositeNode
+export type PositionComponentNode = NumberNode | LiteralIntNode | TildeNode | CaretNode | FragmentCompositeNode
+export type RangeComponentNode = NumberNode | LiteralIntNode | FragmentCompositeNode
+export type RotationComponentNode = NumberNode | LiteralIntNode | TildeNode | FragmentCompositeNode
 
 export class LiteralPositionNode extends FragmentNode {
   readonly xNode: OrParameter<PositionComponentNode>
@@ -273,10 +275,14 @@ export class LiteralPositionNode extends FragmentNode {
 }
 
 export class LiteralRangeNode extends FragmentNode {
-  readonly minNode: LiteralIntNode // TODO add number type (not just int)
-  readonly maxNode: LiteralIntNode
+  readonly minNode: OrParameter<RangeComponentNode>
+  readonly maxNode: OrParameter<RangeComponentNode>
 
-  constructor(minNode: LiteralIntNode, maxNode: LiteralIntNode, sourceBlockId?: string | null) {
+  constructor(
+    minNode: OrParameter<RangeComponentNode>,
+    maxNode: OrParameter<RangeComponentNode>,
+    sourceBlockId?: string | null
+  ) {
     super(sourceBlockId)
     this.minNode = minNode
     this.maxNode = maxNode
@@ -288,10 +294,14 @@ export class LiteralRangeNode extends FragmentNode {
 }
 
 export class LiteralRotationNode extends FragmentNode {
-  readonly yawNode: LiteralStringNode
-  readonly pitchNode: LiteralStringNode
+  readonly yawNode: OrParameter<RotationComponentNode>
+  readonly pitchNode: OrParameter<RotationComponentNode>
 
-  constructor(yawNode: LiteralStringNode, pitchNode: LiteralStringNode, sourceBlockId?: string | null) {
+  constructor(
+    yawNode: OrParameter<RotationComponentNode>,
+    pitchNode: OrParameter<RotationComponentNode>,
+    sourceBlockId?: string | null
+  ) {
     super(sourceBlockId)
     this.yawNode = yawNode
     this.pitchNode = pitchNode

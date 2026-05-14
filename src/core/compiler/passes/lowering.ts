@@ -10,7 +10,8 @@ import {
   type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
   ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode, TildeNode, CaretNode,
   type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
-  VariableOperationNode, VariableSetNode, WhileNode, type PositionComponentNode
+  VariableOperationNode, VariableSetNode, WhileNode, type PositionComponentNode, type RangeComponentNode,
+  type RotationComponentNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -320,8 +321,8 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [...min.pre, ...max.pre],
       nodes: [new LiteralRangeNode(
-        min.nodes[0] as LiteralIntNode,
-        max.nodes[0] as LiteralIntNode,
+        min.nodes[0] as OrParameter<RangeComponentNode>,
+        max.nodes[0] as OrParameter<RangeComponentNode>,
         node.sourceBlockId
       )]
     }
@@ -333,8 +334,8 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [...yaw.pre, ...pitch.pre],
       nodes: [new LiteralRotationNode(
-        yaw.nodes[0] as LiteralStringNode,
-        pitch.nodes[0] as LiteralStringNode,
+        yaw.nodes[0] as OrParameter<RotationComponentNode>,
+        pitch.nodes[0] as OrParameter<RotationComponentNode>,
         node.sourceBlockId
       )]
     }
