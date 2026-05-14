@@ -115,7 +115,13 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
 
   // `deserializing` flag is set to true by `deserialize()` in `serialization.ts`
   workspace.addChangeListener((e) => {
-    if (e.type === Blockly.Events.FINISHED_LOADING) states.deserializing = false
+    if (e.type === Blockly.Events.FINISHED_LOADING) {
+      states.deserializing = false
+      workspace.updateToolbox({
+        kind: 'categoryToolbox',
+        contents: getToolboxContents(workspace)
+      })
+    }
   })
 
   const unsubProcListeners = subscribeProcedureListeners(workspace)
