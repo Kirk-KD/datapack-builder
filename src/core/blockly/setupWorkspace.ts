@@ -9,8 +9,9 @@ import {
 import {colours} from "./colours.ts"
 import theme from "../../theme.ts"
 import getToolboxContents from "./getToolboxContents.ts";
-import {procedureRegistry, variableRegistry} from "./registry";
-import {subscribeListeners} from "./specs/categories/procedures.ts";
+import {constantRegistry, procedureRegistry, variableRegistry} from "./registry";
+import {subscribeListeners as subscribeProcedureListeners} from "./specs/categories/procedures.ts";
+import {subscribeListeners as subscribeConstantListeners} from './specs/categories/constants.ts'
 import type {WorkspaceCallbacks} from './workspaceCallbacks.ts'
 import {states} from './states.ts'
 
@@ -104,15 +105,25 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
     })
   })
 
+  // TODO placeholder
+  workspace.registerButtonCallback('CREATE_CONSTANT', () => {
+    constantRegistry.add({
+      name: prompt('Name?') as string,
+      valueType: 'int'
+    })
+  })
+
   // `deserializing` flag is set to true by `deserialize()` in `serialization.ts`
   workspace.addChangeListener((e) => {
     if (e.type === Blockly.Events.FINISHED_LOADING) states.deserializing = false
   })
 
-  const unsubProcListeners = subscribeListeners(workspace)
+  const unsubProcListeners = subscribeProcedureListeners(workspace)
+  const unsubConstantListeners = subscribeConstantListeners(workspace)
 
   return () => {
     unsubProcListeners()
+    unsubConstantListeners()
   }
 }
 

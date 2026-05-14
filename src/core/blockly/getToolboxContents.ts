@@ -1,6 +1,7 @@
 import {colours} from './colours'
 import { getBlockTypesByCategory } from './specs/blockRegistry'
 import {getProcCallBlocks} from "./specs/categories/procedures.ts";
+import {getConstantGetBlocks} from './specs/categories/constants.ts';
 
 export default function getToolboxContents() {
   return [
@@ -49,6 +50,23 @@ export default function getToolboxContents() {
         text: 'Create variable',
         callbackKey: 'CREATE_VARIABLE'
       }, ...getBlockTypesByCategory('variable').map(type => ({ kind: 'block', type }))]
+    },
+    {
+      kind: 'category',
+      name: 'Constants',
+      colour: colours.constants,
+      contents: [
+        {
+          kind: 'button',
+          text: 'Create constant',
+          callbackKey: 'CREATE_CONSTANT'
+        },
+        {
+          kind: 'block',
+          type: 'constants'
+        },
+        ...getConstantGetBlocks()
+      ]
     },
     {
       kind: "category",
