@@ -33,6 +33,7 @@ const constantValueChecks: Record<ConstantValueType, string> = {
   int: valueTypes.Int,
   string: valueTypes.String,
   position: valueTypes.Position,
+  item_stack: valueTypes.ItemStack
 }
 
 function syncConstantState(block: ConstantDefBlock | ConstantGetBlock) {

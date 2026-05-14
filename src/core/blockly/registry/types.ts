@@ -20,7 +20,7 @@ export interface ProcedureRegistryEntry {
   parameters: ProcedureParameterRegistryEntry[]
 }
 
-export type ConstantValueType = 'int' | 'string' | 'position'  // Add more later, entities etc.
+export type ConstantValueType = 'int' | 'string' | 'position' | 'item_stack'  // Add more later, entities etc.
 
 export interface ConstantRegistryEntry {
   name: string
