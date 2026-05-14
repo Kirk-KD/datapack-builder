@@ -10,6 +10,7 @@ import {colours} from "../../colours.ts";
 import {TextButton} from "../../fields/textButton.ts";
 import {getItemRegistry, getItemSpritePath} from "../../../minecraft";
 import {ItemStackNode} from '../../../compiler'
+import {valueTypes} from '../valueTypes'
 
 type ItemStackBlockState = {
   itemStackEditorState_: EditorState<ItemStackEditorResult>
@@ -29,7 +30,7 @@ function getItemStackButtonText(block: ItemStackBlock) {
 
 export const constructBlockSpecs: BlockSpec[] = [
   {
-    type: 'mc_item_stack',
+    type: valueTypes.ItemStack,
     category: 'constructs',
     init(this: Blockly.Block) {
       const block = this as ItemStackBlock
@@ -45,7 +46,7 @@ export const constructBlockSpecs: BlockSpec[] = [
       block.setTooltip('')
       block.setHelpUrl('')
       block.setInputsInline(true)
-      block.setOutput(true, 'mc_item_stack')
+      block.setOutput(true, valueTypes.ItemStack)
 
       block.updateShape_ = function(this: ItemStackBlock) {
         this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))

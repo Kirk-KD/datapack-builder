@@ -5,6 +5,7 @@ import {constantRegistry, type ConstantRegistryEntry, type ConstantValueType} fr
 import {colours} from '../../colours.ts'
 import getToolboxContents from '../../getToolboxContents.ts'
 import {states} from '../../states.ts'
+import {valueTypes} from '../valueTypes'
 
 const INPUT_VALUE = 'VALUE'
 
@@ -17,9 +18,9 @@ type ConstantDefBlock = StatefulBlock & ConstantBlockState
 type ConstantGetBlock = StatefulBlock & ConstantBlockState
 
 const constantValueChecks: Record<ConstantValueType, string> = {
-  int: 'mc_int',
-  string: 'mc_string',
-  position: 'mc_block_pos',
+  int: valueTypes.Int,
+  string: valueTypes.String,
+  position: valueTypes.Position,
 }
 
 function syncConstantState(block: ConstantDefBlock | ConstantGetBlock) {
@@ -127,7 +128,7 @@ const constantsBlockSpec: BlockSpec = {
       {
         type: 'input_statement',
         name: 'DEFINITIONS',
-        check: ['constant_def']
+          check: [valueTypes.ConstantDef]
       }
     ]
   },

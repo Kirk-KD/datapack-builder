@@ -4,6 +4,7 @@ import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
 import { createStateDropdown } from '../dynamicFields.ts'
 import { blockToIr, valueToIr, ExecuteNode, type IrNode, FragmentCompositeNode } from '../../../compiler'
+import {valueTypes} from '../valueTypes'
 
 const INPUT_MODIFIER_STACK = 'MODIFIER_STACK'
 const INPUT_RUN_STACK = 'RUN_STACK'
@@ -125,7 +126,7 @@ const executeScoreModeOptions: [string, string][] = [
   ['matches', 'MATCHES'],
 ]
 
-const selectorLikeChecks = ['mc_string', 'mc_target_selector', 'mc_proc_param']
+const selectorLikeChecks = [valueTypes.String, valueTypes.TargetSelector, valueTypes.ProcParam]
 
 const scoreTargetArg: ExecuteConditionInputConfig = {
   kind: 'value',
@@ -136,7 +137,7 @@ const scoreTargetArg: ExecuteConditionInputConfig = {
 const scoreTargetObjectiveArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'TARGET_OBJECTIVE',
-  check: ['mc_string', 'mc_proc_param'],
+  check: [valueTypes.String, valueTypes.ProcParam],
 }
 
 const scoreSourceArg: ExecuteConditionInputConfig = {
@@ -148,13 +149,13 @@ const scoreSourceArg: ExecuteConditionInputConfig = {
 const scoreSourceObjectiveArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'SOURCE_OBJECTIVE',
-  check: ['mc_string', 'mc_proc_param'],
+  check: [valueTypes.String, valueTypes.ProcParam],
 }
 
 const scoreRangeArg: ExecuteConditionInputConfig = {
   kind: 'value',
   name: 'RANGE',
-  check: ['mc_range'],
+  check: [valueTypes.Range],
 }
 
 /**
@@ -164,7 +165,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   biome: {
     message: 'at %1 is %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'POS', check: [valueTypes.Position, valueTypes.ProcParam] },
       { kind: 'field_input', name: 'BIOME', text: 'minecraft:plains' },
     ],
     partialGenerator(block) {
@@ -177,7 +178,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   block: {
     message: 'at %1 is %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'POS', check: [valueTypes.Position, valueTypes.ProcParam] },
       { kind: 'field_input', name: 'BLOCK', text: 'minecraft:stone' },
     ],
     partialGenerator(block) {
@@ -191,9 +192,9 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
     message: '',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'START_POS', check: ['mc_block_pos', 'mc_proc_param'] },
-      { kind: 'value', name: 'END_POS', check: ['mc_block_pos', 'mc_proc_param'] },
-      { kind: 'value', name: 'DEST_POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'START_POS', check: [valueTypes.Position, valueTypes.ProcParam] },
+      { kind: 'value', name: 'END_POS', check: [valueTypes.Position, valueTypes.ProcParam] },
+      { kind: 'value', name: 'DEST_POS', check: [valueTypes.Position, valueTypes.ProcParam] },
       { kind: 'field_dropdown', name: 'SCAN_MODE', options: executeBlocksScanModeOptions },
     ],
     partialGenerator(block) {
@@ -255,7 +256,7 @@ const executeConditionModeConfigs: Record<ExecuteConditionMode, ExecuteCondition
   loaded: {
     message: 'at %1',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'POS', check: [valueTypes.Position, valueTypes.ProcParam] },
     ],
     partialGenerator(block) {
       return new FragmentCompositeNode([valueToIr(block, 'POS')])
@@ -283,7 +284,7 @@ const executeConditionDataKindConfigs: Record<ExecuteConditionDataKind, ExecuteC
   block: {
     message: 'at %1 has %2',
     args: [
-      { kind: 'value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] },
+      { kind: 'value', name: 'POS', check: [valueTypes.Position, valueTypes.ProcParam] },
       { kind: 'field_input', name: 'PATH', text: '' },
     ],
     partialGenerator(block) {
@@ -329,9 +330,9 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     message: 'at %1 in %2 matching %3',
     inputsInline: false,
     args: [
-      { kind: 'value', name: 'SOURCE_POS', check: ['mc_block_pos', 'mc_proc_param'] },
-      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_proc_param'] },
-      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_proc_param'] },
+      { kind: 'value', name: 'SOURCE_POS', check: [valueTypes.Position, valueTypes.ProcParam] },
+      { kind: 'value', name: 'SLOTS', check: [valueTypes.String, valueTypes.ProcParam] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: [valueTypes.String, valueTypes.ProcParam] },
     ],
     partialGenerator(block) {
       return new FragmentCompositeNode([
@@ -347,8 +348,8 @@ const executeConditionItemsKindConfigs: Record<ExecuteConditionItemsKind, Execut
     inputsInline: false,
     args: [
       { kind: 'value', name: 'SOURCE', check: selectorLikeChecks },
-      { kind: 'value', name: 'SLOTS', check: ['mc_string', 'mc_proc_param'] },
-      { kind: 'value', name: 'ITEM_PREDICATE', check: ['mc_string', 'mc_proc_param'] },
+      { kind: 'value', name: 'SLOTS', check: [valueTypes.String, valueTypes.ProcParam] },
+      { kind: 'value', name: 'ITEM_PREDICATE', check: [valueTypes.String, valueTypes.ProcParam] },
     ],
     partialGenerator(block) {
       return new FragmentCompositeNode([
@@ -683,35 +684,35 @@ export const executeBlockSpecs: BlockSpec[] = [
         }
 
         if (this.mode_ === 'entity') {
-          setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+          setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
         } else if (this.mode_ === 'data') {
           if (this.dataKind_ === 'entity') {
-            setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+            setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
           }
         } else if (this.mode_ === 'items') {
           if (this.itemsKind_ === 'entity') {
-            setShadowState(this, 'SOURCE', { type: 'mc_target_selector' })
+            setShadowState(this, 'SOURCE', { type: valueTypes.TargetSelector })
           }
           setShadowState(this, 'SLOTS', {
-            type: 'mc_string',
+            type: valueTypes.String,
             fields: { VALUE: 'container.*' },
           })
           setShadowState(this, 'ITEM_PREDICATE', {
-            type: 'mc_string',
+            type: valueTypes.String,
             fields: { VALUE: 'minecraft:stone' },
           })
         } else if (this.mode_ === 'score') {
-          setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
+          setShadowState(this, 'TARGET', { type: valueTypes.TargetSelector })
           setShadowState(this, 'TARGET_OBJECTIVE', {
-            type: 'mc_string',
+            type: valueTypes.String,
             fields: { VALUE: 'objective' },
           })
           if (this.scoreMode_ === 'MATCHES') {
-            setShadowState(this, 'RANGE', { type: 'mc_range' })
+            setShadowState(this, 'RANGE', { type: valueTypes.Range })
           } else {
-            setShadowState(this, 'SOURCE', { type: 'mc_target_selector' })
+            setShadowState(this, 'SOURCE', { type: valueTypes.TargetSelector })
             setShadowState(this, 'SOURCE_OBJECTIVE', {
-              type: 'mc_string',
+              type: valueTypes.String,
               fields: { VALUE: 'objective' },
             })
           }
@@ -761,11 +762,11 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_align',
     'align %1',
-    [{ type: 'input_value', name: 'AXES', check: ['swizzle'] }],
+    [{ type: 'input_value', name: 'AXES', check: [valueTypes.Swizzle] }],
     block => new FragmentCompositeNode(['align', valueToIr(block, 'AXES')], block.id),
     {},
     function(this: Blockly.Block) {
-      setShadowState(this, 'AXES', { type: 'swizzle' })
+      setShadowState(this, 'AXES', { type: valueTypes.Swizzle })
     },
   ),
   executeModifierSpec(
@@ -785,7 +786,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     block => new FragmentCompositeNode(['as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
-      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+      setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
     },
   ),
   executeModifierSpec(
@@ -795,13 +796,13 @@ export const executeBlockSpecs: BlockSpec[] = [
     block => new FragmentCompositeNode(['at', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
-      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+      setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
     },
   ),
   executeModifierSpec(
     'execute_mod_facing',
     'facing %1',
-    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
+    [{ type: 'input_value', name: 'POS', check: [valueTypes.Position, valueTypes.ProcParam] }],
     block => new FragmentCompositeNode(['facing', valueToIr(block, 'POS')], block.id),
     {},
   ),
@@ -819,7 +820,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     block => new FragmentCompositeNode(['facing', 'entity', valueToIr(block, INPUT_TARGET), block.getFieldValue('ANCHOR')], block.id),
     {},
     function(this: Blockly.Block) {
-      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+      setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
     },
   ),
   executeModifierSpec(
@@ -850,7 +851,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_positioned',
     'positioned %1',
-    [{ type: 'input_value', name: 'POS', check: ['mc_block_pos', 'mc_proc_param'] }],
+    [{ type: 'input_value', name: 'POS', check: [valueTypes.Position, valueTypes.ProcParam] }],
     block => new FragmentCompositeNode(['positioned', valueToIr(block, 'POS')], block.id),
     {},
   ),
@@ -861,7 +862,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     block => new FragmentCompositeNode(['positioned', 'as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
-      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+      setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
     },
   ),
   executeModifierSpec(
@@ -882,7 +883,7 @@ export const executeBlockSpecs: BlockSpec[] = [
   executeModifierSpec(
     'execute_mod_rotated',
     'rotated %1',
-    [{ type: 'input_value', name: 'ROTATION', check: ['mc_rotation', 'mc_proc_param'] }],
+    [{ type: 'input_value', name: 'ROTATION', check: [valueTypes.Rotation, valueTypes.ProcParam] }],
     block => new FragmentCompositeNode(['rotated', valueToIr(block, 'ROTATION')], block.id),
     {},
   ),
@@ -893,7 +894,7 @@ export const executeBlockSpecs: BlockSpec[] = [
     block => new FragmentCompositeNode(['rotated', 'as', valueToIr(block, INPUT_TARGET)], block.id),
     {},
     function(this: Blockly.Block) {
-      setShadowState(this, INPUT_TARGET, { type: 'mc_target_selector' })
+      setShadowState(this, INPUT_TARGET, { type: valueTypes.TargetSelector })
     },
   ),
   executeModifierSpec(
