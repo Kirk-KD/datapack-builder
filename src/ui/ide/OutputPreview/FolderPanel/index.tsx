@@ -107,7 +107,7 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
       minWidth: '15rem',
       maxWidth: '20rem'
     }}>
-      <Stack sx={{p: 1, flex: 1}}>
+      <Stack sx={{p: 1, flex: 1, minHeight: 0}}>
         <Stack direction={'row'} spacing={1} sx={{
           alignItems: 'center',
           mb: 0.5,
@@ -139,7 +139,7 @@ export function FolderPanel({activePath, setActivePath}: FolderPanelProps) {
             </IconButton>
           </IconsPill>
         </Stack>
-        <Stack sx={{flex: 1}}>
+        <Stack sx={{flex: 1, minHeight: 0, overflowY: 'auto'}}>
           {renderFolderContents(folderContents)}
         </Stack>
       </Stack>
