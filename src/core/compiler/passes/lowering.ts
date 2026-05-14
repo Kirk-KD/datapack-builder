@@ -83,6 +83,7 @@ interface LoweredResult {
 export class LoweringPass implements IrVisitor<LoweredResult> {
   naming: Naming
   private readonly constantDefs = new Map<string, ConstantDefNode>()
+  private readonly resolvingConstants: string[] = []
 
   /**
    * Returns the next temporary scoreboard variable name to be passed to `new TempVariableNode(...)`.
@@ -846,11 +847,24 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   }
 
   visitConstantGet(node: ConstantGetNode): LoweredResult {
-    const constantDef = this.constantDefs.get(node.constantEntry.name)
+    const constantName = node.constantEntry.name
+    const constantDef = this.constantDefs.get(constantName)
     if (!constantDef) {
-      throw new Error(`Constant "${node.constantEntry.name}" is not defined.`)
+      throw new Error(`Constant "${constantName}" is not defined.`)
     }
 
-    return constantDef.valueNode.accept(this)
+    if (this.resolvingConstants.includes(constantName)) {
+      const cycleStart = this.resolvingConstants.indexOf(constantName)
+      const cycle = [...this.resolvingConstants.slice(cycleStart), constantName]
+      throw new Error(`Circular constant reference: ${cycle.join(' -> ')}`)
+    }
+
+    this.resolvingConstants.push(constantName)
+    try {
+      return constantDef.valueNode.accept(this)
+    }
+    finally {
+      this.resolvingConstants.pop()
+    }
   }
 }
