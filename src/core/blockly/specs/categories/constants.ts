@@ -13,6 +13,17 @@ type ConstantBlockState = {
   constant: ConstantRegistryEntry | null
 }
 
+type SerializedBlockState = {
+  type: string
+  extraState?: unknown
+  inputs?: Record<string, SerializedConnectionState>
+  next?: SerializedConnectionState
+}
+
+type SerializedConnectionState = {
+  block?: SerializedBlockState
+}
+
 type ConstantDefBlock = StatefulBlock & ConstantBlockState
 
 type ConstantGetBlock = StatefulBlock & ConstantBlockState
@@ -63,6 +74,24 @@ function createConstantDefinitionBlock(
 
 function findConstantsBlock(workspace: Blockly.WorkspaceSvg) {
   return workspace.getBlocksByType('constants', false)[0] ?? null
+}
+
+function getConstantDefinitionFromBlockState(blockState: SerializedBlockState) {
+  if (blockState.type !== 'constant_def') return null
+
+  const state = blockState.extraState as Partial<ConstantBlockState> | undefined
+  return state?.constant ?? null
+}
+
+function removeConstantDefinitionStack(blockState: SerializedBlockState | undefined) {
+  let currentBlockState = blockState
+
+  while (currentBlockState) {
+    const constant = getConstantDefinitionFromBlockState(currentBlockState)
+    if (constant) constantRegistry.remove(constant.name)
+
+    currentBlockState = currentBlockState.next?.block
+  }
 }
 
 function getLastStackBlock(firstBlock: Blockly.Block) {
@@ -134,7 +163,7 @@ const constantsBlockSpec: BlockSpec = {
   },
   generator(block: Blockly.Block) {
     void block
-    // TODO stub
+    throw new Error('Constants block generation is not implemented')
   }
 }
 
@@ -181,7 +210,7 @@ const constantDefBlockSpec: BlockSpec = {
   },
   generator(block: Blockly.Block) {
     void block
-    // TODO stub
+    throw new Error('Constant definition block generation is not implemented')
   }
 }
 
@@ -223,7 +252,7 @@ const constantGetBlockSpec: BlockSpec = {
   },
   generator(block: Blockly.Block) {
     void block
-    // TODO stub
+    throw new Error('Constant getter block generation is not implemented')
   }
 }
 
@@ -273,6 +302,10 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
       if (blockData && blockData.type === 'constant_def') {
         const constant = (blockData.extraState as ConstantBlockState).constant
         if (constant) constantRegistry.remove(constant.name)
+      }
+      else if (blockData && blockData.type === 'constants') {
+        const constantsBlockData = blockData as SerializedBlockState
+        removeConstantDefinitionStack(constantsBlockData.inputs?.DEFINITIONS?.block)
       }
     }
   })
