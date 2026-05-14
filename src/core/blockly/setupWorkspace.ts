@@ -121,6 +121,11 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
   const unsubProcListeners = subscribeProcedureListeners(workspace)
   const unsubConstantListeners = subscribeConstantListeners(workspace)
 
+  workspace.updateToolbox({
+    kind: 'categoryToolbox',
+    contents: getToolboxContents(workspace)
+  })
+
   return () => {
     unsubProcListeners()
     unsubConstantListeners()

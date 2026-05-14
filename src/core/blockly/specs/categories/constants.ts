@@ -57,6 +57,18 @@ function getConstantValueCheck(valueType: ConstantValueType) {
   return constantValueChecks[valueType]
 }
 
+function getPreviousInputConnections(block: Blockly.Block) {
+  const previousConnections = new Map<string, Blockly.Block>()
+  for (const input of block.inputList) {
+    if (!input.name) continue
+    const targetBlock = input.connection?.targetBlock()
+    if (targetBlock) {
+      previousConnections.set(input.name, targetBlock)
+    }
+  }
+  return previousConnections
+}
+
 function createConstantDefinitionBlock(
   workspace: Blockly.WorkspaceSvg,
   constant: ConstantRegistryEntry,
@@ -73,7 +85,7 @@ function createConstantDefinitionBlock(
   return block
 }
 
-function findConstantsBlock(workspace: Blockly.WorkspaceSvg) {
+function findConstantsBlock(workspace: Blockly.Workspace) {
   return workspace.getBlocksByType('constants', false)[0] ?? null
 }
 
@@ -187,6 +199,8 @@ const constantDefBlockSpec: BlockSpec = {
     block.setInputsInline(true)
 
     block.updateShape_ = function(this: ConstantDefBlock) {
+      const previousConnections = getPreviousInputConnections(this)
+
       this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
       if (!this.constant) {
@@ -203,6 +217,11 @@ const constantDefBlockSpec: BlockSpec = {
       this.appendValueInput(INPUT_VALUE)
         .setCheck(getConstantValueCheck(this.constant.valueType))
         .appendField('=')
+
+      const previousBlock = previousConnections.get(INPUT_VALUE)
+      if (previousBlock?.outputConnection) {
+        this.getInput(INPUT_VALUE)?.connection?.connect(previousBlock.outputConnection)
+      }
     }
 
     constantRegistry.subscribe(() => {
@@ -270,17 +289,28 @@ export const constantsBlockSpecs: BlockSpec[] = [
   constantGetBlockSpec,
 ]
 
-export function getConstantGetBlocks() {
+export function getConstantBlocks(workspace?: Blockly.Workspace) {
   const constants = constantRegistry.list()
-  if (constants.length === 0) return []
 
-  return constants.map(constant => ({
+  const blocks = constants.map(constant => ({
     kind: 'block',
     type: 'constant_get',
     extraState: {
       constant,
     },
   }))
+
+  if (constants.length !== 0 && (!workspace || !findConstantsBlock(workspace))) {
+    return [
+      {
+        kind: 'block',
+        type: 'constants',
+      },
+      ...blocks,
+    ]
+  }
+
+  return blocks
 }
 
 export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
@@ -295,7 +325,7 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
     constantRegistry.subscribe(() => {
       workspace.updateToolbox({
         kind: 'categoryToolbox',
-        contents: getToolboxContents()
+        contents: getToolboxContents(workspace)
       })
     })
   ]
@@ -314,6 +344,21 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
       else if (blockData && blockData.type === 'constants') {
         const constantsBlockData = blockData as SerializedBlockState
         removeConstantDefinitionStack(constantsBlockData.inputs?.DEFINITIONS?.block)
+        workspace.updateToolbox({
+          kind: 'categoryToolbox',
+          contents: getToolboxContents(workspace)
+        })
+      }
+    }
+    else if (e.type === Blockly.Events.BLOCK_CREATE) {
+      const blockCreateEvent = e as Blockly.Events.BlockCreate
+      const block = blockCreateEvent.blockId ? workspace.getBlockById(blockCreateEvent.blockId) : null
+
+      if (block?.type === 'constants') {
+        workspace.updateToolbox({
+          kind: 'categoryToolbox',
+          contents: getToolboxContents(workspace)
+        })
       }
     }
   })

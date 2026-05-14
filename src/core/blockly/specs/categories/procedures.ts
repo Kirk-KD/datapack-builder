@@ -342,7 +342,7 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
     procedureRegistry.subscribe(() => {
       workspace.updateToolbox({
         kind: 'categoryToolbox',
-        contents: getToolboxContents()
+        contents: getToolboxContents(workspace)
       })
     })
   ]
