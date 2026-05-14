@@ -69,6 +69,31 @@ function getPreviousInputConnections(block: Blockly.Block) {
   return previousConnections
 }
 
+function isInConstantsBlock(block: Blockly.Block) {
+  let currentBlock = block.getParent()
+
+  while (currentBlock) {
+    if (currentBlock.type === 'constants') return true
+    currentBlock = currentBlock.getParent()
+  }
+
+  return false
+}
+
+function updateConstantDefinitionWarning(block: ConstantDefBlock) {
+  const warnings = []
+
+  if (!block.constant) {
+    warnings.push('Missing constant')
+  }
+
+  if (!block.isInFlyout && !isInConstantsBlock(block)) {
+    warnings.push('Constants must be in a constants definition block')
+  }
+
+  block.setWarningText(warnings.length ? warnings.join('\n') : null)
+}
+
 function createConstantDefinitionBlock(
   workspace: Blockly.WorkspaceSvg,
   constant: ConstantRegistryEntry,
@@ -204,12 +229,12 @@ const constantDefBlockSpec: BlockSpec = {
       this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
       if (!this.constant) {
-        this.setWarningText('Missing constant')
+        updateConstantDefinitionWarning(this)
         this.appendDummyInput('input').appendField('Missing constant')
         return
       }
 
-      this.setWarningText(null)
+      updateConstantDefinitionWarning(this)
       this.appendDummyInput('input')
         .appendField(this.constant.name)
         .appendField(`(${this.constant.valueType})`)
@@ -222,6 +247,10 @@ const constantDefBlockSpec: BlockSpec = {
       if (previousBlock?.outputConnection) {
         this.getInput(INPUT_VALUE)?.connection?.connect(previousBlock.outputConnection)
       }
+    }
+
+    block.onchange = function(this: ConstantDefBlock) {
+      updateConstantDefinitionWarning(this)
     }
 
     constantRegistry.subscribe(() => {
