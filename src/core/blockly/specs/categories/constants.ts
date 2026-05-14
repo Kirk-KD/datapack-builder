@@ -60,6 +60,62 @@ function createConstantDefinitionBlock(
   return block
 }
 
+function findConstantsBlock(workspace: Blockly.WorkspaceSvg) {
+  return workspace.getBlocksByType('constants', false)[0] ?? null
+}
+
+function getLastStackBlock(firstBlock: Blockly.Block) {
+  let current = firstBlock
+  while (current.getNextBlock()) {
+    current = current.getNextBlock() as Blockly.Block
+  }
+  return current
+}
+
+function attachConstantDefinitionBlock(
+  constantsBlock: Blockly.Block,
+  definitionBlock: ConstantDefBlock,
+) {
+  const definitionInput = constantsBlock.getInput('DEFINITIONS')
+  const definitionConnection = definitionInput?.connection
+  if (!definitionConnection || !definitionBlock.previousConnection) return
+
+  const firstDefinitionBlock = definitionConnection.targetBlock()
+  if (!firstDefinitionBlock) {
+    definitionConnection.connect(definitionBlock.previousConnection)
+    return
+  }
+
+  const lastBlock = getLastStackBlock(firstDefinitionBlock)
+  if (lastBlock.nextConnection) {
+    lastBlock.nextConnection.connect(definitionBlock.previousConnection)
+  }
+}
+
+function placeConstantDefinitionBlock(
+  workspace: Blockly.WorkspaceSvg,
+  constant: ConstantRegistryEntry,
+) {
+  const definitionBlock = createConstantDefinitionBlock(workspace, constant)
+  const constantsBlock = findConstantsBlock(workspace)
+
+  if (constantsBlock) {
+    attachConstantDefinitionBlock(constantsBlock, definitionBlock)
+    return
+  }
+
+  const newConstantsBlock = workspace.newBlock('constants')
+  newConstantsBlock.initSvg()
+  newConstantsBlock.render()
+
+  const workspaceCoordinates = workspace.getMetricsManager().getViewMetrics(true)
+  const x = workspaceCoordinates.left + workspaceCoordinates.width / 2
+  const y = workspaceCoordinates.top + workspaceCoordinates.height / 2
+  newConstantsBlock.moveTo(new Blockly.utils.Coordinate(x, y))
+
+  attachConstantDefinitionBlock(newConstantsBlock, definitionBlock)
+}
+
 const constantsBlockSpec: BlockSpec = {
   type: 'constants',
   category: 'constants',
@@ -108,8 +164,8 @@ const constantDefBlockSpec: BlockSpec = {
 
       this.setWarningText(null)
       this.appendDummyInput('input')
-        .appendField(this.constant.valueType)
         .appendField(this.constant.name)
+        .appendField(`(${this.constant.valueType})`)
 
       this.appendValueInput(INPUT_VALUE)
         .setCheck(getConstantValueCheck(this.constant.valueType))
@@ -194,13 +250,7 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
     constantRegistry.subscribe(({type, changedEntries}) => {
       if (type === 'add') {
         changedEntries.forEach(constant => {
-          const block = createConstantDefinitionBlock(workspace, constant)
-
-          const workspaceCoordinates = workspace.getMetricsManager().getViewMetrics(true)
-          const x = workspaceCoordinates.left + workspaceCoordinates.width / 2
-          const y = workspaceCoordinates.top + workspaceCoordinates.height / 2
-
-          block.moveTo(new Blockly.utils.Coordinate(x, y))
+          placeConstantDefinitionBlock(workspace, constant)
         })
       }
     }),

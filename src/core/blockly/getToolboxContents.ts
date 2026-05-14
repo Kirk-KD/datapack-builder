@@ -61,10 +61,6 @@ export default function getToolboxContents() {
           text: 'Create constant',
           callbackKey: 'CREATE_CONSTANT'
         },
-        {
-          kind: 'block',
-          type: 'constants'
-        },
         ...getConstantGetBlocks()
       ]
     },
