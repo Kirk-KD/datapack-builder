@@ -1,6 +1,7 @@
 import type {IrVisitor} from "./visitor.ts";
 import type {OrParameter, TopLevelNode, VariableCompareOpType, VariableOpType} from "./types.ts";
 import type {
+  ConstantRegistryEntry,
   ProcedureParameterRegistryEntry,
   ProcedureRegistryEntry,
 } from "../../blockly/registry";
@@ -564,5 +565,46 @@ export class RaycastBlockNode extends CommandNode {
 
   accept<T>(visitor: IrVisitor<T>): T {
     return visitor.visitRaycastBlock(this)
+  }
+}
+
+export class ConstantsNode extends IrNode {
+  readonly constantDefNodes: ConstantDefNode[]
+
+  constructor(constantDefNodes: ConstantDefNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.constantDefNodes = constantDefNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitConstants(this)
+  }
+}
+
+export class ConstantDefNode extends IrNode {
+  readonly constantEntry: ConstantRegistryEntry
+  readonly valueNode: IrNode
+
+  constructor(constantEntry: ConstantRegistryEntry, valueNode: IrNode, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.constantEntry = constantEntry
+    this.valueNode = valueNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitConstantDef(this)
+  }
+}
+
+export class ConstantGetNode extends FragmentNode {
+  readonly constantEntry: ConstantRegistryEntry
+
+  constructor(constantEntry: ConstantRegistryEntry, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.constantEntry = constantEntry
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitConstantGet(this)
   }
 }

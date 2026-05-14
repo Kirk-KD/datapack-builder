@@ -1,17 +1,49 @@
 import {
-  CommandCompositeNode, CommandNode,
+  CommandCompositeNode,
+  CommandNode,
   DatapackNode,
   ExecuteNode,
-  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode, FunctionTagNode,
+  FragmentCompositeNode,
+  FragmentNode,
+  FunctionCallNode,
+  FunctionDefinitionNode,
+  FunctionTagNode,
   IfNode,
   IrNode,
-  type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
-  LiteralStringNode, NumberNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode, OptNumberNode,
-  type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
-  ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode, TildeNode, CaretNode,
-  type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
-  VariableOperationNode, VariableSetNode, WhileNode, type PositionComponentNode, type RangeComponentNode,
-  type RotationComponentNode
+  type IrVisitor,
+  ItemStackNode,
+  LiteralIntNode,
+  LiteralPositionNode,
+  LiteralRangeNode,
+  LiteralRotationNode,
+  LiteralStringNode,
+  NumberNode,
+  OnLoadNode,
+  OnPlayerMinesBlockNode,
+  OnTickNode,
+  OptNumberNode,
+  type OrParameter,
+  ProcedureCallArgumentNode,
+  ProcedureCallNode,
+  ProcedureDefinitionNode,
+  ProcedureParameterNode,
+  RaycastBlockNode,
+  RaycastEntityNode,
+  TargetSelectorNode,
+  TempVariableNode,
+  TildeNode,
+  CaretNode,
+  type TopLevelNode,
+  VariableCompareNode,
+  VariableMatchesNode,
+  VariableNode,
+  VariableOperationNode,
+  VariableSetNode,
+  WhileNode,
+  type PositionComponentNode,
+  type RangeComponentNode,
+  type RotationComponentNode,
+  ConstantsNode, ConstantDefNode, ConstantGetNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -50,6 +82,7 @@ interface LoweredResult {
 
 export class LoweringPass implements IrVisitor<LoweredResult> {
   naming: Naming
+  private readonly constantDefs = new Map<string, ConstantDefNode>()
 
   /**
    * Returns the next temporary scoreboard variable name to be passed to `new TempVariableNode(...)`.
@@ -204,6 +237,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   visitDatapack(node: DatapackNode): LoweredResult {
     const topLevelNodes: TopLevelNode[] = []
     for (const topLevelNode of node.topLevelNodes) {
+      if (topLevelNode instanceof ConstantsNode) {
+        topLevelNode.accept(this)
+      }
+    }
+    for (const topLevelNode of node.topLevelNodes) {
+      if (topLevelNode instanceof ConstantsNode) continue
       const lowered = topLevelNode.accept(this)
       topLevelNodes.push(...lowered.nodes as TopLevelNode[])
     }
@@ -792,5 +831,26 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
         )
       ]
     }
+  }
+
+  visitConstants(node: ConstantsNode): LoweredResult {
+    for (const constantDefNode of node.constantDefNodes) {
+      constantDefNode.accept(this)
+    }
+    return { pre: [], nodes: [] }
+  }
+
+  visitConstantDef(node: ConstantDefNode): LoweredResult {
+    this.constantDefs.set(node.constantEntry.name, node)
+    return { pre: [], nodes: [] }
+  }
+
+  visitConstantGet(node: ConstantGetNode): LoweredResult {
+    const constantDef = this.constantDefs.get(node.constantEntry.name)
+    if (!constantDef) {
+      throw new Error(`Constant "${node.constantEntry.name}" is not defined.`)
+    }
+
+    return constantDef.valueNode.accept(this)
   }
 }

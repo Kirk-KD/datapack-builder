@@ -6,6 +6,7 @@ import {colours} from '../../colours.ts'
 import getToolboxContents from '../../getToolboxContents.ts'
 import {states} from '../../states.ts'
 import {valueTypes} from '../valueTypes'
+import {ConstantDefNode, ConstantGetNode, ConstantsNode, statementToIr, valueToIr} from '../../../compiler'
 
 const INPUT_VALUE = 'VALUE'
 
@@ -157,13 +158,15 @@ const constantsBlockSpec: BlockSpec = {
       {
         type: 'input_statement',
         name: 'DEFINITIONS',
-          check: [valueTypes.ConstantDef]
+        check: [valueTypes.ConstantDef]
       }
     ]
   },
   generator(block: Blockly.Block) {
-    void block
-    throw new Error('Constants block generation is not implemented')
+    return new ConstantsNode(
+      statementToIr(block, 'DEFINITIONS') as ConstantDefNode[],
+      block.id
+    )
   }
 }
 
@@ -209,8 +212,11 @@ const constantDefBlockSpec: BlockSpec = {
     block.updateShape_()
   },
   generator(block: Blockly.Block) {
-    void block
-    throw new Error('Constant definition block generation is not implemented')
+    return new ConstantDefNode(
+      (block as ConstantDefBlock).constant!,
+      valueToIr(block, INPUT_VALUE),
+      block.id
+    )
   }
 }
 
@@ -251,8 +257,10 @@ const constantGetBlockSpec: BlockSpec = {
     block.updateShape_()
   },
   generator(block: Blockly.Block) {
-    void block
-    throw new Error('Constant getter block generation is not implemented')
+    return new ConstantGetNode(
+      (block as ConstantGetBlock).constant!,
+      block.id
+    )
   }
 }
 
