@@ -38,6 +38,12 @@ export default function getToolboxContents(workspace?: Blockly.Workspace) {
     },
     {
       kind: 'category',
+      name: 'Math',
+      colour: colours.literals,
+      contents: getBlockTypesByCategory('math').map(type => ({ kind: 'block', type }))
+    },
+    {
+      kind: 'category',
       name: 'Constructs',
       colour: colours.constructs,
       contents: getBlockTypesByCategory('constructs').map(type => ({ kind: 'block', type }))

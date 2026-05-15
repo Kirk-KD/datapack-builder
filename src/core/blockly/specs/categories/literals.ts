@@ -5,7 +5,6 @@ import {colours} from '../../colours.ts'
 import {valueTypes} from '../valueTypes'
 import {
   LiteralRotationNode,
-  LiteralIntNode,
   LiteralPositionNode,
   LiteralRangeNode,
   LiteralStringNode,
@@ -19,29 +18,6 @@ const ROTATION_YAW_INPUT = 'YAW'
 const ROTATION_PITCH_INPUT = 'PITCH'
 
 export const literalBlockSpecs: BlockSpec[] = [
-  {
-    type: valueTypes.Int,
-    category: 'literals',
-    tags: ['literal', 'scoreboardVarSet', 'procArg'],
-    json: {
-      type: valueTypes.Int,
-      tooltip: '',
-      helpUrl: '',
-      message0: 'int %1',
-      args0: [
-        {
-          type: 'field_number',
-          name: FIELD_VALUE,
-          value: 0,
-        },
-      ],
-      output: valueTypes.Int,
-      extensions: ['mc_int_validator'],
-    },
-    generator(block) {
-      return new LiteralIntNode(block.getFieldValue(FIELD_VALUE), block.id)
-    },
-  },
   {
     type: valueTypes.String,
     category: 'literals',

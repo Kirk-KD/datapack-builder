@@ -13,6 +13,7 @@ import {registerBlockIrGenerator} from '../../compiler'
 import type { BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
 import {utilityBlockSpecs} from './categories/utility.ts'
 import {constantsBlockSpecs} from './categories/constants.ts'
+import {mathBlockSpecs} from './categories/math.ts'
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
@@ -26,7 +27,8 @@ const allBlockSpecs = [
   ...selectorBlockSpecs,
   ...shadowInputBlockSpecs,
   ...utilityBlockSpecs,
-  ...constantsBlockSpecs
+  ...constantsBlockSpecs,
+  ...mathBlockSpecs
 ]
 
 const specsByCategory = new Map<BlockSpecCategory, BlockSpec[]>()
