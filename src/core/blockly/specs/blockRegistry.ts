@@ -14,6 +14,7 @@ import type { BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
 import {utilityBlockSpecs} from './categories/utility.ts'
 import {constantsBlockSpecs} from './categories/constants.ts'
 import {mathBlockSpecs} from './categories/math.ts'
+import {arrayBlockSpecs} from './categories/array.ts'
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
@@ -28,7 +29,8 @@ const allBlockSpecs = [
   ...shadowInputBlockSpecs,
   ...utilityBlockSpecs,
   ...constantsBlockSpecs,
-  ...mathBlockSpecs
+  ...mathBlockSpecs,
+  ...arrayBlockSpecs,
 ]
 
 const specsByCategory = new Map<BlockSpecCategory, BlockSpec[]>()

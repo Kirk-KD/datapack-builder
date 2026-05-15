@@ -1,4 +1,5 @@
 import * as Blockly from 'blockly'
+import {shouldDisallowArrayConnection} from './arrayPolicy'
 import {shouldDisallowConstantsConnection} from './constantsPolicy'
 import {shouldDisallowExecuteConnection} from './executePolicy'
 import {shouldDisallowSelectorConnection} from './selectorPolicy'
@@ -14,6 +15,7 @@ class GlobalChecker extends Blockly.ConnectionChecker {
 
     const superiorBlock = superior.getSourceBlock()
     const inferiorBlock = inferior.getSourceBlock()
+    if (shouldDisallowArrayConnection(superior, superiorBlock, inferiorBlock)) return false
     if (shouldDisallowConstantsConnection(superior, superiorBlock, inferiorBlock)) return false
     if (shouldDisallowExecuteConnection(superior, superiorBlock, inferiorBlock)) return false
     if (shouldDisallowSelectorConnection(superior, superiorBlock, inferiorBlock)) return false

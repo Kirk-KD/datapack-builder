@@ -22,6 +22,8 @@ export const valueTypes = {
   Angle: 'angle',
 
   ConstantDef: 'constant_def',
+
+  Array: 'array'
 } as const
 
 export type ValueType = (typeof valueTypes)[keyof typeof valueTypes]

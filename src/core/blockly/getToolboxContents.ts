@@ -72,6 +72,12 @@ export default function getToolboxContents(workspace?: Blockly.Workspace) {
       ]
     },
     {
+      kind: 'category',
+      name: 'Arrays',
+      colour: colours.array,
+      contents: getBlockTypesByCategory('array').map(type => ({ kind: 'block', type }))
+    },
+    {
       kind: "category",
       name: "Procedures",
       colour: colours.procedures,
