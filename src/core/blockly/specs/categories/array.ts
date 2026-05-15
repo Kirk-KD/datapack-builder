@@ -6,15 +6,18 @@ import {valueTypes} from '../valueTypes.ts'
 import * as Blockly from 'blockly'
 import {colours} from '../../colours.ts'
 import {TextButton} from '../../fields/textButton.ts'
+import {ArrayNode, statementToIr, valueToIr} from '../../../compiler'
+
+type ArrayElementValueType = Exclude<ConstantValueType, 'array'>
 
 type ArrayBlockState = {
-  type_: ConstantValueType
+  type_: ArrayElementValueType
 }
 type ArrayBlock = StatefulBlock & ArrayBlockState
 
 type ArrayItemBlockState = {
   parentId_: string | null
-  type_: ConstantValueType
+  type_: ArrayElementValueType
 }
 type ArrayItemBlock = StatefulBlock & ArrayItemBlockState
 
@@ -23,21 +26,21 @@ const ARRAY_ITEMS_INPUT = 'ITEMS'
 const ARRAY_ITEM_VALUE_INPUT = 'VALUE'
 const ARRAY_ITEM_INDEX_FIELD = 'INDEX'
 
-const constantValueTypeOptions: [string, ConstantValueType][] = [
+const constantValueTypeOptions: [string, ArrayElementValueType][] = [
   ['integers', 'int'],
   ['strings', 'string'],
   ['positions', 'position'],
   ['item stacks', 'item_stack'],
 ]
 
-const constantValueTypeChecks: Record<ConstantValueType, string> = {
+const constantValueTypeChecks: Record<ArrayElementValueType, string> = {
   int: valueTypes.Int,
   string: valueTypes.String,
   position: valueTypes.Position,
   item_stack: valueTypes.ItemStack,
 }
 
-function getConstantValueTypeCheck(valueType: ConstantValueType) {
+function getConstantValueTypeCheck(valueType: ArrayElementValueType) {
   return constantValueTypeChecks[valueType]
 }
 
@@ -79,7 +82,7 @@ function updateArrayItemLabel(arrayItemBlock: ArrayItemBlock) {
   }
 }
 
-function updateArrayItemType(arrayItemBlock: ArrayItemBlock, valueType: ConstantValueType) {
+function updateArrayItemType(arrayItemBlock: ArrayItemBlock, valueType: ArrayElementValueType) {
   mutateExtraState(arrayItemBlock, () => {
     arrayItemBlock.type_ = valueType
   })
@@ -168,8 +171,7 @@ const arrayBlockSpec: BlockSpec = {
     block.updateShape_()
   },
   generator(block: Blockly.Block) {
-    void block
-    throw Error() // TODO stub
+    return new ArrayNode(statementToIr(block, ARRAY_ITEMS_INPUT), block.id)
   }
 }
 
@@ -204,8 +206,7 @@ const arrayItemBlockSpec: BlockSpec = {
     block.updateShape_()
   },
   generator(block: Blockly.Block) {
-    void block
-    throw Error() // TODO stub
+    return valueToIr(block, ARRAY_ITEM_VALUE_INPUT)
   }
 }
 

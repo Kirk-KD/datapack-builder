@@ -632,3 +632,16 @@ export class BinOpNode extends FragmentNode {
     return visitor.visitBinOp(this)
   }
 }
+
+export class ArrayNode extends FragmentNode {
+  readonly itemNodes: IrNode[]
+
+  constructor(itemNodes: IrNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.itemNodes = itemNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitArray(this)
+  }
+}

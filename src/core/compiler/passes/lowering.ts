@@ -44,7 +44,7 @@ import {
   type RangeComponentNode,
   type RotationComponentNode,
   ConstantsNode, ConstantDefNode, ConstantGetNode, BinOpNode,
-  type BinaryOperandNode
+  type BinaryOperandNode, ArrayNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -943,5 +943,9 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       ],
       nodes: [tempVar]
     }
+  }
+
+  visitArray(node: ArrayNode): LoweredResult {
+    return { pre: [], nodes: [node] } // Evaluating an array node is useless
   }
 }
