@@ -92,7 +92,7 @@ const intBlockSpec: BlockSpec = {
     extensions: ['mc_int_validator'],
   },
   generator(block) {
-    return new LiteralIntNode(block.getFieldValue('VALUE'), block.id)
+    return new LiteralIntNode(+block.getFieldValue('VALUE'), block.id)
   },
 }
 

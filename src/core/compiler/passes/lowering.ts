@@ -43,7 +43,8 @@ import {
   type PositionComponentNode,
   type RangeComponentNode,
   type RotationComponentNode,
-  ConstantsNode, ConstantDefNode, ConstantGetNode, BinOpNode
+  ConstantsNode, ConstantDefNode, ConstantGetNode, BinOpNode,
+  type BinaryOperandNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -314,8 +315,18 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: condition.pre,
       nodes: [
-        trueFuncName ? new FunctionDefinitionNode(trueFuncName, this.lowerBody(node.trueBodyNodes), null, node.sourceBlockId) : null,
-        falseFuncName ? new FunctionDefinitionNode(falseFuncName, this.lowerBody(node.falseBodyNodes), null, node.sourceBlockId) : null,
+        trueFuncName ? new FunctionDefinitionNode(
+          trueFuncName,
+          this.lowerBody(node.trueBodyNodes),
+          null,
+          node.sourceBlockId
+        ) : null,
+        falseFuncName ? new FunctionDefinitionNode(
+          falseFuncName,
+          this.lowerBody(node.falseBodyNodes),
+          null,
+          node.sourceBlockId
+        ) : null,
         trueFuncName ? new CommandCompositeNode([
           'execute if',
           condition.nodes[0],
@@ -869,7 +880,68 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   }
 
   visitBinOp(node: BinOpNode): LoweredResult {
-    void node
-    throw Error() // TODO stub
+    const leftResult = node.leftNode.accept(this)
+    const rightResult = node.rightNode.accept(this)
+
+    const leftNode = leftResult.nodes[0] as BinaryOperandNode
+    const rightNode = rightResult.nodes[0] as BinaryOperandNode
+
+    if (leftNode instanceof LiteralIntNode && rightNode instanceof LiteralIntNode) {
+      return {
+        pre: [...leftResult.pre, ...rightResult.pre],
+        nodes: [
+          new LiteralIntNode(
+            ((a, op, b) => {
+              switch (op) {
+                case '+': return a + b
+                case '-': return a - b
+                case '*': return a * b
+                case '/': return Math.floor(a / b)
+                case 'mod': return a % b
+              }
+            })(leftNode.value, node.op, rightNode.value),
+            node.sourceBlockId
+          )
+        ]
+      }
+    }
+
+    // Var&Var or Var+Int or Int&Var
+
+    const tempVarName = this.nextTempName()
+    const tempVar = new TempVariableNode(tempVarName, node.sourceBlockId)
+
+    const tempVarSet = new VariableSetNode(
+      tempVar,
+      leftNode,
+      node.sourceBlockId
+    ).accept(this)
+
+    const tempVarOp = new VariableOperationNode(
+      tempVar,
+      (op => {
+        switch (op) {
+          case '+': return '+='
+          case '-': return '-='
+          case '*': return '*='
+          case '/': return '/='
+          case 'mod': return '%='
+        }
+      })(node.op),
+      rightNode,
+      node.sourceBlockId
+    ).accept(this)
+
+    return {
+      pre: [
+        ...leftResult.pre,
+        ...rightResult.pre,
+        ...tempVarSet.pre,
+        tempVarSet.nodes[0] as CommandCompositeNode,
+        ...tempVarOp.pre,
+        tempVarOp.nodes[0] as CommandCompositeNode
+      ],
+      nodes: [tempVar]
+    }
   }
 }
