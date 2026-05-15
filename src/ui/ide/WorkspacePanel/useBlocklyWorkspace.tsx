@@ -2,8 +2,8 @@ import {useEffect, useRef} from "react";
 import * as Blockly from "blockly";
 import {injectWorkspace, setupWorkspace} from "../../../core/blockly";
 import {controller} from '../../editor'
-import {CreateProcedure, CreateVariable} from '../WorkspaceDialogues'
-import type {VariableValueType} from '../../../core/blockly/registry'
+import {CreateProcedure, CreateTypedValue} from '../WorkspaceDialogues'
+import type {ConstantValueType, VariableValueType} from '../../../core/blockly/registry'
 
 export default function useBlocklyWorkspace() {
   const divRef = useRef<HTMLDivElement>(null)
@@ -41,9 +41,26 @@ export default function useBlocklyWorkspace() {
           title: 'Create Variable',
           mode: 'confirm',
           onConfirm: () => onConfirm({ name: variableName, valueType: variableType }),
-          editor: <CreateVariable
+          editor: <CreateTypedValue<VariableValueType>
+            typeOptions={['int']}
             onChangeName={name => { variableName = name }}
             onChangeType={type => { variableType = type }}
+          />
+        })
+      },
+      onCreateConstant: onConfirm => {
+        let constantName = 'constant'
+        let constantType: ConstantValueType = 'int'
+
+        controller.openEditorModal({
+          title: 'Create Constant',
+          mode: 'confirm',
+          onConfirm: () => onConfirm({ name: constantName, valueType: constantType }),
+          editor: <CreateTypedValue<ConstantValueType>
+            defaultName={'constant'}
+            typeOptions={['int', 'string', 'position', 'item_stack']}
+            onChangeName={name => { constantName = name }}
+            onChangeType={type => { constantType = type }}
           />
         })
       }

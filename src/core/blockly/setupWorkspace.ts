@@ -105,11 +105,9 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
     })
   })
 
-  // TODO placeholder
   workspace.registerButtonCallback('CREATE_CONSTANT', () => {
-    constantRegistry.add({
-      name: prompt('Name?') as string,
-      valueType: 'int'
+    callbacks.onCreateConstant(({ name, valueType }) => {
+      constantRegistry.add({ name, valueType })
     })
   })
 

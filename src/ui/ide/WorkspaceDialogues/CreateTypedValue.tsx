@@ -2,26 +2,39 @@ import {Stack, Typography} from '@mui/material'
 import {useState} from 'react'
 import TextInput from '../../editor/components/TextInput.tsx'
 import DropdownInput from '../../editor/components/DropdownInput.tsx'
-import type {VariableValueType} from '../../../core/blockly/registry'
 
-const DEFAULT_VARIABLE_NAME = 'var'
+const DEFAULT_TYPED_VALUE_NAME = 'var'
 
-type CreateVariableProps = {
+type CreateTypedValueProps<TValueType extends string> = {
+  defaultName?: string
+  defaultType?: TValueType
+  typeOptions: TValueType[]
   onChangeName: (name: string) => void
-  onChangeType: (type: VariableValueType) => void
+  onChangeType: (type: TValueType) => void
 }
 
-export function CreateVariable({ onChangeName, onChangeType }: CreateVariableProps) {
-  const [variableName, setVariableName] = useState(DEFAULT_VARIABLE_NAME)
-  const [variableType, setVariableType] = useState<VariableValueType>('int')
+export function CreateTypedValue<TValueType extends string>({
+  defaultName = DEFAULT_TYPED_VALUE_NAME,
+  defaultType,
+  typeOptions,
+  onChangeName,
+  onChangeType,
+}: CreateTypedValueProps<TValueType>) {
+  const initialType = defaultType ?? typeOptions[0]
+  if (initialType === undefined) {
+    throw new Error('CreateTypedValue requires at least one type option or a default type.')
+  }
+
+  const [valueName, setValueName] = useState(defaultName)
+  const [valueType, setValueType] = useState<TValueType>(initialType)
 
   const handleNameChange = (name: string) => {
-    setVariableName(name)
+    setValueName(name)
     onChangeName(name)
   }
 
-  const handleTypeChange = (type: VariableValueType) => {
-    setVariableType(type)
+  const handleTypeChange = (type: TValueType) => {
+    setValueType(type)
     onChangeType(type)
   }
 
@@ -36,8 +49,8 @@ export function CreateVariable({ onChangeName, onChangeType }: CreateVariablePro
       }}>
         <Typography sx={{ minWidth: '5rem' }}>Name</Typography>
         <TextInput
-          defaultValue={DEFAULT_VARIABLE_NAME}
-          value={variableName}
+          defaultValue={defaultName}
+          value={valueName}
           setValue={handleNameChange}
           sx={{
             flex: 1,
@@ -52,9 +65,9 @@ export function CreateVariable({ onChangeName, onChangeType }: CreateVariablePro
       }}>
         <Typography sx={{ minWidth: '5rem' }}>Type</Typography>
         <DropdownInput
-          options={['int'] as VariableValueType[]}
-          value={variableType}
-          setValue={type => handleTypeChange(type as VariableValueType)}
+          options={typeOptions}
+          value={valueType}
+          setValue={type => handleTypeChange(type as TValueType)}
           sx={{
             flex: 1,
           }}
