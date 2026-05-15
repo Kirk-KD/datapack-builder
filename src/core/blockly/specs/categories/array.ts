@@ -21,6 +21,7 @@ type ArrayItemBlock = StatefulBlock & ArrayItemBlockState
 const ARRAY_ITEM_BLOCK_TYPE = 'array_item'
 const ARRAY_ITEMS_INPUT = 'ITEMS'
 const ARRAY_ITEM_VALUE_INPUT = 'VALUE'
+const ARRAY_ITEM_INDEX_FIELD = 'INDEX'
 
 const constantValueTypeOptions: [string, ConstantValueType][] = [
   ['integers', 'int'],
@@ -46,6 +47,58 @@ function getLastStackBlock(firstBlock: Blockly.Block) {
     current = current.getNextBlock() as Blockly.Block
   }
   return current
+}
+
+function getArrayItemIndex(arrayItemBlock: ArrayItemBlock) {
+  if (!arrayItemBlock.parentId_) return null
+
+  const parentBlock = arrayItemBlock.workspace.getBlockById(arrayItemBlock.parentId_)
+  if (!parentBlock || parentBlock.type !== valueTypes.Array) return null
+
+  let currentBlock = parentBlock.getInput(ARRAY_ITEMS_INPUT)?.connection?.targetBlock() ?? null
+  let index = 0
+
+  while (currentBlock) {
+    if (currentBlock.id === arrayItemBlock.id) return index
+    currentBlock = currentBlock.getNextBlock()
+    index += 1
+  }
+
+  return null
+}
+
+function getArrayItemLabel(arrayItemBlock: ArrayItemBlock) {
+  const index = getArrayItemIndex(arrayItemBlock)
+  return index === null ? 'item' : `${index}.`
+}
+
+function updateArrayItemLabel(arrayItemBlock: ArrayItemBlock) {
+  const labelField = arrayItemBlock.getField(ARRAY_ITEM_INDEX_FIELD)
+  if (labelField) {
+    labelField.setValue(getArrayItemLabel(arrayItemBlock))
+  }
+}
+
+function updateArrayItemType(arrayItemBlock: ArrayItemBlock, valueType: ConstantValueType) {
+  mutateExtraState(arrayItemBlock, () => {
+    arrayItemBlock.type_ = valueType
+  })
+
+  arrayItemBlock.getInput(ARRAY_ITEM_VALUE_INPUT)
+    ?.setCheck(getConstantValueTypeCheck(arrayItemBlock.type_))
+}
+
+function updateArrayItemsFromParent(arrayBlock: ArrayBlock) {
+  let currentBlock = arrayBlock.getInput(ARRAY_ITEMS_INPUT)?.connection?.targetBlock() ?? null
+
+  while (currentBlock) {
+    if (currentBlock.type === ARRAY_ITEM_BLOCK_TYPE) {
+      const arrayItemBlock = currentBlock as ArrayItemBlock
+      updateArrayItemLabel(arrayItemBlock)
+      updateArrayItemType(arrayItemBlock, arrayBlock.type_)
+    }
+    currentBlock = currentBlock.getNextBlock()
+  }
 }
 
 function connectArrayItemBlock(arrayBlock: ArrayBlock, arrayItemBlock: ArrayItemBlock) {
@@ -78,6 +131,7 @@ function createArrayItemBlock(arrayBlock: ArrayBlock) {
   arrayItemBlock.render()
 
   connectArrayItemBlock(arrayBlock, arrayItemBlock)
+  updateArrayItemsFromParent(arrayBlock)
 }
 
 const arrayBlockSpec: BlockSpec = {
@@ -105,6 +159,10 @@ const arrayBlockSpec: BlockSpec = {
 
       this.appendStatementInput(ARRAY_ITEMS_INPUT)
         .setCheck(ARRAY_ITEM_BLOCK_TYPE)
+    }
+
+    block.onchange = function(this: ArrayBlock) {
+      updateArrayItemsFromParent(this)
     }
 
     block.updateShape_()
@@ -136,7 +194,11 @@ const arrayItemBlockSpec: BlockSpec = {
 
       this.appendValueInput(ARRAY_ITEM_VALUE_INPUT)
         .setCheck(getConstantValueTypeCheck(this.type_))
-        .appendField('item')
+        .appendField(getArrayItemLabel(this), ARRAY_ITEM_INDEX_FIELD)
+    }
+
+    block.onchange = function(this: ArrayItemBlock) {
+      updateArrayItemLabel(this)
     }
 
     block.updateShape_()
