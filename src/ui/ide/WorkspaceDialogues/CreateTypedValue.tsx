@@ -5,10 +5,15 @@ import DropdownInput from '../../editor/components/DropdownInput.tsx'
 
 const DEFAULT_TYPED_VALUE_NAME = 'var'
 
+type TypeOption<TValueType extends string> = {
+  label: string
+  value: TValueType
+}
+
 type CreateTypedValueProps<TValueType extends string> = {
   defaultName?: string
   defaultType?: TValueType
-  typeOptions: TValueType[]
+  typeOptions: TypeOption<TValueType>[]
   onChangeName: (name: string) => void
   onChangeType: (type: TValueType) => void
 }
@@ -20,23 +25,31 @@ export function CreateTypedValue<TValueType extends string>({
   onChangeName,
   onChangeType,
 }: CreateTypedValueProps<TValueType>) {
-  const initialType = defaultType ?? typeOptions[0]
-  if (initialType === undefined) {
+  const initialOption = defaultType
+    ? typeOptions.find(option => option.value === defaultType)
+    : typeOptions[0]
+
+  if (initialOption === undefined) {
     throw new Error('CreateTypedValue requires at least one type option or a default type.')
   }
 
   const [valueName, setValueName] = useState(defaultName)
-  const [valueType, setValueType] = useState<TValueType>(initialType)
+  const [valueType, setValueType] = useState<TValueType>(initialOption.value)
 
   const handleNameChange = (name: string) => {
     setValueName(name)
     onChangeName(name)
   }
 
-  const handleTypeChange = (type: TValueType) => {
-    setValueType(type)
-    onChangeType(type)
+  const handleTypeChange = (label: string) => {
+    const selectedOption = typeOptions.find(option => option.label === label)
+    if (!selectedOption) return
+
+    setValueType(selectedOption.value)
+    onChangeType(selectedOption.value)
   }
+
+  const selectedTypeLabel = typeOptions.find(option => option.value === valueType)?.label ?? initialOption.label
 
   return (
     <Stack spacing={1} sx={{
@@ -65,9 +78,9 @@ export function CreateTypedValue<TValueType extends string>({
       }}>
         <Typography sx={{ minWidth: '5rem' }}>Type</Typography>
         <DropdownInput
-          options={typeOptions}
-          value={valueType}
-          setValue={type => handleTypeChange(type as TValueType)}
+          options={typeOptions.map(option => option.label)}
+          value={selectedTypeLabel}
+          setValue={handleTypeChange}
           sx={{
             flex: 1,
           }}

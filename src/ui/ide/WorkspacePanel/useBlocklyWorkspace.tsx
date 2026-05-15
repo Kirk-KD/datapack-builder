@@ -42,7 +42,7 @@ export default function useBlocklyWorkspace() {
           mode: 'confirm',
           onConfirm: () => onConfirm({ name: variableName, valueType: variableType }),
           editor: <CreateTypedValue<VariableValueType>
-            typeOptions={['int']}
+            typeOptions={[{ label: 'Integer', value: 'int' }]}
             onChangeName={name => { variableName = name }}
             onChangeType={type => { variableType = type }}
           />
@@ -58,7 +58,12 @@ export default function useBlocklyWorkspace() {
           onConfirm: () => onConfirm({ name: constantName, valueType: constantType }),
           editor: <CreateTypedValue<ConstantValueType>
             defaultName={'constant'}
-            typeOptions={['int', 'string', 'position', 'item_stack']}
+            typeOptions={[
+              { label: 'Integer', value: 'int' },
+              { label: 'String', value: 'string' },
+              { label: 'Position', value: 'position' },
+              { label: 'Item stack', value: 'item_stack' },
+            ]}
             onChangeName={name => { constantName = name }}
             onChangeType={type => { constantType = type }}
           />
