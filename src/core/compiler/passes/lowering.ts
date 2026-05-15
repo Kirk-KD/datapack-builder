@@ -43,7 +43,7 @@ import {
   type PositionComponentNode,
   type RangeComponentNode,
   type RotationComponentNode,
-  ConstantsNode, ConstantDefNode, ConstantGetNode
+  ConstantsNode, ConstantDefNode, ConstantGetNode, BinOpNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -866,5 +866,10 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     finally {
       this.resolvingConstants.pop()
     }
+  }
+
+  visitBinOp(node: BinOpNode): LoweredResult {
+    void node
+    throw Error() // TODO stub
   }
 }

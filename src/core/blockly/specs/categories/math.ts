@@ -1,7 +1,7 @@
 import type {BlockSpec} from '../types.ts'
 import * as Blockly from 'blockly'
 import {valueTypes} from '../valueTypes.ts'
-import {LiteralIntNode} from '../../../compiler'
+import {type BinaryOperator, BinOpNode, LiteralIntNode, valueToIr} from '../../../compiler'
 import {colours} from '../../colours.ts'
 
 const BINARY_OPERAND_CHECKS = [valueTypes.VarGet, valueTypes.Int]
@@ -40,7 +40,7 @@ function updateBinaryOutputType(block: Blockly.Block) {
 /**
  * Create a binary math operation block.
  */
-function makeBinaryOperationBlockSpec(type: string, op: string): BlockSpec {
+function makeBinaryOperationBlockSpec(type: string, op: BinaryOperator): BlockSpec {
   return {
     type,
     category: 'math',
@@ -63,8 +63,12 @@ function makeBinaryOperationBlockSpec(type: string, op: string): BlockSpec {
       })
     },
     generator(block: Blockly.Block) {
-      void block
-      throw Error()
+      return new BinOpNode(
+        valueToIr(block, BINARY_INPUT_A),
+        op,
+        valueToIr(block, BINARY_INPUT_B),
+        block.id
+      )
     }
   }
 }
@@ -92,9 +96,17 @@ const intBlockSpec: BlockSpec = {
   },
 }
 
-const additionBlockSpec: BlockSpec = makeBinaryOperationBlockSpec('addition', '+')
+const addBlockSpec: BlockSpec = makeBinaryOperationBlockSpec('add', '+')
+const subBlockSpec: BlockSpec = makeBinaryOperationBlockSpec('sub', '-')
+const mulBlockSpec: BlockSpec = makeBinaryOperationBlockSpec('mul', '*')
+const divBlockSpec: BlockSpec = makeBinaryOperationBlockSpec('div', '/')
+const modBlockSpec: BlockSpec = makeBinaryOperationBlockSpec('mod', 'mod')
 
 export const mathBlockSpecs: BlockSpec[] = [
   intBlockSpec,
-  additionBlockSpec,
+  addBlockSpec,
+  subBlockSpec,
+  mulBlockSpec,
+  divBlockSpec,
+  modBlockSpec,
 ]
