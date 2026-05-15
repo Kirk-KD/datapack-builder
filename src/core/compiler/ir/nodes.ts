@@ -1,6 +1,7 @@
 import type {IrVisitor} from "./visitor.ts";
 import type {OrParameter, TopLevelNode, VariableCompareOpType, VariableOpType} from "./types.ts";
 import type {
+  ConstantRegistryEntry,
   ProcedureParameterRegistryEntry,
   ProcedureRegistryEntry,
 } from "../../blockly/registry";
@@ -223,9 +224,9 @@ export class LiteralStringNode extends FragmentNode {
 }
 
 export class TildeNode extends FragmentNode {
-  readonly valueNode: OrParameter<OptNumberNode>
+  readonly valueNode: OrParameter<OptNumberNode | LiteralIntNode>
 
-  constructor(valueNode: OrParameter<OptNumberNode>, sourceBlockId?: string | null) {
+  constructor(valueNode: OrParameter<OptNumberNode | LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.valueNode = valueNode
   }
@@ -236,9 +237,9 @@ export class TildeNode extends FragmentNode {
 }
 
 export class CaretNode extends FragmentNode {
-  readonly valueNode: OrParameter<OptNumberNode>
+  readonly valueNode: OrParameter<OptNumberNode | LiteralIntNode>
 
-  constructor(valueNode: OrParameter<OptNumberNode>, sourceBlockId?: string | null) {
+  constructor(valueNode: OrParameter<OptNumberNode | LiteralIntNode>, sourceBlockId?: string | null) {
     super(sourceBlockId)
     this.valueNode = valueNode
   }
@@ -248,7 +249,9 @@ export class CaretNode extends FragmentNode {
   }
 }
 
-export type PositionComponentNode = NumberNode | TildeNode | CaretNode | FragmentCompositeNode
+export type PositionComponentNode = NumberNode | LiteralIntNode | TildeNode | CaretNode | FragmentCompositeNode
+export type RangeComponentNode = NumberNode | LiteralIntNode | FragmentCompositeNode
+export type RotationComponentNode = NumberNode | LiteralIntNode | TildeNode | FragmentCompositeNode
 
 export class LiteralPositionNode extends FragmentNode {
   readonly xNode: OrParameter<PositionComponentNode>
@@ -273,10 +276,14 @@ export class LiteralPositionNode extends FragmentNode {
 }
 
 export class LiteralRangeNode extends FragmentNode {
-  readonly minNode: LiteralIntNode // TODO add number type (not just int)
-  readonly maxNode: LiteralIntNode
+  readonly minNode: OrParameter<RangeComponentNode>
+  readonly maxNode: OrParameter<RangeComponentNode>
 
-  constructor(minNode: LiteralIntNode, maxNode: LiteralIntNode, sourceBlockId?: string | null) {
+  constructor(
+    minNode: OrParameter<RangeComponentNode>,
+    maxNode: OrParameter<RangeComponentNode>,
+    sourceBlockId?: string | null
+  ) {
     super(sourceBlockId)
     this.minNode = minNode
     this.maxNode = maxNode
@@ -288,10 +295,14 @@ export class LiteralRangeNode extends FragmentNode {
 }
 
 export class LiteralRotationNode extends FragmentNode {
-  readonly yawNode: LiteralStringNode
-  readonly pitchNode: LiteralStringNode
+  readonly yawNode: OrParameter<RotationComponentNode>
+  readonly pitchNode: OrParameter<RotationComponentNode>
 
-  constructor(yawNode: LiteralStringNode, pitchNode: LiteralStringNode, sourceBlockId?: string | null) {
+  constructor(
+    yawNode: OrParameter<RotationComponentNode>,
+    pitchNode: OrParameter<RotationComponentNode>,
+    sourceBlockId?: string | null
+  ) {
     super(sourceBlockId)
     this.yawNode = yawNode
     this.pitchNode = pitchNode
@@ -554,5 +565,46 @@ export class RaycastBlockNode extends CommandNode {
 
   accept<T>(visitor: IrVisitor<T>): T {
     return visitor.visitRaycastBlock(this)
+  }
+}
+
+export class ConstantsNode extends IrNode {
+  readonly constantDefNodes: ConstantDefNode[]
+
+  constructor(constantDefNodes: ConstantDefNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.constantDefNodes = constantDefNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitConstants(this)
+  }
+}
+
+export class ConstantDefNode extends IrNode {
+  readonly constantEntry: ConstantRegistryEntry
+  readonly valueNode: IrNode
+
+  constructor(constantEntry: ConstantRegistryEntry, valueNode: IrNode, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.constantEntry = constantEntry
+    this.valueNode = valueNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitConstantDef(this)
+  }
+}
+
+export class ConstantGetNode extends FragmentNode {
+  readonly constantEntry: ConstantRegistryEntry
+
+  constructor(constantEntry: ConstantRegistryEntry, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.constantEntry = constantEntry
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitConstantGet(this)
   }
 }

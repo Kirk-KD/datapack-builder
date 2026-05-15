@@ -14,6 +14,7 @@ import {
   nextBlocksToIr
 } from '../../../compiler'
 import {states} from '../../states.ts'
+import {valueTypes} from '../valueTypes'
 
 type ProcBlockState = {
   procedure: ProcedureRegistryEntry | null
@@ -83,7 +84,7 @@ function createProcedureParameterBlock(
   procedure: ProcedureRegistryEntry,
   parameter: ProcedureParameterRegistryEntry,
 ) {
-  const block = workspace.newBlock('mc_proc_param') as ProcParamBlock
+  const block = workspace.newBlock(valueTypes.ProcParam) as ProcParamBlock
   mutateExtraState(block, () => {
     block.procedure = procedure
     block.parameter = parameter
@@ -106,7 +107,7 @@ function ensureProcedureParameterBlocks(block: ProcDefBlock) {
     const connection = input?.connection
     const targetBlock = connection?.targetBlock() as ProcParamBlock | null
 
-    if (targetBlock?.type === 'mc_proc_param' && targetBlock.parameter?.id === parameter.id) return
+    if (targetBlock?.type === valueTypes.ProcParam && targetBlock.parameter?.id === parameter.id) return
 
     const paramBlock = createProcedureParameterBlock(workspace, block.procedure!, parameter)
     connection?.connect(paramBlock.outputConnection)
@@ -149,7 +150,7 @@ const procDefBlockSpec: BlockSpec = {
           params.forEach(parameter => {
             const inputName = `PARAM_${parameter.id}`
             this.appendValueInput(inputName)
-              .setCheck('mc_proc_param')
+              .setCheck(valueTypes.ProcParam)
 
             const previousBlock = previousConnections.get(inputName)
             if (previousBlock?.outputConnection) {
@@ -261,7 +262,7 @@ const procCallBlockSpec: BlockSpec = {
 }
 
 const procParamBlockSpec: BlockSpec = {
-  type: 'mc_proc_param',
+  type: valueTypes.ProcParam,
   category: 'procedures',
   init(this: Blockly.Block) {
     const block = this as ProcParamBlock
@@ -273,7 +274,7 @@ const procParamBlockSpec: BlockSpec = {
     block.setColour(colours.procedures)
     block.setTooltip('')
     block.setHelpUrl('')
-    block.setOutput(true, 'mc_proc_param')
+    block.setOutput(true, valueTypes.ProcParam)
 
     block.updateShape_ = function(this: ProcParamBlock) {
       this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
@@ -341,7 +342,7 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
     procedureRegistry.subscribe(() => {
       workspace.updateToolbox({
         kind: 'categoryToolbox',
-        contents: getToolboxContents()
+        contents: getToolboxContents(workspace)
       })
     })
   ]
@@ -364,7 +365,7 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
 
       const movedBlock = workspace.getBlockById(moveEvent.blockId)
 
-      if (movedBlock?.type !== 'mc_proc_param' || !moveEvent.oldParentId || moveEvent.oldInputName == null) return
+      if (movedBlock?.type !== valueTypes.ProcParam || !moveEvent.oldParentId || moveEvent.oldInputName == null) return
 
       const oldParentId = moveEvent.oldParentId
       const oldParent = workspace.getBlockById(oldParentId)

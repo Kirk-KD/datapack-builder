@@ -1,5 +1,6 @@
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
+import {valueTypes} from '../valueTypes'
 import {
   CommandNode,
   IfNode,
@@ -29,16 +30,16 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: FIELD_VAR_NAME,
-          check: ['mc_var_get']
+          check: [valueTypes.VarGet]
         },
         {
           type: 'input_value',
           name: 'RANGE',
-          check: ['mc_proc_param', 'mc_range'],
+          check: [valueTypes.ProcParam, valueTypes.Range],
         },
       ],
       inputsInline: true,
-      output: 'MCCondition',
+      output: valueTypes.Condition,
     },
     generator(block) {
       return new VariableMatchesNode(
@@ -48,8 +49,8 @@ export const controlBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, FIELD_VAR_NAME, { type: 'mc_var_get' })
-      setShadowState(this, 'RANGE', { type: 'mc_range' })
+      setShadowState(this, FIELD_VAR_NAME, { type: valueTypes.VarGet })
+      setShadowState(this, 'RANGE', { type: valueTypes.Range })
     },
   },
   {
@@ -62,7 +63,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: FIELD_VAR_NAME,
-          check: ['mc_var_get']
+          check: [valueTypes.VarGet]
         },
         {
           type: 'field_dropdown',
@@ -78,11 +79,11 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_VAR_B,
-          check: ['mc_proc_param', 'mc_int', 'mc_var_get'],
+          check: [valueTypes.ProcParam, valueTypes.Int, valueTypes.VarGet],
         },
       ],
       inputsInline: true,
-      output: 'MCCondition',
+      output: valueTypes.Condition,
     },
     generator(block) {
       return new VariableCompareNode(
@@ -94,10 +95,10 @@ export const controlBlockSpecs: BlockSpec[] = [
     },
     setShadowBlocks(this) {
       setShadowState(this, FIELD_VAR_NAME, {
-        type: 'mc_var_get'
+        type: valueTypes.VarGet
       })
       setShadowState(this, INPUT_VAR_B, {
-        type: 'mc_int',
+        type: valueTypes.Int,
         fields: { VALUE: 0 },
       })
     },
@@ -112,7 +113,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: ['mc_proc_param', 'MCCondition'],
+          check: [valueTypes.ProcParam, valueTypes.Condition],
         },
       ],
       message1: 'then %1',
@@ -144,7 +145,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: ['mc_proc_param', 'MCCondition'],
+          check: [valueTypes.ProcParam, valueTypes.Condition],
         },
       ],
       message1: 'then %1',
@@ -183,7 +184,7 @@ export const controlBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_CONDITION,
-          check: 'MCCondition',
+          check: valueTypes.Condition,
         },
       ],
       message1: 'do %1',

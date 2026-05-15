@@ -1,16 +1,49 @@
 import {
-  CommandCompositeNode, CommandNode,
+  CommandCompositeNode,
+  CommandNode,
   DatapackNode,
   ExecuteNode,
-  FragmentCompositeNode, FragmentNode, FunctionCallNode, FunctionDefinitionNode, FunctionTagNode,
+  FragmentCompositeNode,
+  FragmentNode,
+  FunctionCallNode,
+  FunctionDefinitionNode,
+  FunctionTagNode,
   IfNode,
   IrNode,
-  type IrVisitor, ItemStackNode, LiteralIntNode, LiteralPositionNode, LiteralRangeNode, LiteralRotationNode,
-  LiteralStringNode, NumberNode, OnLoadNode, OnPlayerMinesBlockNode, OnTickNode, OptNumberNode,
-  type OrParameter, ProcedureCallArgumentNode, ProcedureCallNode, ProcedureDefinitionNode,
-  ProcedureParameterNode, RaycastBlockNode, RaycastEntityNode, TargetSelectorNode, TempVariableNode, TildeNode, CaretNode,
-  type TopLevelNode, VariableCompareNode, VariableMatchesNode, VariableNode,
-  VariableOperationNode, VariableSetNode, WhileNode, type PositionComponentNode
+  type IrVisitor,
+  ItemStackNode,
+  LiteralIntNode,
+  LiteralPositionNode,
+  LiteralRangeNode,
+  LiteralRotationNode,
+  LiteralStringNode,
+  NumberNode,
+  OnLoadNode,
+  OnPlayerMinesBlockNode,
+  OnTickNode,
+  OptNumberNode,
+  type OrParameter,
+  ProcedureCallArgumentNode,
+  ProcedureCallNode,
+  ProcedureDefinitionNode,
+  ProcedureParameterNode,
+  RaycastBlockNode,
+  RaycastEntityNode,
+  TargetSelectorNode,
+  TempVariableNode,
+  TildeNode,
+  CaretNode,
+  type TopLevelNode,
+  VariableCompareNode,
+  VariableMatchesNode,
+  VariableNode,
+  VariableOperationNode,
+  VariableSetNode,
+  WhileNode,
+  type PositionComponentNode,
+  type RangeComponentNode,
+  type RotationComponentNode,
+  ConstantsNode, ConstantDefNode, ConstantGetNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -49,6 +82,8 @@ interface LoweredResult {
 
 export class LoweringPass implements IrVisitor<LoweredResult> {
   naming: Naming
+  private readonly constantDefs = new Map<string, ConstantDefNode>()
+  private readonly resolvingConstants: string[] = []
 
   /**
    * Returns the next temporary scoreboard variable name to be passed to `new TempVariableNode(...)`.
@@ -203,6 +238,12 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
   visitDatapack(node: DatapackNode): LoweredResult {
     const topLevelNodes: TopLevelNode[] = []
     for (const topLevelNode of node.topLevelNodes) {
+      if (topLevelNode instanceof ConstantsNode) {
+        topLevelNode.accept(this)
+      }
+    }
+    for (const topLevelNode of node.topLevelNodes) {
+      if (topLevelNode instanceof ConstantsNode) continue
       const lowered = topLevelNode.accept(this)
       topLevelNodes.push(...lowered.nodes as TopLevelNode[])
     }
@@ -320,8 +361,8 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [...min.pre, ...max.pre],
       nodes: [new LiteralRangeNode(
-        min.nodes[0] as LiteralIntNode,
-        max.nodes[0] as LiteralIntNode,
+        min.nodes[0] as OrParameter<RangeComponentNode>,
+        max.nodes[0] as OrParameter<RangeComponentNode>,
         node.sourceBlockId
       )]
     }
@@ -333,8 +374,8 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
     return {
       pre: [...yaw.pre, ...pitch.pre],
       nodes: [new LiteralRotationNode(
-        yaw.nodes[0] as LiteralStringNode,
-        pitch.nodes[0] as LiteralStringNode,
+        yaw.nodes[0] as OrParameter<RotationComponentNode>,
+        pitch.nodes[0] as OrParameter<RotationComponentNode>,
         node.sourceBlockId
       )]
     }
@@ -790,6 +831,40 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
           true
         )
       ]
+    }
+  }
+
+  visitConstants(node: ConstantsNode): LoweredResult {
+    for (const constantDefNode of node.constantDefNodes) {
+      constantDefNode.accept(this)
+    }
+    return { pre: [], nodes: [] }
+  }
+
+  visitConstantDef(node: ConstantDefNode): LoweredResult {
+    this.constantDefs.set(node.constantEntry.name, node)
+    return { pre: [], nodes: [] }
+  }
+
+  visitConstantGet(node: ConstantGetNode): LoweredResult {
+    const constantName = node.constantEntry.name
+    const constantDef = this.constantDefs.get(constantName)
+    if (!constantDef) {
+      throw new Error(`Constant "${constantName}" is not defined.`)
+    }
+
+    if (this.resolvingConstants.includes(constantName)) {
+      const cycleStart = this.resolvingConstants.indexOf(constantName)
+      const cycle = [...this.resolvingConstants.slice(cycleStart), constantName]
+      throw new Error(`Circular constant reference: ${cycle.join(' -> ')}`)
+    }
+
+    this.resolvingConstants.push(constantName)
+    try {
+      return constantDef.valueNode.accept(this)
+    }
+    finally {
+      this.resolvingConstants.pop()
     }
   }
 }

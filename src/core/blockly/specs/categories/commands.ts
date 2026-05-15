@@ -1,12 +1,22 @@
 import type { BlockSpec } from '../types'
 import {setShadowState} from "../../extensions/shadows.ts";
+import {valueTypes} from '../valueTypes'
 import * as Blockly from "blockly"
 import {colours} from "../../colours.ts";
 import { createStateCheckbox, createStateDropdown } from "../dynamicFields.ts";
 import { bindExtraState } from "../extraState.ts";
 import {valueToIr, CommandCompositeNode, LiteralStringNode} from '../../../compiler'
 
-const sayChecks = ['mc_string', 'mc_int', 'mc_proc_param', 'mc_target_selector', 'MCCondition', 'mc_block_pos', 'mc_rotation', 'mc_range']
+const sayChecks = [
+  valueTypes.String,
+  valueTypes.Int,
+  valueTypes.ProcParam,
+  valueTypes.TargetSelector,
+  valueTypes.Condition,
+  valueTypes.Position,
+  valueTypes.Rotation,
+  valueTypes.Range,
+]
 
 const ADVANCEMENT_ACTION_NAME = 'ACTION'
 const ADVANCEMENT_TARGET_NAME = 'TARGET'
@@ -86,7 +96,7 @@ export const commandBlockSpecs: BlockSpec[] = [
     },
     setShadowBlocks(this) {
       setShadowState(this, 'MESSAGE', {
-        type: 'mc_string',
+        type: valueTypes.String,
         fields: { VALUE: 'Hello world' },
       })
     },
@@ -101,12 +111,12 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'SELECTOR',
-          check: ['mc_proc_param', 'mc_string', 'mc_target_selector'],
+          check: [valueTypes.ProcParam, valueTypes.String, valueTypes.TargetSelector],
         },
         {
           type: 'input_value',
           name: 'TARGET',
-          check: ['mc_proc_param', 'mc_block_pos']
+          check: [valueTypes.ProcParam, valueTypes.Position]
         }
       ],
       inputsInline: true,
@@ -123,7 +133,7 @@ export const commandBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'SELECTOR', { type: 'mc_target_selector' })
+      setShadowState(this, 'SELECTOR', { type: valueTypes.TargetSelector })
     },
   },
   {
@@ -136,17 +146,17 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: SUMMON_ENTITY_NAME,
-          check: ['mc_string'],
+          check: [valueTypes.String],
         },
         {
           type: 'input_value',
           name: SUMMON_POS_NAME,
-          check: ['mc_block_pos'],
+          check: [valueTypes.Position],
         },
         {
           type: 'input_value',
           name: SUMMON_NBT_NAME,
-          check: ['mc_string'],
+          check: [valueTypes.String],
         }
       ],
       inputsInline: true,
@@ -167,8 +177,8 @@ export const commandBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, SUMMON_ENTITY_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:pig' } })
-      setShadowState(this, SUMMON_NBT_NAME, { type: 'mc_string', fields: { VALUE: '' } })
+      setShadowState(this, SUMMON_ENTITY_NAME, { type: valueTypes.String, fields: { VALUE: 'minecraft:pig' } })
+      setShadowState(this, SUMMON_NBT_NAME, { type: valueTypes.String, fields: { VALUE: '' } })
     }
   },
   {
@@ -196,10 +206,10 @@ export const commandBlockSpecs: BlockSpec[] = [
           ['revoke', 'revoke'],
         ] as [string, AdvancementAction][])
         this.appendValueInput(ADVANCEMENT_TARGET_NAME)
-          .setCheck(['mc_proc_param', 'mc_string', 'mc_target_selector']) // TODO validate target is player-type
+          .setCheck([valueTypes.ProcParam, valueTypes.String, valueTypes.TargetSelector]) // TODO validate target is player-type
           .appendField('advancement')
           .appendField(actionDropdown, ADVANCEMENT_ACTION_NAME)
-        setShadowState(this, ADVANCEMENT_TARGET_NAME, { type: 'mc_target_selector' })
+        setShadowState(this, ADVANCEMENT_TARGET_NAME, { type: valueTypes.TargetSelector })
 
         const specifierDropdown = createStateDropdown(block, 'specifier_', [
           ['everything', 'everything'],
@@ -211,13 +221,16 @@ export const commandBlockSpecs: BlockSpec[] = [
         this.appendDummyInput('HEADER').appendField(specifierDropdown, ADVANCEMENT_SPECIFIER_NAME)
 
         if (this.specifier_ !== 'everything') {
-          this.appendValueInput(ADVANCEMENT_ADVANCEMENT_NAME).setCheck(['mc_proc_param', 'mc_string']) // TODO validate
-          setShadowState(this, ADVANCEMENT_ADVANCEMENT_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:story/shiny_gear' } })
+          this.appendValueInput(ADVANCEMENT_ADVANCEMENT_NAME)
+            .setCheck([valueTypes.ProcParam, valueTypes.String]) // TODO validate
+          setShadowState(this, ADVANCEMENT_ADVANCEMENT_NAME, { type: valueTypes.String, fields: { VALUE: 'minecraft:story/shiny_gear' } })
         }
 
         if (this.specifier_ === 'only') {
-          this.appendValueInput(ADVANCEMENT_CRITERION_NAME).appendField('with criterion').setCheck(['mc_proc_param', 'mc_string']) // TODO validate
-          setShadowState(this, ADVANCEMENT_CRITERION_NAME, { type: 'mc_string', fields: { VALUE: '' } })
+          this.appendValueInput(ADVANCEMENT_CRITERION_NAME)
+            .appendField('with criterion')
+            .setCheck([valueTypes.ProcParam, valueTypes.String]) // TODO validate
+          setShadowState(this, ADVANCEMENT_CRITERION_NAME, { type: valueTypes.String, fields: { VALUE: '' } })
         }
       }
 
@@ -262,13 +275,13 @@ export const commandBlockSpecs: BlockSpec[] = [
         this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
 
         this.appendValueInput(ATTRIBUTE_TARGET_NAME)
-          .setCheck(['mc_proc_param', 'mc_string', 'mc_target_selector'])
+          .setCheck([valueTypes.ProcParam, valueTypes.String, valueTypes.TargetSelector])
           .appendField('attribute')
-        setShadowState(this, ATTRIBUTE_TARGET_NAME, { type: 'mc_target_selector' })
+        setShadowState(this, ATTRIBUTE_TARGET_NAME, { type: valueTypes.TargetSelector })
 
         this.appendValueInput(ATTRIBUTE_ATTRIBUTE_NAME)
-          .setCheck(['mc_proc_param', 'mc_string'])
-        setShadowState(this, ATTRIBUTE_ATTRIBUTE_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:max_health' } })
+          .setCheck([valueTypes.ProcParam, valueTypes.String])
+        setShadowState(this, ATTRIBUTE_ATTRIBUTE_NAME, { type: valueTypes.String, fields: { VALUE: 'minecraft:max_health' } })
 
         const actionDropdown = createStateDropdown(block, 'action_', [
           ['get', 'get'],
@@ -284,19 +297,19 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         const appendScaleInput = () => {
           this.appendValueInput(ATTRIBUTE_SCALE_NAME)
-            .setCheck(['mc_proc_param', 'number'])
+            .setCheck([valueTypes.ProcParam, valueTypes.Number])
             .appendField('scaled by')
-          setShadowState(this, ATTRIBUTE_SCALE_NAME, { type: 'number', fields: { VALUE: '1' } })
+          setShadowState(this, ATTRIBUTE_SCALE_NAME, { type: valueTypes.Number, fields: { VALUE: '1' } })
         }
         const appendIdInput = () => {
           this.appendValueInput(ATTRIBUTE_ID_NAME)
-            .setCheck(['mc_proc_param', 'mc_string'])
-          setShadowState(this, ATTRIBUTE_ID_NAME, { type: 'mc_string', fields: { VALUE: 'custom_id'} })
+            .setCheck([valueTypes.ProcParam, valueTypes.String])
+          setShadowState(this, ATTRIBUTE_ID_NAME, { type: valueTypes.String, fields: { VALUE: 'custom_id'} })
         }
         const appendValueInput = () => {
           this.appendValueInput(ATTRIBUTE_VALUE_NAME)
-            .setCheck(['mc_proc_param', 'number'])
-          setShadowState(this, ATTRIBUTE_VALUE_NAME, { type: 'number' })
+            .setCheck([valueTypes.ProcParam, valueTypes.Number])
+          setShadowState(this, ATTRIBUTE_VALUE_NAME, { type: valueTypes.Number })
         }
         if (this.action_ === 'get' || this.action_ === 'base get') {
           appendScaleInput()
@@ -375,10 +388,10 @@ export const commandBlockSpecs: BlockSpec[] = [
         this.appendDummyInput('1').appendField('clone')
 
         this.appendValueInput(CLONE_BEGIN_NAME)
-          .setCheck(['mc_proc_param', 'mc_block_pos'])
+          .setCheck([valueTypes.ProcParam, valueTypes.Position])
 
         this.appendValueInput(CLONE_END_NAME)
-          .setCheck(['mc_proc_param', 'mc_block_pos'])
+          .setCheck([valueTypes.ProcParam, valueTypes.Position])
 
         this.appendDummyInput('2')
           .appendField('in dimension?')
@@ -386,12 +399,12 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         if (this.hasFromDimension_) {
           this.appendValueInput(CLONE_SOURCE_DIMENSION_NAME)
-              .setCheck(['mc_proc_param', 'mc_string'])
-          setShadowState(this, CLONE_SOURCE_DIMENSION_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:overworld' }})
+              .setCheck([valueTypes.ProcParam, valueTypes.String])
+          setShadowState(this, CLONE_SOURCE_DIMENSION_NAME, { type: valueTypes.String, fields: { VALUE: 'minecraft:overworld' }})
         }
 
         this.appendValueInput(CLONE_DESTINATION_NAME)
-          .setCheck(['mc_proc_param', 'mc_block_pos'])
+          .setCheck([valueTypes.ProcParam, valueTypes.Position])
           .appendField('to')
 
         this.appendDummyInput('3')
@@ -400,8 +413,8 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         if (this.hasToDimension_) {
           this.appendValueInput(CLONE_TARGET_DIMENSION_NAME)
-              .setCheck(['mc_proc_param', 'mc_string'])
-          setShadowState(this, CLONE_TARGET_DIMENSION_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:overworld' } })
+              .setCheck([valueTypes.ProcParam, valueTypes.String])
+          setShadowState(this, CLONE_TARGET_DIMENSION_NAME, { type: valueTypes.String, fields: { VALUE: 'minecraft:overworld' } })
         }
 
         this.appendDummyInput('4')
@@ -420,8 +433,8 @@ export const commandBlockSpecs: BlockSpec[] = [
 
         if (block.maskMode_ === 'filtered') {
           this.appendValueInput(CLONE_FILTER_NAME)
-              .setCheck(['mc_proc_param', 'mc_string']) // TODO block predicate
-          setShadowState(this, CLONE_FILTER_NAME, { type: 'mc_string', fields: { VALUE: 'minecraft:stone' } })
+              .setCheck([valueTypes.ProcParam, valueTypes.String]) // TODO block predicate
+          setShadowState(this, CLONE_FILTER_NAME, { type: valueTypes.String, fields: { VALUE: 'minecraft:stone' } })
         }
 
         const cloneModeDropdown = createStateDropdown(block, 'cloneMode_', [
@@ -496,12 +509,12 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'TARGET',
-          check: ['mc_proc_param', 'mc_string', 'mc_target_selector'],
+          check: [valueTypes.ProcParam, valueTypes.String, valueTypes.TargetSelector],
         },
         {
           type: 'input_value',
           name: 'ITEM',
-          check: ['mc_proc_param', 'mc_item_stack']
+          check: [valueTypes.ProcParam, valueTypes.ItemStack]
         },
       ],
       previousStatement: null,
@@ -517,8 +530,8 @@ export const commandBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
-      setShadowState(this, 'ITEM', { type: 'mc_item_stack' })
+      setShadowState(this, 'TARGET', { type: valueTypes.TargetSelector })
+      setShadowState(this, 'ITEM', { type: valueTypes.ItemStack })
     }
   },
   {
@@ -531,12 +544,12 @@ export const commandBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'POS',
-          check: ['mc_block_pos'],
+          check: [valueTypes.Position],
         },
         {
           type: 'input_value',
           name: 'BLOCK',
-          check: ['mc_string'],
+          check: [valueTypes.String],
         },
         {
           type: 'field_dropdown',
@@ -564,7 +577,7 @@ export const commandBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'BLOCK', { type: 'mc_string', fields: { VALUE: 'air' } })
+      setShadowState(this, 'BLOCK', { type: valueTypes.String, fields: { VALUE: 'air' } })
     },
   },
   {

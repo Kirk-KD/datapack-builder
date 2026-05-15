@@ -1,5 +1,6 @@
 import type { BlockSpec } from '../types'
 import { setShadowState } from '../../extensions/shadows.ts'
+import {valueTypes} from '../valueTypes'
 import * as Blockly from "blockly";
 import {FieldDropdown} from "blockly";
 import {colours} from "../../colours.ts";
@@ -10,7 +11,7 @@ import {valueToIr, VariableNode, VariableOperationNode, type VariableOpType, Var
 const FIELD_VAR_NAME = 'VAR_NAME'
 const FIELD_OP = 'OP'
 const INPUT_VALUE = 'VALUE'
-const VAR_SET_CHECKS = ['mc_int', 'mc_var_get', 'mc_proc_param']
+const VAR_SET_CHECKS = [valueTypes.Int, valueTypes.VarGet, valueTypes.ProcParam]
 
 type VarBlockStates = {
   variable?: VariableRegistryEntry
@@ -32,7 +33,7 @@ export const variableBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: FIELD_VAR_NAME,
-          check: ['mc_var_get']
+          check: [valueTypes.VarGet]
         },
         {
           type: 'input_value',
@@ -53,11 +54,11 @@ export const variableBlockSpecs: BlockSpec[] = [
     },
     setShadowBlocks(this) {
       setShadowState(this, INPUT_VALUE, {
-        type: 'mc_int',
+        type: valueTypes.Int,
         fields: { VALUE: 0 },
       })
       setShadowState(this, FIELD_VAR_NAME, {
-        type: 'mc_var_get'
+        type: valueTypes.VarGet
       })
     },
   },
@@ -71,7 +72,7 @@ export const variableBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: FIELD_VAR_NAME,
-          check: ['mc_var_get']
+          check: [valueTypes.VarGet]
         },
         {
           type: 'field_dropdown',
@@ -87,7 +88,7 @@ export const variableBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: INPUT_VALUE,
-          check: ['mc_proc_param', 'mc_int', 'mc_var_get'],
+          check: [valueTypes.ProcParam, valueTypes.Int, valueTypes.VarGet],
         },
       ],
       previousStatement: null,
@@ -104,16 +105,16 @@ export const variableBlockSpecs: BlockSpec[] = [
     },
     setShadowBlocks(this) {
       setShadowState(this, INPUT_VALUE, {
-        type: 'mc_int',
+        type: valueTypes.Int,
         fields: { VALUE: 1 },
       })
       setShadowState(this, FIELD_VAR_NAME, {
-        type: 'mc_var_get'
+        type: valueTypes.VarGet
       })
     },
   },
   {
-    type: 'mc_var_get',
+    type: valueTypes.VarGet,
     category: 'variable',
     init(this: Blockly.Block) {
       const block = this as VarBlock
@@ -165,7 +166,7 @@ export const variableBlockSpecs: BlockSpec[] = [
       block.setTooltip('')
       block.setHelpUrl('')
       block.setInputsInline(true)
-      block.setOutput(true, 'mc_var_get')
+      block.setOutput(true, valueTypes.VarGet)
 
       block.updateShape_()
     },

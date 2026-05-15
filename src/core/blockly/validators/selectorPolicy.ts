@@ -1,7 +1,8 @@
 import * as Blockly from 'blockly'
+import {valueTypes} from '../specs/valueTypes'
 
-const SELECTOR_TYPE = 'mc_target_selector'
-const SELECTOR_FILTER_PREFIX = 'mc_target_filter_'
+const SELECTOR_TYPE = valueTypes.TargetSelector
+const SELECTOR_FILTER_PREFIX = 'target_filter_'
 const SELECTOR_FILTER_STACK_INPUT = 'FILTER_STACK'
 
 function isSelectorFilterBlock(block: Blockly.Block | null): block is Blockly.Block {

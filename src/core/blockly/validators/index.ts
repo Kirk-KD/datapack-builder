@@ -1,6 +1,7 @@
 import * as Blockly from 'blockly'
-import { shouldDisallowExecuteConnection } from './executePolicy'
-import {shouldDisallowSelectorConnection} from "./selectorPolicy.ts";
+import {shouldDisallowConstantsConnection} from './constantsPolicy'
+import {shouldDisallowExecuteConnection} from './executePolicy'
+import {shouldDisallowSelectorConnection} from './selectorPolicy'
 
 class GlobalChecker extends Blockly.ConnectionChecker {
   doTypeChecks(a: Blockly.Connection, b: Blockly.Connection): boolean {
@@ -13,6 +14,7 @@ class GlobalChecker extends Blockly.ConnectionChecker {
 
     const superiorBlock = superior.getSourceBlock()
     const inferiorBlock = inferior.getSourceBlock()
+    if (shouldDisallowConstantsConnection(superior, superiorBlock, inferiorBlock)) return false
     if (shouldDisallowExecuteConnection(superior, superiorBlock, inferiorBlock)) return false
     if (shouldDisallowSelectorConnection(superior, superiorBlock, inferiorBlock)) return false
 

@@ -9,6 +9,7 @@ import {
   LiteralStringNode
 } from '../../../compiler'
 import {setShadowState} from '../../extensions/shadows.ts'
+import {valueTypes} from '../valueTypes'
 
 export const eventBlockSpecs: BlockSpec[] = [
   {
@@ -53,7 +54,7 @@ export const eventBlockSpecs: BlockSpec[] = [
         {
           type: 'input_value',
           name: 'BLOCK',
-          check: ['mc_string'],
+          check: [valueTypes.String],
         },
       ],
       inputsInline: true,
@@ -67,7 +68,7 @@ export const eventBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'BLOCK', { type: 'mc_string', fields: { VALUE: 'stone' } })
+      setShadowState(this, 'BLOCK', { type: valueTypes.String, fields: { VALUE: 'stone' } })
     }
   }
 ]

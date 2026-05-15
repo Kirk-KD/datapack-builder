@@ -2,6 +2,7 @@ import type { BlockSpec } from '../types'
 import * as Blockly from 'blockly'
 import {setShadowState} from "../../extensions/shadows.ts"
 import {colours} from '../../colours.ts'
+import {valueTypes} from '../valueTypes'
 import {
   LiteralRotationNode,
   LiteralIntNode,
@@ -19,11 +20,11 @@ const ROTATION_PITCH_INPUT = 'PITCH'
 
 export const literalBlockSpecs: BlockSpec[] = [
   {
-    type: 'mc_int',
+    type: valueTypes.Int,
     category: 'literals',
     tags: ['literal', 'scoreboardVarSet', 'procArg'],
     json: {
-      type: 'mc_int',
+      type: valueTypes.Int,
       tooltip: '',
       helpUrl: '',
       message0: 'int %1',
@@ -34,7 +35,7 @@ export const literalBlockSpecs: BlockSpec[] = [
           value: 0,
         },
       ],
-      output: 'mc_int',
+      output: valueTypes.Int,
       extensions: ['mc_int_validator'],
     },
     generator(block) {
@@ -42,11 +43,11 @@ export const literalBlockSpecs: BlockSpec[] = [
     },
   },
   {
-    type: 'mc_string',
+    type: valueTypes.String,
     category: 'literals',
     tags: ['literal', 'procArg'],
     json: {
-      type: 'mc_string',
+      type: valueTypes.String,
       tooltip: '',
       helpUrl: '',
       message0: '%1',
@@ -57,7 +58,7 @@ export const literalBlockSpecs: BlockSpec[] = [
           text: 'Hello world',
         },
       ],
-      output: 'mc_string',
+      output: valueTypes.String,
     },
     generator(block) {
       return new LiteralStringNode(block.getFieldValue(FIELD_VALUE), block.id)
@@ -68,14 +69,14 @@ export const literalBlockSpecs: BlockSpec[] = [
     category: 'literals',
     init(this: Blockly.Block) {
       this.appendValueInput(FIELD_VALUE)
-        .setCheck(['opt_number', 'mc_proc_param'])
+        .setCheck([valueTypes.OptNumber, valueTypes.ProcParam, valueTypes.Int])
         .appendField('~', FIELD_PREFIX)
 
       this.setColour(colours.literals)
       this.setTooltip('')
       this.setHelpUrl('')
       this.setInputsInline(true)
-      this.setOutput(true, 'tilde')
+      this.setOutput(true, valueTypes.Tilde)
     },
     generator(block) {
       return new TildeNode(valueToIr(block, FIELD_VALUE), block.id)
@@ -89,14 +90,14 @@ export const literalBlockSpecs: BlockSpec[] = [
     category: 'literals',
     init(this: Blockly.Block) {
       this.appendValueInput(FIELD_VALUE)
-        .setCheck(['opt_number', 'mc_proc_param'])
+        .setCheck([valueTypes.OptNumber, valueTypes.ProcParam, valueTypes.Int])
         .appendField('^', FIELD_PREFIX)
 
       this.setColour(colours.literals)
       this.setTooltip('')
       this.setHelpUrl('')
       this.setInputsInline(true)
-      this.setOutput(true, 'caret')
+      this.setOutput(true, valueTypes.Caret)
     },
     generator(block) {
       return new CaretNode(valueToIr(block, FIELD_VALUE), block.id)
@@ -106,30 +107,30 @@ export const literalBlockSpecs: BlockSpec[] = [
     },
   },
   {
-    type: 'mc_block_pos',
+    type: valueTypes.Position,
     category: 'literals',
     json: {
-      type: 'mc_block_pos',
+      type: valueTypes.Position,
       message0: 'x%1 y%2 z%3',
       args0: [
         {
           type: 'input_value',
           name: 'X',
           // Right now proc param is always int; might need to change in the future
-          check: ['mc_proc_param', 'number', 'tilde', 'caret']
+          check: [valueTypes.ProcParam, valueTypes.Number, valueTypes.Tilde, valueTypes.Caret, valueTypes.Int]
         },
         {
           type: 'input_value',
           name: 'Y',
-          check: ['mc_proc_param', 'number', 'tilde', 'caret']
+          check: [valueTypes.ProcParam, valueTypes.Number, valueTypes.Tilde, valueTypes.Caret, valueTypes.Int]
         },
         {
           type: 'input_value',
           name: 'Z',
-          check: ['mc_proc_param', 'number', 'tilde', 'caret']
+          check: [valueTypes.ProcParam, valueTypes.Number, valueTypes.Tilde, valueTypes.Caret, valueTypes.Int]
         },
       ],
-      output: 'mc_block_pos',
+      output: valueTypes.Position,
       inputsInline: true,
     },
     generator(block) {
@@ -141,30 +142,30 @@ export const literalBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'X', {type: 'number'})
-      setShadowState(this, 'Y', {type: 'number'})
-      setShadowState(this, 'Z', {type: 'number'})
+      setShadowState(this, 'X', {type: valueTypes.Number})
+      setShadowState(this, 'Y', {type: valueTypes.Number})
+      setShadowState(this, 'Z', {type: valueTypes.Number})
     }
   },
   {
-    type: 'mc_range',
+    type: valueTypes.Range,
     category: 'literals',
     json: {
-      type: 'mc_range',
+      type: valueTypes.Range,
       message0: '%1..%2',
       args0: [
         {
           type: 'input_value',
           name: 'MIN',
-          check: ['mc_proc_param', 'number']
+          check: [valueTypes.ProcParam, valueTypes.Number, valueTypes.Int]
         },
         {
           type: 'input_value',
           name: 'MAX',
-          check: ['mc_proc_param', 'number']
+          check: [valueTypes.ProcParam, valueTypes.Number, valueTypes.Int]
         },
       ],
-      output: 'mc_range',
+      output: valueTypes.Range,
       inputsInline: true,
     },
     generator(block) {
@@ -175,26 +176,26 @@ export const literalBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, 'MIN', {type: 'number', fields: { VALUE: '' }})
-      setShadowState(this, 'MAX', {type: 'number', fields: { VALUE: '' }})
+      setShadowState(this, 'MIN', {type: valueTypes.Number, fields: { VALUE: '' }})
+      setShadowState(this, 'MAX', {type: valueTypes.Number, fields: { VALUE: '' }})
     }
   },
   {
-    type: 'mc_rotation',
+    type: valueTypes.Rotation,
     category: 'literals',
     init(this: Blockly.Block) {
       this.appendValueInput(ROTATION_YAW_INPUT)
-        .setCheck(['mc_proc_param', 'number', 'tilde'])
+        .setCheck([valueTypes.ProcParam, valueTypes.Number, valueTypes.Tilde, valueTypes.Int])
         .appendField('yaw')
       this.appendValueInput(ROTATION_PITCH_INPUT)
-        .setCheck(['mc_proc_param', 'number', 'tilde'])
+        .setCheck([valueTypes.ProcParam, valueTypes.Number, valueTypes.Tilde, valueTypes.Int])
         .appendField('pitch')
 
       this.setColour(colours.literals)
       this.setTooltip('')
       this.setHelpUrl('')
       this.setInputsInline(true)
-      this.setOutput(true, 'mc_rotation')
+      this.setOutput(true, valueTypes.Rotation)
     },
     generator(block) {
       return new LiteralRotationNode(
@@ -204,8 +205,8 @@ export const literalBlockSpecs: BlockSpec[] = [
       )
     },
     setShadowBlocks(this) {
-      setShadowState(this, ROTATION_YAW_INPUT, {type: 'number'})
-      setShadowState(this, ROTATION_PITCH_INPUT, {type: 'number'})
+      setShadowState(this, ROTATION_YAW_INPUT, {type: valueTypes.Number})
+      setShadowState(this, ROTATION_PITCH_INPUT, {type: valueTypes.Number})
     }
   },
 ]

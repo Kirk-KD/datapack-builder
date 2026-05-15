@@ -1,8 +1,10 @@
 import {colours} from './colours'
 import { getBlockTypesByCategory } from './specs/blockRegistry'
 import {getProcCallBlocks} from "./specs/categories/procedures.ts";
+import {getConstantBlocks} from './specs/categories/constants.ts';
+import * as Blockly from 'blockly'
 
-export default function getToolboxContents() {
+export default function getToolboxContents(workspace?: Blockly.Workspace) {
   return [
     {
       kind: 'category',
@@ -49,6 +51,19 @@ export default function getToolboxContents() {
         text: 'Create variable',
         callbackKey: 'CREATE_VARIABLE'
       }, ...getBlockTypesByCategory('variable').map(type => ({ kind: 'block', type }))]
+    },
+    {
+      kind: 'category',
+      name: 'Constants',
+      colour: colours.constants,
+      contents: [
+        {
+          kind: 'button',
+          text: 'Create constant',
+          callbackKey: 'CREATE_CONSTANT'
+        },
+        ...getConstantBlocks(workspace)
+      ]
     },
     {
       kind: "category",

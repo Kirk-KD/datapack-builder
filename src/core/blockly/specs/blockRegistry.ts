@@ -12,6 +12,7 @@ import { shadowInputBlockSpecs } from "./shadowInputs.ts"
 import {registerBlockIrGenerator} from '../../compiler'
 import type { BlockJsonDefinition, BlockSpec, BlockSpecCategory } from './types'
 import {utilityBlockSpecs} from './categories/utility.ts'
+import {constantsBlockSpecs} from './categories/constants.ts'
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
@@ -25,6 +26,7 @@ const allBlockSpecs = [
   ...selectorBlockSpecs,
   ...shadowInputBlockSpecs,
   ...utilityBlockSpecs,
+  ...constantsBlockSpecs
 ]
 
 const specsByCategory = new Map<BlockSpecCategory, BlockSpec[]>()

@@ -6,6 +6,7 @@ export const DEFAULT_SAVE: ProjectSave = {
   version: 1,
   blocklyWorkspace: {},
   blocklyRegistry: {
+    constantEntries: [],
     variableEntries: [],
     procedureEntries: []
   },

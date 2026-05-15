@@ -1,10 +1,15 @@
 import type {ProjectConfig} from "../../stores";
 import Blockly from "blockly";
-import type {ProcedureRegistryEntry, VariableRegistryEntry} from "../blockly/registry";
+import type {
+  ConstantRegistryEntry,
+  ProcedureRegistryEntry,
+  VariableRegistryEntry,
+} from "../blockly/registry";
 
 export type BlocklyWorkspaceData = { [p: string]: unknown }
 
 export type BlocklyRegistryData = {
+  constantEntries: ConstantRegistryEntry[]
   variableEntries: VariableRegistryEntry[]
   procedureEntries: ProcedureRegistryEntry[]
 }

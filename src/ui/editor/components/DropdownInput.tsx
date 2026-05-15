@@ -12,7 +12,6 @@ type DropdownInputProps = {
 export default function DropdownInput({ disabled, options, value = null, setValue, sx, endAdornment }: DropdownInputProps & {sx?: SxProps<Theme>}) {
   return <Autocomplete
     disableClearable
-    disablePortal
     options={options}
     value={value ?? options[0]}
     onChange={(_, newValue) => {

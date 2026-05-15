@@ -11,6 +11,7 @@ export type BlockSpecCategory =
   | 'procedures'
   | 'execute'
   | 'utility'
+  | 'constants'
 
 export type BlockInitFunction = (this: Blockly.Block) => void
 export type BlockJsonDefinition = Record<string, unknown> & { type: string }

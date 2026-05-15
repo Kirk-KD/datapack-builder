@@ -1,6 +1,7 @@
 import * as Blockly from 'blockly'
 import type { BlockSpec, ShadowInputBlockValidatorFunction } from './types'
 import {type IrGeneratorFunction, LiteralStringNode, NumberNode, OptNumberNode} from '../../compiler'
+import {valueTypes} from './valueTypes'
 
 const INPUT_VALUE = 'VALUE'
 
@@ -52,7 +53,7 @@ function validateNumber(input: string) {
 
 export const shadowInputBlockSpecs: BlockSpec[] = [
   makeShadowInputBlockSpec(
-    'number',
+    valueTypes.Number,
     input => {
       return validateNumber(input)
     },
@@ -62,7 +63,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
     '0'
   ),
   makeShadowInputBlockSpec(
-    'opt_number',
+    valueTypes.OptNumber,
     input => {
       if (input === '') return input
       return validateNumber(input)
@@ -75,7 +76,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
     },
     ''
   ),
-  makeShadowInputBlockSpec('swizzle',
+  makeShadowInputBlockSpec(valueTypes.Swizzle,
     input => {
       if (input === '') return input
       return /^(?!.*(.).*\1)[xyz]{1,3}$/.test(input) ? input : null
@@ -85,7 +86,7 @@ export const shadowInputBlockSpecs: BlockSpec[] = [
     },
     'xyz'
   ),
-  makeShadowInputBlockSpec('angle',
+  makeShadowInputBlockSpec(valueTypes.Angle,
     input => {
       if (input === '') return input
       return validateNumber(input) ?? (/^~(?:-?\d*(?:\.\d+)?)?$/.test(input) ? input : null)

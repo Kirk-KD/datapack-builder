@@ -5,6 +5,7 @@ import {colours} from '../../colours.ts'
 import {setShadowState} from '../../extensions/shadows.ts'
 import {createStateDropdown} from '../dynamicFields.ts'
 import {CommandNode, RaycastBlockNode, RaycastEntityNode, statementToIr, valueToIr} from '../../../compiler'
+import {valueTypes} from '../valueTypes'
 
 type RaycastBlockStates = { mode: 'entity' | 'block' }
 type RaycastBlock = StatefulBlock & RaycastBlockStates
@@ -32,18 +33,18 @@ export const utilityBlockSpecs: BlockSpec[] = [
         const mode = this.getFieldValue('MODE')
         if (mode === 'entity') {
           this.appendValueInput('TARGET')
-            .setCheck('mc_target_selector')
-          setShadowState(this, 'TARGET', { type: 'mc_target_selector' })
+            .setCheck(valueTypes.TargetSelector)
+          setShadowState(this, 'TARGET', { type: valueTypes.TargetSelector })
         } else {
           this.appendValueInput('BLOCK')
-            .setCheck('mc_string')
-          setShadowState(this, 'BLOCK', { type: 'mc_string', fields: { VALUE: 'stone' } })
+            .setCheck(valueTypes.String)
+          setShadowState(this, 'BLOCK', { type: valueTypes.String, fields: { VALUE: 'stone' } })
         }
 
         this.appendValueInput('DISTANCE')
           .appendField('within')
-          .setCheck(['mc_int', 'mc_proc_param'])
-        setShadowState(this, 'DISTANCE', { type: 'mc_int', fields: { VALUE: 5 } })
+          .setCheck([valueTypes.Int, valueTypes.ProcParam])
+        setShadowState(this, 'DISTANCE', { type: valueTypes.Int, fields: { VALUE: 5 } })
 
         this.appendDummyInput('1')
           .appendField('blocks')
