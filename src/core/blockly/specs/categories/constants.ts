@@ -14,15 +14,17 @@ type ConstantBlockState = {
   constant: ConstantRegistryEntry | null
 }
 
-type SerializedBlockState = {
+type DeletedBlockState = {
   type: string
-  extraState?: unknown
-  inputs?: Record<string, SerializedConnectionState>
-  next?: SerializedConnectionState
+  id?: string
+  extraState?: Partial<ConstantBlockState>
+  inputs?: Record<string, DeletedConnectionState>
+  next?: DeletedConnectionState
 }
 
-type SerializedConnectionState = {
-  block?: SerializedBlockState
+type DeletedConnectionState = {
+  block?: DeletedBlockState
+  shadow?: DeletedBlockState
 }
 
 type ConstantDefBlock = StatefulBlock & ConstantBlockState
@@ -115,22 +117,30 @@ function findConstantsBlock(workspace: Blockly.Workspace) {
   return workspace.getBlocksByType('constants', false)[0] ?? null
 }
 
-function getConstantDefinitionFromBlockState(blockState: SerializedBlockState) {
-  if (blockState.type !== 'constant_def') return null
+function getDeletedBlockStates(
+  blockState: DeletedBlockState | undefined,
+  deletedIds: Set<string>,
+) {
+  const deletedBlockStates: DeletedBlockState[] = []
 
-  const state = blockState.extraState as Partial<ConstantBlockState> | undefined
-  return state?.constant ?? null
-}
+  function collect(currentBlockState: DeletedBlockState | undefined) {
+    if (!currentBlockState) return
 
-function removeConstantDefinitionStack(blockState: SerializedBlockState | undefined) {
-  let currentBlockState = blockState
+    if (currentBlockState.id && deletedIds.has(currentBlockState.id)) {
+      deletedBlockStates.push(currentBlockState)
+    }
 
-  while (currentBlockState) {
-    const constant = getConstantDefinitionFromBlockState(currentBlockState)
-    if (constant) constantRegistry.remove(constant.name)
+    Object.values(currentBlockState.inputs ?? {}).forEach(connection => {
+      collect(connection.block)
+      collect(connection.shadow)
+    })
 
-    currentBlockState = currentBlockState.next?.block
+    collect(currentBlockState.next?.block)
+    collect(currentBlockState.next?.shadow)
   }
+
+  collect(blockState)
+  return deletedBlockStates
 }
 
 function getLastStackBlock(firstBlock: Blockly.Block) {
@@ -365,15 +375,20 @@ export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
 
     if (e.type === Blockly.Events.BLOCK_DELETE) {
       const blockDeleteEvent = e as Blockly.Events.BlockDelete
-      const blockData = blockDeleteEvent.oldJson
+      const deletedIds = new Set(blockDeleteEvent.ids ?? [])
+      const deletedBlocks = getDeletedBlockStates(
+        blockDeleteEvent.oldJson as DeletedBlockState | undefined,
+        deletedIds,
+      )
 
-      if (blockData && blockData.type === 'constant_def') {
-        const constant = (blockData.extraState as ConstantBlockState).constant
-        if (constant) constantRegistry.remove(constant.name)
-      }
-      else if (blockData && blockData.type === 'constants') {
-        const constantsBlockData = blockData as SerializedBlockState
-        removeConstantDefinitionStack(constantsBlockData.inputs?.DEFINITIONS?.block)
+      const deletedConstants = deletedBlocks
+        .filter(block => block.type === 'constant_def')
+        .map(block => block.extraState?.constant)
+        .filter(constant => constant != null)
+
+      deletedConstants.forEach(constant => constantRegistry.remove(constant.name))
+
+      if (deletedBlocks.some(block => block.type === 'constants')) {
         workspace.updateToolbox({
           kind: 'categoryToolbox',
           contents: getToolboxContents(workspace)
