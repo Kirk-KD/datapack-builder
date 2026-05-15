@@ -608,3 +608,27 @@ export class ConstantGetNode extends FragmentNode {
     return visitor.visitConstantGet(this)
   }
 }
+
+export type BinaryOperator = '+' | '-' | '*' | '/' | 'mod'
+export type BinaryOperandNode = LiteralIntNode | VariableNode
+export class BinOpNode extends FragmentNode {
+  readonly leftNode: BinaryOperandNode
+  readonly op: BinaryOperator
+  readonly rightNode: BinaryOperandNode
+
+  constructor(
+    leftNode: BinaryOperandNode,
+    op: BinaryOperator,
+    rightNode: BinaryOperandNode,
+    sourceBlockId?: string | null
+  ) {
+    super(sourceBlockId)
+    this.leftNode = leftNode
+    this.op = op
+    this.rightNode = rightNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitBinOp(this)
+  }
+}

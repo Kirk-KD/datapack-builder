@@ -11,7 +11,8 @@ const colours: Record<string, string> = {
   procedures: '#ff6680',
   execute: '#4c97ff',
   utility: '#5cb1d6',
-  constants: '#ec3c15'
+  constants: '#ec3c15',
+  math: '#006676'
 }
 
 function applyColour(category: BlockSpecCategory) {
@@ -30,6 +31,7 @@ function applyCategoryColours() {
   applyColour('procedures')
   applyColour('execute')
   applyColour('constants')
+  applyColour('math')
 }
 
 export { colours, applyColour, applyCategoryColours }
