@@ -7,6 +7,7 @@ import * as Blockly from 'blockly'
 import {colours} from '../../colours.ts'
 import {TextButton} from '../../fields/textButton.ts'
 import {ArrayNode, statementToIr, valueToIr} from '../../../compiler'
+import {setShadowState} from '../../extensions/shadows.ts'
 
 type ArrayElementValueType = Exclude<ConstantValueType, 'array'>
 
@@ -25,6 +26,9 @@ const ARRAY_ITEM_BLOCK_TYPE = 'array_item'
 const ARRAY_ITEMS_INPUT = 'ITEMS'
 const ARRAY_ITEM_VALUE_INPUT = 'VALUE'
 const ARRAY_ITEM_INDEX_FIELD = 'INDEX'
+const ITEM_AT_INDEX_BLOCK_TYPE = 'item_at_index'
+const ITEM_AT_INDEX_INDEX_INPUT = 'INDEX'
+const ITEM_AT_INDEX_ARRAY_INPUT = 'ARRAY'
 
 const constantValueTypeOptions: [string, ArrayElementValueType][] = [
   ['integers', 'int'],
@@ -42,6 +46,19 @@ const constantValueTypeChecks: Record<ArrayElementValueType, string> = {
 
 function getConstantValueTypeCheck(valueType: ArrayElementValueType) {
   return constantValueTypeChecks[valueType]
+}
+
+function getArrayElementTypeCheck(block: Blockly.Block) {
+  const targetBlock = block.getInputTargetBlock(ITEM_AT_INDEX_ARRAY_INPUT)
+  if (targetBlock?.type === valueTypes.Array) {
+    return getConstantValueTypeCheck((targetBlock as ArrayBlock).type_)
+  }
+
+  return Object.values(constantValueTypeChecks)
+}
+
+function updateArrayGetByIndexOutputType(block: Blockly.Block) {
+  block.setOutput(true, getArrayElementTypeCheck(block))
 }
 
 function getLastStackBlock(firstBlock: Blockly.Block) {
@@ -210,7 +227,39 @@ const arrayItemBlockSpec: BlockSpec = {
   }
 }
 
+const itemAtIndexBlockSpec: BlockSpec = {
+  type: ITEM_AT_INDEX_BLOCK_TYPE,
+  category: 'array',
+  init(this: Blockly.Block) {
+    this.setColour(colours.array)
+    this.setTooltip('')
+    this.setHelpUrl('')
+    this.setInputsInline(true)
+
+    this.appendValueInput(ITEM_AT_INDEX_INDEX_INPUT)
+      .setCheck(valueTypes.Int)
+      .appendField('item at index')
+
+    this.appendValueInput(ITEM_AT_INDEX_ARRAY_INPUT)
+      .setCheck(valueTypes.Array)
+      .appendField('of')
+
+    updateArrayGetByIndexOutputType(this)
+    this.setOnChange(function(this: Blockly.Block) {
+      updateArrayGetByIndexOutputType(this)
+    })
+  },
+  generator(block: Blockly.Block) {
+    void block
+    throw new Error()
+  },
+  setShadowBlocks(this: Blockly.Block) {
+    setShadowState(this, ITEM_AT_INDEX_INDEX_INPUT, { type: valueTypes.Int })
+  }
+}
+
 export const arrayBlockSpecs: BlockSpec[] = [
   arrayBlockSpec,
   arrayItemBlockSpec,
+  itemAtIndexBlockSpec,
 ]
