@@ -2,6 +2,7 @@ import {colours} from './colours'
 import { getBlockTypesByCategory } from './specs/blockRegistry'
 import {getProcCallBlocks} from "./specs/categories/procedures.ts";
 import {getConstantBlocks} from './specs/categories/constants.ts';
+import {getForEachItemBlocks} from './specs/categories/array.ts'
 import * as Blockly from 'blockly'
 
 export default function getToolboxContents(workspace?: Blockly.Workspace) {
@@ -75,7 +76,10 @@ export default function getToolboxContents(workspace?: Blockly.Workspace) {
       kind: 'category',
       name: 'Arrays',
       colour: colours.array,
-      contents: getBlockTypesByCategory('array').map(type => ({ kind: 'block', type }))
+      contents: [
+        ...getBlockTypesByCategory('array').map(type => ({ kind: 'block', type })),
+        ...getForEachItemBlocks(workspace),
+      ]
     },
     {
       kind: "category",

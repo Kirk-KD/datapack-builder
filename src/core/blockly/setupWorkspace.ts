@@ -12,6 +12,7 @@ import getToolboxContents from "./getToolboxContents.ts";
 import {constantRegistry, procedureRegistry, variableRegistry} from "./registry";
 import {subscribeListeners as subscribeProcedureListeners} from "./specs/categories/procedures.ts";
 import {subscribeListeners as subscribeConstantListeners} from './specs/categories/constants.ts'
+import {subscribeListeners as subscribeArrayListeners} from './specs/categories/array.ts'
 import type {WorkspaceCallbacks} from './workspaceCallbacks.ts'
 import {states} from './states.ts'
 
@@ -124,6 +125,7 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
 
   const unsubProcListeners = subscribeProcedureListeners(workspace)
   const unsubConstantListeners = subscribeConstantListeners(workspace)
+  const unsubArrayListeners = subscribeArrayListeners(workspace)
 
   workspace.updateToolbox({
     kind: 'categoryToolbox',
@@ -133,6 +135,7 @@ function setupWorkspace(workspace: Blockly.WorkspaceSvg, callbacks: WorkspaceCal
   return () => {
     unsubProcListeners()
     unsubConstantListeners()
+    unsubArrayListeners()
   }
 }
 

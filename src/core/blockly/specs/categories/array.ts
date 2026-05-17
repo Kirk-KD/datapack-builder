@@ -8,6 +8,8 @@ import {colours} from '../../colours.ts'
 import {TextButton} from '../../fields/textButton.ts'
 import {ArrayNode, ItemAtIndexNode, statementToIr, valueToIr} from '../../../compiler'
 import {setShadowState} from '../../extensions/shadows.ts'
+import {states} from '../../states.ts'
+import getToolboxContents from '../../getToolboxContents.ts'
 import type {ConstantDefBlock, ConstantGetBlock} from './constants.ts'
 import {CONSTANT_DEFINITION_VALUE_INPUT} from './constants.ts'
 
@@ -18,16 +20,33 @@ type ArrayBlockState = {
 }
 type ArrayBlock = StatefulBlock & ArrayBlockState
 
+type ForEachBlockState = {
+  itemName_: string
+}
+type ForEachBlock = StatefulBlock & ForEachBlockState
+
 type ArrayItemBlockState = {
   parentId_: string | null
   type_: ArrayElementValueType
 }
 type ArrayItemBlock = StatefulBlock & ArrayItemBlockState
 
+type ForEachItemBlockState = {
+  parentId_: string | null
+  itemName_: string
+  itemType_: ArrayElementValueType | null
+}
+type ForEachItemBlock = StatefulBlock & ForEachItemBlockState
+
 const ARRAY_ITEM_BLOCK_TYPE = 'array_item'
 const ARRAY_ITEMS_INPUT = 'ITEMS'
 const ARRAY_ITEM_VALUE_INPUT = 'VALUE'
 const ARRAY_ITEM_INDEX_FIELD = 'INDEX'
+const FOR_EACH_IN_ARRAY_BLOCK_TYPE = 'for_each_in_array'
+const FOR_EACH_ITEM_NAME_FIELD = 'ITEM_NAME'
+const FOR_EACH_ARRAY_INPUT = 'ARRAY'
+const FOR_EACH_BODY_INPUT = 'BODY'
+const FOR_EACH_ITEM_BLOCK_TYPE = 'for_each_item'
 const ITEM_AT_INDEX_BLOCK_TYPE = 'item_at_index'
 const ITEM_AT_INDEX_INDEX_INPUT = 'INDEX'
 const ITEM_AT_INDEX_ARRAY_INPUT = 'ARRAY'
@@ -106,6 +125,13 @@ function getLastStackBlock(firstBlock: Blockly.Block) {
   return current
 }
 
+function getInputNameForTargetBlock(block: Blockly.Block, targetBlock: Blockly.Block) {
+  for (const input of block.inputList) {
+    if (input.connection?.targetBlock()?.id === targetBlock.id) return input.name ?? null
+  }
+  return null
+}
+
 function getArrayItemIndex(arrayItemBlock: ArrayItemBlock) {
   if (!arrayItemBlock.parentId_) return null
 
@@ -143,6 +169,93 @@ function updateArrayItemType(arrayItemBlock: ArrayItemBlock, valueType: ArrayEle
 
   arrayItemBlock.getInput(ARRAY_ITEM_VALUE_INPUT)
     ?.setCheck(getConstantValueTypeCheck(arrayItemBlock.type_))
+}
+
+function syncForEachItemLabel(forEachItemBlock: ForEachItemBlock) {
+  if (!forEachItemBlock.parentId_) return
+
+  const parentBlock = forEachItemBlock.workspace.getBlockById(forEachItemBlock.parentId_)
+  if (!parentBlock || parentBlock.type !== FOR_EACH_IN_ARRAY_BLOCK_TYPE) return
+
+  const parentForEachBlock = parentBlock as ForEachBlock
+  const nextName = parentForEachBlock.itemName_ || 'item'
+
+  if (forEachItemBlock.itemName_ !== nextName) {
+    mutateExtraState(forEachItemBlock, () => {
+      forEachItemBlock.itemName_ = nextName
+    })
+  }
+
+  const labelField = forEachItemBlock.getField(FOR_EACH_ITEM_NAME_FIELD)
+  if (labelField) labelField.setValue(nextName)
+}
+
+function getForEachItemTypeFromParent(forEachItemBlock: ForEachItemBlock) {
+  if (!forEachItemBlock.parentId_) return null
+
+  const parentBlock = forEachItemBlock.workspace.getBlockById(forEachItemBlock.parentId_)
+  if (!parentBlock || parentBlock.type !== FOR_EACH_IN_ARRAY_BLOCK_TYPE) return null
+
+  const arrayBlock = parentBlock.getInput(FOR_EACH_ARRAY_INPUT)?.connection?.targetBlock() ?? null
+  return getArrayElementTypeFromBlock(arrayBlock)
+}
+
+function syncForEachItemOutputType(forEachItemBlock: ForEachItemBlock) {
+  const nextType = getForEachItemTypeFromParent(forEachItemBlock) ?? forEachItemBlock.itemType_ ?? null
+
+  if (nextType !== forEachItemBlock.itemType_) {
+    mutateExtraState(forEachItemBlock, () => {
+      forEachItemBlock.itemType_ = nextType
+    })
+  }
+
+  forEachItemBlock.setOutput(true, nextType ? getConstantValueTypeCheck(nextType) : Object.values(constantValueTypeChecks))
+}
+
+function syncForEachItemName(forEachBlock: ForEachBlock) {
+  const nextName = (forEachBlock.getFieldValue(FOR_EACH_ITEM_NAME_FIELD) ?? 'item').trim() || 'item'
+
+  if (nextName !== forEachBlock.itemName_) {
+    mutateExtraState(forEachBlock, () => {
+      forEachBlock.itemName_ = nextName
+    })
+  }
+}
+
+function syncForEachItemBlocks(workspace: Blockly.Workspace) {
+  workspace.getBlocksByType(FOR_EACH_ITEM_BLOCK_TYPE, false).forEach(block => {
+    const itemBlock = block as ForEachItemBlock
+    syncForEachItemLabel(itemBlock)
+    syncForEachItemOutputType(itemBlock)
+    updateForEachItemWarning(itemBlock)
+  })
+}
+
+function isForEachItemAttachedToParent(forEachItemBlock: ForEachItemBlock) {
+  if (!forEachItemBlock.parentId_) return false
+
+  const parentBlock = forEachItemBlock.workspace.getBlockById(forEachItemBlock.parentId_)
+  if (!parentBlock || parentBlock.type !== FOR_EACH_IN_ARRAY_BLOCK_TYPE) return false
+
+  let currentBlock: Blockly.Block = forEachItemBlock
+  while (currentBlock.getParent() && currentBlock.getParent() !== parentBlock) {
+    currentBlock = currentBlock.getParent() as Blockly.Block
+  }
+
+  if (currentBlock.getParent() !== parentBlock) return false
+
+  const inputName = getInputNameForTargetBlock(parentBlock, currentBlock)
+  return inputName === FOR_EACH_BODY_INPUT
+}
+
+function updateForEachItemWarning(forEachItemBlock: ForEachItemBlock) {
+  if (forEachItemBlock.isDeadOrDying() || forEachItemBlock.isInFlyout) return
+
+  forEachItemBlock.setWarningText(
+    isForEachItemAttachedToParent(forEachItemBlock)
+      ? null
+      : 'Must be inside a "for each..." block'
+  )
 }
 
 function updateArrayItemsFromParent(arrayBlock: ArrayBlock) {
@@ -229,6 +342,135 @@ const arrayBlockSpec: BlockSpec = {
   }
 }
 
+const forEachInArrayBlockSpec: BlockSpec = {
+  type: FOR_EACH_IN_ARRAY_BLOCK_TYPE,
+  category: 'array',
+  init(this: Blockly.Block) {
+    const block = this as ForEachBlock
+
+    bindExtraState<ForEachBlock, ForEachBlockState>(block, {
+      itemName_: 'item',
+    })
+
+    block.setColour(colours.array)
+    block.setTooltip('')
+    block.setHelpUrl('')
+    block.setPreviousStatement(true)
+    block.setNextStatement(true)
+    block.setInputsInline(true)
+
+    block.updateShape_ = function(this: ForEachBlock) {
+      this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
+
+      const itemNameField = new Blockly.FieldTextInput(this.itemName_ || 'item')
+      itemNameField.setValidator(value => {
+        const nextName = (value ?? 'item').trim() || 'item'
+        mutateExtraState(this, () => {
+          this.itemName_ = nextName
+        })
+        return nextName
+      })
+
+      this.appendDummyInput('HEADER')
+        .appendField('for each')
+        .appendField(itemNameField, FOR_EACH_ITEM_NAME_FIELD)
+        .appendField('in')
+
+      this.appendValueInput(FOR_EACH_ARRAY_INPUT)
+        .setCheck(valueTypes.Array)
+
+      this.appendStatementInput(FOR_EACH_BODY_INPUT)
+        .appendField('do')
+    }
+
+    block.onchange = function(this: Blockly.Block) {
+      syncForEachItemName(this as ForEachBlock)
+    }
+
+    block.updateShape_()
+  },
+  generator(block: Blockly.Block) {
+    void block
+    throw new Error()
+  },
+}
+
+const forEachItemBlockSpec: BlockSpec = {
+  type: FOR_EACH_ITEM_BLOCK_TYPE,
+  init(this: Blockly.Block) {
+    const block = this as ForEachItemBlock
+    bindExtraState<ForEachItemBlock, ForEachItemBlockState>(block, {
+      parentId_: null,
+      itemName_: 'item',
+      itemType_: null,
+    })
+
+    block.setColour(colours.variable)
+    block.setTooltip('')
+    block.setHelpUrl('')
+    block.setOutput(true, Object.values(constantValueTypeChecks))
+
+    block.updateShape_ = function(this: ForEachItemBlock) {
+      this.inputList.filter(input => input.name !== '').forEach(input => this.removeInput(input.name))
+
+      this.appendDummyInput('input')
+        .appendField(new Blockly.FieldLabelSerializable(this.itemName_ || 'item'), FOR_EACH_ITEM_NAME_FIELD)
+    }
+
+    block.onchange = function(this: ForEachItemBlock) {
+      syncForEachItemLabel(this)
+      syncForEachItemOutputType(this)
+      updateForEachItemWarning(this)
+    }
+
+    block.updateShape_()
+    syncForEachItemOutputType(block)
+    updateForEachItemWarning(block)
+  },
+  generator(block: Blockly.Block) {
+    void block
+    throw new Error()
+  },
+}
+
+function getForEachItemBlocks(workspace?: Blockly.Workspace) {
+  if (!workspace) return []
+
+  return workspace.getBlocksByType(FOR_EACH_IN_ARRAY_BLOCK_TYPE, false).map(block => {
+    const forEachBlock = block as ForEachBlock
+    return {
+      kind: 'block',
+      type: FOR_EACH_ITEM_BLOCK_TYPE,
+      extraState: {
+        parentId_: forEachBlock.id,
+        itemName_: forEachBlock.itemName_ || 'item',
+        itemType_: getArrayElementTypeFromBlock(forEachBlock.getInput(FOR_EACH_ARRAY_INPUT)?.connection?.targetBlock() ?? null),
+      },
+    }
+  })
+}
+
+export function subscribeListeners(workspace: Blockly.WorkspaceSvg) {
+  const changeListener = (e: Blockly.Events.Abstract) => {
+    if (states.deserializing) return
+
+    if (
+      e.type === Blockly.Events.BLOCK_CREATE
+      || e.type === Blockly.Events.BLOCK_DELETE
+      || e.type === Blockly.Events.BLOCK_CHANGE
+    ) {
+      syncForEachItemBlocks(workspace)
+      workspace.updateToolbox({
+        kind: 'categoryToolbox',
+        contents: getToolboxContents(workspace)
+      })
+    }
+  }
+
+  workspace.addChangeListener(changeListener)
+  return () => workspace.removeChangeListener(changeListener)
+}
+
 const arrayItemBlockSpec: BlockSpec = {
   type: ARRAY_ITEM_BLOCK_TYPE,
   init(this: Blockly.Block) {
@@ -300,6 +542,10 @@ const itemAtIndexBlockSpec: BlockSpec = {
 
 export const arrayBlockSpecs: BlockSpec[] = [
   arrayBlockSpec,
+  forEachInArrayBlockSpec,
+  forEachItemBlockSpec,
   arrayItemBlockSpec,
   itemAtIndexBlockSpec,
 ]
+
+export {getForEachItemBlocks}
