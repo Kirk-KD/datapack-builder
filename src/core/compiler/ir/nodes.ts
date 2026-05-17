@@ -645,3 +645,18 @@ export class ArrayNode extends FragmentNode {
     return visitor.visitArray(this)
   }
 }
+
+export class ItemAtIndexNode extends FragmentNode {
+  readonly arrayNode: ArrayNode
+  readonly indexNode: LiteralIntNode
+
+  constructor(arrayNode: ArrayNode, indexNode: LiteralIntNode, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.arrayNode = arrayNode
+    this.indexNode = indexNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitItemAtIndexNode(this)
+  }
+}

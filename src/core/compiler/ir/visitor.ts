@@ -8,7 +8,7 @@ import {
   VariableMatchesNode, VariableCompareNode, IfNode, WhileNode, CommandCompositeNode, FragmentCompositeNode,
   TempVariableNode, VariableSetNode, FunctionDefinitionNode, FunctionCallNode, IrNode, OnPlayerMinesBlockNode,
   FunctionTagNode, RaycastEntityNode, RaycastBlockNode, TildeNode, CaretNode, NumberNode, OptNumberNode, ConstantsNode,
-  ConstantDefNode, ConstantGetNode, BinOpNode, ArrayNode
+  ConstantDefNode, ConstantGetNode, BinOpNode, ArrayNode, ItemAtIndexNode
 } from "./nodes.ts";
 
 export interface IrVisitor<T> {
@@ -64,6 +64,7 @@ export interface IrVisitor<T> {
   visitConstantGet(node: ConstantGetNode): T
 
   visitArray(node: ArrayNode): T
+  visitItemAtIndexNode(node: ItemAtIndexNode): T
 }
 
 export abstract class SelectiveIrVisitor<T> implements IrVisitor<T> {
@@ -228,6 +229,10 @@ export abstract class SelectiveIrVisitor<T> implements IrVisitor<T> {
   }
 
   visitArray(node: ArrayNode): T {
+    this.disallow(node)
+  }
+
+  visitItemAtIndexNode(node: ItemAtIndexNode): T {
     this.disallow(node)
   }
 }

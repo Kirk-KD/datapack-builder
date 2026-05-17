@@ -6,7 +6,7 @@ import {valueTypes} from '../valueTypes.ts'
 import * as Blockly from 'blockly'
 import {colours} from '../../colours.ts'
 import {TextButton} from '../../fields/textButton.ts'
-import {ArrayNode, statementToIr, valueToIr} from '../../../compiler'
+import {ArrayNode, ItemAtIndexNode, statementToIr, valueToIr} from '../../../compiler'
 import {setShadowState} from '../../extensions/shadows.ts'
 
 type ArrayElementValueType = Exclude<ConstantValueType, 'array'>
@@ -250,8 +250,11 @@ const itemAtIndexBlockSpec: BlockSpec = {
     })
   },
   generator(block: Blockly.Block) {
-    void block
-    throw new Error()
+    return new ItemAtIndexNode(
+      valueToIr(block, ITEM_AT_INDEX_ARRAY_INPUT),
+      valueToIr(block, ITEM_AT_INDEX_INDEX_INPUT),
+      block.id
+    )
   },
   setShadowBlocks(this: Blockly.Block) {
     setShadowState(this, ITEM_AT_INDEX_INDEX_INPUT, { type: valueTypes.Int })
