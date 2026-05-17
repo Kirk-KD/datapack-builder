@@ -8,6 +8,8 @@ import {colours} from '../../colours.ts'
 import {TextButton} from '../../fields/textButton.ts'
 import {ArrayNode, ItemAtIndexNode, statementToIr, valueToIr} from '../../../compiler'
 import {setShadowState} from '../../extensions/shadows.ts'
+import type {ConstantDefBlock, ConstantGetBlock} from './constants.ts'
+import {CONSTANT_DEFINITION_VALUE_INPUT} from './constants.ts'
 
 type ArrayElementValueType = Exclude<ConstantValueType, 'array'>
 
@@ -48,10 +50,45 @@ function getConstantValueTypeCheck(valueType: ArrayElementValueType) {
   return constantValueTypeChecks[valueType]
 }
 
+function getConstantDefinitionBlock(workspace: Blockly.Workspace, constantName: string) {
+  return workspace.getBlocksByType(valueTypes.ConstantDef, false).find(block => {
+    return (block as ConstantDefBlock).constant?.name === constantName
+  }) ?? null
+}
+
+function getArrayElementTypeFromBlock(
+  block: Blockly.Block | null,
+  visitedBlockIds = new Set<string>(),
+  visitedConstantNames = new Set<string>(),
+): ArrayElementValueType | null {
+  if (!block || visitedBlockIds.has(block.id)) return null
+  visitedBlockIds.add(block.id)
+
+  if (block.type === valueTypes.Array) {
+    return (block as ArrayBlock).type_
+  }
+
+  if (block.type === 'constant_get') {
+    const constantGetBlock = block as ConstantGetBlock
+    const constant = constantGetBlock.constant
+    if (!constant || constant.valueType !== 'array' || visitedConstantNames.has(constant.name)) return null
+
+    visitedConstantNames.add(constant.name)
+
+    const definitionBlock = getConstantDefinitionBlock(block.workspace, constant.name)
+    const definitionValueBlock = definitionBlock?.getInput(CONSTANT_DEFINITION_VALUE_INPUT)?.connection?.targetBlock() ?? null
+    return getArrayElementTypeFromBlock(definitionValueBlock, visitedBlockIds, visitedConstantNames)
+  }
+
+  return null
+}
+
 function getArrayElementTypeCheck(block: Blockly.Block) {
   const targetBlock = block.getInputTargetBlock(ITEM_AT_INDEX_ARRAY_INPUT)
-  if (targetBlock?.type === valueTypes.Array) {
-    return getConstantValueTypeCheck((targetBlock as ArrayBlock).type_)
+  const arrayElementType = getArrayElementTypeFromBlock(targetBlock)
+
+  if (arrayElementType) {
+    return getConstantValueTypeCheck(arrayElementType)
   }
 
   return Object.values(constantValueTypeChecks)

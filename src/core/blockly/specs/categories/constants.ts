@@ -8,9 +8,9 @@ import {states} from '../../states.ts'
 import {valueTypes} from '../valueTypes'
 import {ConstantDefNode, ConstantGetNode, ConstantsNode, statementToIr, valueToIr} from '../../../compiler'
 
-const INPUT_VALUE = 'VALUE'
+export const CONSTANT_DEFINITION_VALUE_INPUT = 'VALUE'
 
-type ConstantBlockState = {
+export type ConstantBlockState = {
   constant: ConstantRegistryEntry | null
 }
 
@@ -27,9 +27,9 @@ type DeletedConnectionState = {
   shadow?: DeletedBlockState
 }
 
-type ConstantDefBlock = StatefulBlock & ConstantBlockState
+export type ConstantDefBlock = StatefulBlock & ConstantBlockState
 
-type ConstantGetBlock = StatefulBlock & ConstantBlockState
+export type ConstantGetBlock = StatefulBlock & ConstantBlockState
 
 const constantValueChecks: Record<ConstantValueType, string> = {
   int: valueTypes.Int,
@@ -251,13 +251,13 @@ const constantDefBlockSpec: BlockSpec = {
         .appendField(this.constant.name)
         .appendField(`(${this.constant.valueType})`)
 
-      this.appendValueInput(INPUT_VALUE)
+      this.appendValueInput(CONSTANT_DEFINITION_VALUE_INPUT)
         .setCheck(getConstantValueCheck(this.constant.valueType))
         .appendField('=')
 
-      const previousBlock = previousConnections.get(INPUT_VALUE)
+      const previousBlock = previousConnections.get(CONSTANT_DEFINITION_VALUE_INPUT)
       if (previousBlock?.outputConnection) {
-        this.getInput(INPUT_VALUE)?.connection?.connect(previousBlock.outputConnection)
+        this.getInput(CONSTANT_DEFINITION_VALUE_INPUT)?.connection?.connect(previousBlock.outputConnection)
       }
     }
 
@@ -274,7 +274,7 @@ const constantDefBlockSpec: BlockSpec = {
   generator(block: Blockly.Block) {
     return new ConstantDefNode(
       (block as ConstantDefBlock).constant!,
-      valueToIr(block, INPUT_VALUE),
+      valueToIr(block, CONSTANT_DEFINITION_VALUE_INPUT),
       block.id
     )
   }
