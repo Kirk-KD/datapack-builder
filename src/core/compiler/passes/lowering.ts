@@ -44,7 +44,7 @@ import {
   type RangeComponentNode,
   type RotationComponentNode,
   ConstantsNode, ConstantDefNode, ConstantGetNode, BinOpNode,
-  type BinaryOperandNode, ArrayNode, ItemAtIndexNode
+  type BinaryOperandNode, ArrayNode, ItemAtIndexNode, ArrayForNode, ArrayForItemNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -976,5 +976,36 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       pre: [...array.pre, ...index.pre],
       nodes: [arrayNode.itemNodes[indexNode.value]]
     }
+  }
+
+  // maps item name to value node
+  readonly arrayForCurrentItem: Map<string, IrNode> = new Map()
+
+  visitArrayFor(node: ArrayForNode): LoweredResult {
+    const arrayRes = node.arrayNode.accept(this)
+    const arrayNode = arrayRes.nodes[0] as ArrayNode
+
+    const resolvedNodes = []
+
+    for (let i = 0; i < arrayNode.itemNodes.length; i++) {
+      // keeps track of current loop's current item
+      this.arrayForCurrentItem.set(node.itemName, arrayNode.itemNodes[i])
+
+      // body of the loop
+      resolvedNodes.push(...this.lowerBody(node.bodyNodes))
+    }
+
+    return {
+      pre: arrayRes.pre,
+      nodes: resolvedNodes
+    }
+  }
+
+  visitArrayForItem(node: ArrayForItemNode): LoweredResult {
+    const valueNode = this.arrayForCurrentItem.get(node.itemName)
+
+    if (valueNode === undefined) throw new Error('Missing item name')
+
+    return { pre: [], nodes: [valueNode] }
   }
 }

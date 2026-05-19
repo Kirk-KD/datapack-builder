@@ -660,3 +660,33 @@ export class ItemAtIndexNode extends FragmentNode {
     return visitor.visitItemAtIndexNode(this)
   }
 }
+
+export class ArrayForNode extends CommandNode {
+  readonly arrayNode: ArrayNode
+  readonly bodyNodes: CommandNode[]
+  readonly itemName: string // User provides the name
+
+  constructor(arrayNode: ArrayNode, bodyNodes: CommandNode[], itemName: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.arrayNode = arrayNode
+    this.bodyNodes = bodyNodes
+    this.itemName = itemName
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitArrayFor(this)
+  }
+}
+
+export class ArrayForItemNode extends FragmentNode {
+  readonly itemName: string
+
+  constructor(itemName: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.itemName = itemName
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitArrayForItem(this)
+  }
+}

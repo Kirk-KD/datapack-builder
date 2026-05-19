@@ -6,7 +6,15 @@ import {valueTypes} from '../valueTypes.ts'
 import * as Blockly from 'blockly'
 import {colours} from '../../colours.ts'
 import {TextButton} from '../../fields/textButton.ts'
-import {ArrayNode, ItemAtIndexNode, statementToIr, valueToIr} from '../../../compiler'
+import {
+  ArrayForItemNode,
+  ArrayForNode,
+  ArrayNode,
+  CommandNode,
+  ItemAtIndexNode,
+  statementToIr,
+  valueToIr
+} from '../../../compiler'
 import {setShadowState} from '../../extensions/shadows.ts'
 import {states} from '../../states.ts'
 import getToolboxContents from '../../getToolboxContents.ts'
@@ -390,8 +398,12 @@ const forEachInArrayBlockSpec: BlockSpec = {
     block.updateShape_()
   },
   generator(block: Blockly.Block) {
-    void block
-    throw new Error()
+    return new ArrayForNode(
+      valueToIr(block, FOR_EACH_ARRAY_INPUT),
+      statementToIr(block, FOR_EACH_BODY_INPUT) as CommandNode[],
+      block.getFieldValue(FOR_EACH_ITEM_NAME_FIELD),
+      block.id,
+    )
   },
 }
 
@@ -428,8 +440,7 @@ const forEachItemBlockSpec: BlockSpec = {
     updateForEachItemWarning(block)
   },
   generator(block: Blockly.Block) {
-    void block
-    throw new Error()
+    return new ArrayForItemNode((block as ForEachItemBlock).itemName_, block.id)
   },
 }
 
