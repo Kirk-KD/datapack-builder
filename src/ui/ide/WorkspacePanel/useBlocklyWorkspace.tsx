@@ -63,6 +63,7 @@ export default function useBlocklyWorkspace() {
               { label: 'String', value: 'string' },
               { label: 'Position', value: 'position' },
               { label: 'Item stack', value: 'item_stack' },
+              { label: 'Array', value: 'array' }
             ]}
             onChangeName={name => { constantName = name }}
             onChangeType={type => { constantType = type }}

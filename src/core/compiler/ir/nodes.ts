@@ -632,3 +632,61 @@ export class BinOpNode extends FragmentNode {
     return visitor.visitBinOp(this)
   }
 }
+
+export class ArrayNode extends FragmentNode {
+  readonly itemNodes: IrNode[]
+
+  constructor(itemNodes: IrNode[], sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.itemNodes = itemNodes
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitArray(this)
+  }
+}
+
+export class ItemAtIndexNode extends FragmentNode {
+  readonly arrayNode: ArrayNode
+  readonly indexNode: LiteralIntNode
+
+  constructor(arrayNode: ArrayNode, indexNode: LiteralIntNode, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.arrayNode = arrayNode
+    this.indexNode = indexNode
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitItemAtIndexNode(this)
+  }
+}
+
+export class ArrayForNode extends CommandNode {
+  readonly arrayNode: ArrayNode
+  readonly bodyNodes: CommandNode[]
+  readonly itemName: string // User provides the name
+
+  constructor(arrayNode: ArrayNode, bodyNodes: CommandNode[], itemName: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.arrayNode = arrayNode
+    this.bodyNodes = bodyNodes
+    this.itemName = itemName
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitArrayFor(this)
+  }
+}
+
+export class ArrayForItemNode extends FragmentNode {
+  readonly itemName: string
+
+  constructor(itemName: string, sourceBlockId?: string | null) {
+    super(sourceBlockId)
+    this.itemName = itemName
+  }
+
+  accept<T>(visitor: IrVisitor<T>): T {
+    return visitor.visitArrayForItem(this)
+  }
+}

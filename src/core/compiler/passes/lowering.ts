@@ -44,7 +44,7 @@ import {
   type RangeComponentNode,
   type RotationComponentNode,
   ConstantsNode, ConstantDefNode, ConstantGetNode, BinOpNode,
-  type BinaryOperandNode
+  type BinaryOperandNode, ArrayNode, ItemAtIndexNode, ArrayForNode, ArrayForItemNode
 } from '../ir'
 import {Naming} from '../emitter/naming.ts'
 import type {ProjectConfig} from '../../../stores'
@@ -943,5 +943,69 @@ export class LoweringPass implements IrVisitor<LoweredResult> {
       ],
       nodes: [tempVar]
     }
+  }
+
+  visitArray(node: ArrayNode): LoweredResult {
+    const pre: CommandNode[] = []
+    const itemNodes: IrNode[] = []
+
+    for (const itemNode of node.itemNodes) {
+      const lowered = itemNode.accept(this)
+      pre.push(...lowered.pre)
+      itemNodes.push(...lowered.nodes)
+    }
+
+    return {
+      pre,
+      nodes: [new ArrayNode(itemNodes, node.sourceBlockId)]
+    }
+  }
+
+  visitItemAtIndexNode(node: ItemAtIndexNode): LoweredResult {
+    const array = node.arrayNode.accept(this)
+    const index = node.indexNode.accept(this)
+
+    const arrayNode = array.nodes[0] as ArrayNode
+    const indexNode = index.nodes[0] as LiteralIntNode
+
+    if (indexNode.value < 0 || indexNode.value >= arrayNode.itemNodes.length) {
+      throw new Error(`Array index ${indexNode.value} is out of bounds for array of length ${arrayNode.itemNodes.length}.`)
+    }
+
+    return {
+      pre: [...array.pre, ...index.pre],
+      nodes: [arrayNode.itemNodes[indexNode.value]]
+    }
+  }
+
+  // maps item name to value node
+  readonly arrayForCurrentItem: Map<string, IrNode> = new Map()
+
+  visitArrayFor(node: ArrayForNode): LoweredResult {
+    const arrayRes = node.arrayNode.accept(this)
+    const arrayNode = arrayRes.nodes[0] as ArrayNode
+
+    const resolvedNodes = []
+
+    for (let i = 0; i < arrayNode.itemNodes.length; i++) {
+      // keeps track of current loop's current item
+      this.arrayForCurrentItem.set(node.itemName, arrayNode.itemNodes[i])
+
+      // body of the loop
+      resolvedNodes.push(...this.lowerBody(node.bodyNodes))
+    }
+
+    return {
+      pre: arrayRes.pre,
+      nodes: resolvedNodes
+    }
+  }
+
+  visitArrayForItem(node: ArrayForItemNode): LoweredResult {
+    const valueNode = this.arrayForCurrentItem.get(node.itemName)
+
+    if (valueNode === undefined) throw new Error('Missing item name')
+
+    return { pre: [], nodes: [valueNode] }
   }
 }
