@@ -4,11 +4,11 @@ import type {
   EditorState,
   EditorStateList,
   EditorStateMap,
-  ItemStackEditorResult
+  ItemStackEditorResult, RegistryReferenceOption
 } from '../../../editor'
 import {type SNBT, snbtToString} from '../../snbt.ts'
 import type {LoweredResult} from './types.ts'
-import {FragmentCompositeNode, type FragmentNode} from '../../ir'
+import {ConstantGetNode, FragmentCompositeNode, type FragmentNode, ProcedureParameterNode} from '../../ir'
 import type {LoweringPass} from './lowering.ts'
 
 export class EditorStateLowering {
@@ -18,7 +18,6 @@ export class EditorStateLowering {
   constructor(lowering: LoweringPass, sourceBlockId?: string | null) {
     this.lowering = lowering
     this.sourceBlockId = sourceBlockId
-    void this.lowering
   }
 
   compileEditorState(state: AnyEditorState, opt: CompilerOptions): LoweredResult {
@@ -39,6 +38,15 @@ export class EditorStateLowering {
     if (typeof state.data === 'string' && !opt.nbt) return {
       pre: [],
       nodes: [new FragmentCompositeNode([state.data], this.sourceBlockId, true)]
+    }
+
+    if (typeof state.data === 'number' && state.registryReference) {
+      const regRef = state.registryReference as RegistryReferenceOption<'constant' | 'parameter'>
+      const regRefNode = regRef.type === 'constant'
+        ? new ConstantGetNode(regRef.entry, this.sourceBlockId)
+        : new ProcedureParameterNode(regRef.entry, this.sourceBlockId)
+
+      return regRefNode.accept(this.lowering)
     }
 
     return {
