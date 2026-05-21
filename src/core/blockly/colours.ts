@@ -1,6 +1,3 @@
-import {getBlockJsonByCategory} from "./specs/blockRegistry.ts";
-import type {BlockSpecCategory} from "./specs/types.ts";
-
 const colours: Record<string, string> = {
   events: '#ffbf00',
   control: '#ffab19',
@@ -16,23 +13,4 @@ const colours: Record<string, string> = {
   array: '#ffab19'
 }
 
-function applyColour(category: BlockSpecCategory) {
-  getBlockJsonByCategory(category).forEach(block => {
-    block.colour = colours[category]
-  })
-}
-
-function applyCategoryColours() {
-  applyColour('commands')
-  applyColour('control')
-  applyColour('variable')
-  applyColour('events')
-  applyColour('literals')
-  applyColour('constructs')
-  applyColour('procedures')
-  applyColour('execute')
-  applyColour('constants')
-  applyColour('math')
-}
-
-export { colours, applyColour, applyCategoryColours }
+export { colours }

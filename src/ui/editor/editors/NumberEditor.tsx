@@ -3,6 +3,7 @@ import {useCallback, useEffect, useState} from "react";
 import type {EditorBaseProps, RegistryReferenceOption} from "../../../core/editor";
 import type {SxProps, Theme} from "@mui/material";
 import {RegistryReferenceButton} from '../components/RegistryReferenceButton.tsx'
+import {getBlockColours} from '../../../core/blockly'
 
 export type NumberEditorProps = EditorBaseProps<never, number> & {
   type: 'int' | 'long' | 'float' | 'double'
@@ -70,11 +71,24 @@ export default function NumberEditor(
   return (
     <TextInput
       defaultValue={defaultValueStr}
-      value={value}
+      value={selectedRegRef ? selectedRegRef.readableName : value}
       setValue={setValue}
       onChange={(nextValue) => setHasError(validateAndCallback(nextValue))}
-      hasError={hasError}
-      sx={sx}
+      hasError={selectedRegRef ? hasError : false}
+      sx={{
+        ...sx,
+        ...(selectedRegRef ? {
+          '& input': {
+            background: selectedRegRef.type === 'constant' ? getBlockColours().constants : getBlockColours().procedures,
+            borderRadius: '9999px',
+            color: 'white',
+            p: 0.5,
+            pl: 1.5,
+            pr: 0,
+            m: 0.5,
+          },
+        } : {}),
+      }}
       endAdornment={
         getRegistryReferenceOptions ? (
           <RegistryReferenceButton

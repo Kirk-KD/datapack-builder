@@ -49,10 +49,6 @@ export default function ItemStackEditor({context, state, setState}: EditorBasePr
         <ItemSelectorEditor context={context} state={itemState} setState={setItemState}/>
         <Typography>count:</Typography>
         <NumberEditor
-          sx={{
-            maxWidth: '8rem',
-            minWidth: '2rem' // Override default
-          }}
           defaultValue={1}
           type={'int'}
           min={1}

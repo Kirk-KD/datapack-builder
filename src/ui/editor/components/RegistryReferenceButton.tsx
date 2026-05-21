@@ -20,7 +20,7 @@ export function RegistryReferenceButton({
 
   return (
     <>
-      <Tooltip title={'Use reference'}>
+      <Tooltip title={selectedRegRef ? 'Clear reference' : 'Use reference'}>
         <IconButton
           onClick={(event) => {
             if (selectedRegRef === null) {
@@ -35,6 +35,7 @@ export function RegistryReferenceButton({
       <Menu
         anchorEl={anchorEl}
         open={menuOpen}
+        onClose={() => setAnchorEl(null)}
       >{
         options.map((option, index) => {
           return (

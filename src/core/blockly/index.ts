@@ -2,6 +2,7 @@ import './extensions'
 import './validators'
 import './renderer.ts'
 import * as Blockly from 'blockly'
+import {colours} from './colours.ts'
 
 export {bootstrapBlockly} from './bootstrap.ts'
 export {setupToolbox} from './setupToolbox.ts'
@@ -12,4 +13,8 @@ export {blocklyWorkspaceRegistry} from './registry'
 
 export function getFocusManager() {
   return Blockly.getFocusManager()
+}
+
+export function getBlockColours() {
+  return colours
 }

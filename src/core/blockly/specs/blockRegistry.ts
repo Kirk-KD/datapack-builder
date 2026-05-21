@@ -15,6 +15,7 @@ import {utilityBlockSpecs} from './categories/utility.ts'
 import {constantsBlockSpecs} from './categories/constants.ts'
 import {mathBlockSpecs} from './categories/math.ts'
 import {arrayBlockSpecs} from './categories/array.ts'
+import {colours} from '../colours.ts'
 
 const allBlockSpecs = [
   ...commandBlockSpecs,
@@ -63,6 +64,25 @@ export function getBlockTypesByTag(tag: string): string[] {
 export function getBlockJsonByCategory(category: BlockSpecCategory): BlockJsonDefinition[] {
   return getBlockSpecsByCategory(category)
     .flatMap(spec => (spec.json ? [spec.json] : []))
+}
+
+export function applyColour(category: BlockSpecCategory) {
+  getBlockJsonByCategory(category).forEach(block => {
+    block.colour = colours[category]
+  })
+}
+
+export function applyCategoryColours() {
+  applyColour('commands')
+  applyColour('control')
+  applyColour('variable')
+  applyColour('events')
+  applyColour('literals')
+  applyColour('constructs')
+  applyColour('procedures')
+  applyColour('execute')
+  applyColour('constants')
+  applyColour('math')
 }
 
 /**
