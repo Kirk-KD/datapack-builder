@@ -1,5 +1,6 @@
 import * as Blockly from "blockly"
 import {type Dispatch, type SetStateAction} from "react";
+import type {RegistryReferenceOption} from "./blocklyRegistryReference.ts";
 
 // Data flow
 
@@ -20,6 +21,7 @@ export type EditorState<T> = {
   error: boolean
   data?: T
   enabled?: boolean
+  registryReference?: RegistryReferenceOption | null
 }
 
 export type EditorStateCallback<T> = Dispatch<SetStateAction<EditorState<T>>>
