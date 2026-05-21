@@ -13,11 +13,13 @@ type TextInputProps = Omit<TextFieldProps, 'onChange' | 'value' | 'defaultValue'
   hasError?: boolean
   sx?: SxProps<Theme>
   startAdornment?: React.ReactNode
+  endAdornment?: React.ReactNode
+  handleReset?: () => void
   multiline?: boolean
 }
 
 const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
-  { defaultValue, value, setValue, onChange, disabled, hasError, sx, startAdornment, multiline, ...rest },
+  { defaultValue, value, setValue, onChange, disabled, hasError, sx, startAdornment, endAdornment, handleReset, multiline, ...rest },
   ref
 ) => {
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -25,9 +27,10 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
     onChange?.(e.target.value)
   }
 
-  const handleReset = () => {
+  const handleReset_ = () => {
     setValue(defaultValue)
     onChange?.(defaultValue)
+    handleReset?.()
   }
 
   return (
@@ -56,7 +59,8 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>((
             ) : undefined,
             endAdornment: (
               <InputAdornment position="end" sx={{ mr: -1.5 }}>
-                <ResetButton handleReset={handleReset} disabled={disabled} />
+                {endAdornment}
+                <ResetButton handleReset={handleReset_} disabled={disabled} />
               </InputAdornment>
             )
           }

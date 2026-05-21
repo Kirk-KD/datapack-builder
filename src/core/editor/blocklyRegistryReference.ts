@@ -7,10 +7,10 @@ import {
 } from '../blockly/registry'
 
 export type RegistryReferenceOption<T extends RegistryReferenceType = RegistryReferenceType> =
-  | (T extends 'variable' ? { type: 'variable'; entry: VariableRegistryEntry } : never)
-  | (T extends 'constant' ? { type: 'constant'; entry: ConstantRegistryEntry } : never)
-  | (T extends 'procedure' ? { type: 'procedure'; entry: ProcedureRegistryEntry } : never)
-  | (T extends 'parameter' ? { type: 'parameter'; entry: ProcedureParameterRegistryEntry } : never)
+  | (T extends 'variable' ? { type: 'variable'; entry: VariableRegistryEntry; readableName: string } : never)
+  | (T extends 'constant' ? { type: 'constant'; entry: ConstantRegistryEntry; readableName: string } : never)
+  | (T extends 'procedure' ? { type: 'procedure'; entry: ProcedureRegistryEntry; readableName: string } : never)
+  | (T extends 'parameter' ? { type: 'parameter'; entry: ProcedureParameterRegistryEntry; readableName: string } : never)
 
 export type RegistryReferenceType = 'variable' | 'constant' | 'procedure' | 'parameter'
 
@@ -19,7 +19,8 @@ export function getConstantsOfType(type: ConstantValueType): RegistryReferenceOp
     .filter(entry => entry.valueType === type)
     .map(entry => ({
       type: 'constant',
-      entry
+      entry,
+      readableName: entry.name
     }))
 }
 
@@ -29,6 +30,7 @@ export function getParameters(): RegistryReferenceOption<'parameter'>[] {
     .listParameters()
     .map(entry => ({
       type: 'parameter',
-      entry
+      entry,
+      readableName: entry.name
     }))
 }

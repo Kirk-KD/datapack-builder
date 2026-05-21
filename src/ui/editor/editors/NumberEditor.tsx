@@ -2,6 +2,7 @@ import TextInput from "../components/TextInput.tsx";
 import {useCallback, useEffect, useState} from "react";
 import type {EditorBaseProps, RegistryReferenceOption} from "../../../core/editor";
 import type {SxProps, Theme} from "@mui/material";
+import {RegistryReferenceButton} from '../components/RegistryReferenceButton.tsx'
 
 export type NumberEditorProps = EditorBaseProps<never, number> & {
   type: 'int' | 'long' | 'float' | 'double'
@@ -26,6 +27,8 @@ export default function NumberEditor(
   const defaultValueStr = (defaultValue ?? 0).toString()
   const [value, setValue] = useState(state.data === undefined ? defaultValueStr : state.data.toString())
   const [hasError, setHasError] = useState(false)
+
+  const [selectedRegRef, setSelectedRegRef] = useState<RegistryReferenceOption | null>(null)
 
   const valid = useCallback((value: string): boolean => {
     if (value === '') return false
@@ -72,6 +75,16 @@ export default function NumberEditor(
       onChange={(nextValue) => setHasError(validateAndCallback(nextValue))}
       hasError={hasError}
       sx={sx}
+      endAdornment={
+        getRegistryReferenceOptions ? (
+          <RegistryReferenceButton
+            selectedRegRef={selectedRegRef}
+            setSelectedRegRef={setSelectedRegRef}
+            options={getRegistryReferenceOptions()}
+          />
+        ) : undefined
+      }
+      handleReset={() => setSelectedRegRef(null)}
     />
   )
 }
