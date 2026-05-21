@@ -1,5 +1,5 @@
 export * from './snbt.ts'
-export {compileEditorState, inferCompilerType} from './emitter'
+export {inferCompilerType} from './emitter'
 export * from './ir'
 export * from './generator'
 export {orchestrate} from './orchestrator.ts'

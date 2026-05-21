@@ -1,8 +1,8 @@
-import type {
-  EditorBaseProps,
-  EditorState,
-  ItemComponent,
-  ItemStackEditorResult
+import {
+  type EditorBaseProps,
+  type EditorState, getConstantsOfType, getParameters,
+  type ItemComponent,
+  type ItemStackEditorResult
 } from "../../../../core/editor";
 import {ItemSelectorEditor} from "../ItemSelectorEditor";
 import {useEffect, useState} from "react";
@@ -48,10 +48,14 @@ export default function ItemStackEditor({context, state, setState}: EditorBasePr
       }}>
         <ItemSelectorEditor context={context} state={itemState} setState={setItemState}/>
         <Typography>count:</Typography>
-        <NumberEditor sx={{
-          maxWidth: '8rem',
-          minWidth: '2rem' // Override default
-        }} defaultValue={1} type={'int'} min={1} state={amountState} setState={setAmountState} />
+        <NumberEditor
+          defaultValue={1}
+          type={'int'}
+          min={1}
+          state={amountState}
+          setState={setAmountState}
+          getRegistryReferenceOptions={() => [...getConstantsOfType('int'), ...getParameters()]}
+        />
       </Stack>
       <Box sx={{
         pl: 1

@@ -1,2 +1,2 @@
-export {compileEditorState, inferCompilerType} from './emitEditorState.ts'
+export {inferCompilerType} from './emitEditorState.ts'
 export {Emitter} from './emitter.ts'

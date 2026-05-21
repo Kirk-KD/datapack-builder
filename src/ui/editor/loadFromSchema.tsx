@@ -1,13 +1,13 @@
-import type {
-  AnyEditorState,
-  AnyEditorStateCallback,
-  EditorContext,
-  EditorStateList,
-  EditorStateMap,
-  EditorStateCallback,
-  EditorSchema, ListSchema,
-  ObjectSchema, ReferenceSchema,
-  ScalarSchema, EditorState, ItemStackEditorResult
+import {
+  type AnyEditorState,
+  type AnyEditorStateCallback,
+  type EditorContext,
+  type EditorStateList,
+  type EditorStateMap,
+  type EditorStateCallback,
+  type EditorSchema, type ListSchema,
+  type ObjectSchema, type ReferenceSchema,
+  type ScalarSchema, type EditorState, type ItemStackEditorResult, getConstantsOfType, getParameters
 } from "../../core/editor";
 import NumberEditor from "./editors/NumberEditor.tsx";
 import * as React from "react";
@@ -50,6 +50,7 @@ function makeScalar(schema: ScalarSchema, {state, setState}: BaseProps): React.R
           defaultValue={schema.defaultValue as number}
           min={schema.min}
           max={schema.max}
+          getRegistryReferenceOptions={() => [...getConstantsOfType('int'), ...getParameters()]}
         />
       )
     case 'string':
