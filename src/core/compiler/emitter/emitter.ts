@@ -1,5 +1,5 @@
 import {
-  DatapackNode, ItemStackNode, LiteralRotationNode, LiteralIntNode,
+  DatapackNode, LiteralRotationNode, LiteralIntNode,
   LiteralPositionNode, LiteralRangeNode, LiteralStringNode,
   ProcedureParameterNode, TargetSelectorNode, VariableNode, CommandCompositeNode,
   FragmentCompositeNode, TempVariableNode, FunctionDefinitionNode, FunctionCallNode, FunctionTagNode, NumberNode
@@ -7,7 +7,6 @@ import {
 import {OutputFiles} from '../outputFiles.ts'
 import {Naming} from './naming.ts'
 import type {ProjectConfig} from '../../../stores'
-import {compileEditorState} from './emitEditorState.ts'
 import {SelectiveIrVisitor} from '../ir'
 import {Segment} from '../mapping.ts'
 import type {ProcedureRegistryEntry} from '../../blockly/registry'
@@ -135,11 +134,6 @@ export class Emitter extends SelectiveIrVisitor<Segment[]> {
     else this.loadFunctionNames.push(node.name)
 
     return []
-  }
-
-  visitItemStack(node: ItemStackNode): Segment[] {
-    const result = compileEditorState({ compiler: 'item_stack', error: false, data: node.itemStackData }, {})
-    return [new Segment(result, node)]
   }
 
   visitLiteralRotation(node: LiteralRotationNode): Segment[] {
