@@ -8,6 +8,7 @@ export {setupToolbox} from './setupToolbox.ts'
 export {setupWorkspace, injectWorkspace} from './setupWorkspace.ts'
 export type {CreateProcedureData, CreateVariableData, WorkspaceCallbacks, CreateParamData} from './workspaceCallbacks.ts'
 export {states} from './states.ts'
+export {blocklyWorkspaceRegistry} from './registry'
 
 export function getFocusManager() {
   return Blockly.getFocusManager()

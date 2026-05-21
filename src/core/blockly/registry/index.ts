@@ -30,7 +30,7 @@ export function createBlocklyWorkspaceRegistrySystem(): BlocklyWorkspaceRegistry
   }
 }
 
-const blocklyWorkspaceRegistry = createBlocklyWorkspaceRegistrySystem()
+export const blocklyWorkspaceRegistry = createBlocklyWorkspaceRegistrySystem()
 export const constantRegistry = blocklyWorkspaceRegistry.constants
 export const variableRegistry = blocklyWorkspaceRegistry.variables
 export const procedureRegistry = blocklyWorkspaceRegistry.procedures

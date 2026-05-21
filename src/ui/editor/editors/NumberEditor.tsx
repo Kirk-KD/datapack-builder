@@ -1,6 +1,6 @@
 import TextInput from "../components/TextInput.tsx";
 import {useCallback, useEffect, useState} from "react";
-import type {EditorBaseProps} from "../../../core/editor";
+import type {EditorBaseProps, RegistryReferenceOption} from "../../../core/editor";
 import type {SxProps, Theme} from "@mui/material";
 
 export type NumberEditorProps = EditorBaseProps<never, number> & {
@@ -8,9 +8,21 @@ export type NumberEditorProps = EditorBaseProps<never, number> & {
   defaultValue?: number
   min?: number
   max?: number
+  getRegistryReferenceOptions?: () => RegistryReferenceOption<'constant' | 'parameter'>[]
 }
 
-export default function NumberEditor({state, setState, type, defaultValue, min, max, sx}: NumberEditorProps & {sx?: SxProps<Theme>}) {
+export default function NumberEditor(
+  {
+    state,
+    setState,
+    type,
+    defaultValue,
+    min,
+    max,
+    sx,
+    getRegistryReferenceOptions,
+  }: NumberEditorProps & {sx?: SxProps<Theme>}
+) {
   const defaultValueStr = (defaultValue ?? 0).toString()
   const [value, setValue] = useState(state.data === undefined ? defaultValueStr : state.data.toString())
   const [hasError, setHasError] = useState(false)
@@ -46,6 +58,11 @@ export default function NumberEditor({state, setState, type, defaultValue, min, 
   useEffect(() => {
     if (state.data === undefined) validateAndCallback(defaultValueStr)
   }, [defaultValueStr, state.data, validateAndCallback])
+
+  // TODO placeholder
+  if (getRegistryReferenceOptions) {
+    console.log(getRegistryReferenceOptions())
+  }
 
   return (
     <TextInput
