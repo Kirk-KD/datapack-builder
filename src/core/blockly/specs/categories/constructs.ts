@@ -23,9 +23,19 @@ const ITEM_STACK_EDITOR_FIELD_NAME = 'item_stack_editor'
 
 function getItemStackButtonText(block: ItemStackBlock) {
   const itemName = block.itemStackEditorState_.data?.item.data
-  const itemAmt = block.itemStackEditorState_.data?.amount.data
-  if (!itemName || !itemAmt) return 'edit item stack'
-  return `${itemName}${block.itemStackEditorState_.data?.components.length ? '[...]' : ''} ${itemAmt === 1 ? '' : '×' + itemAmt}`
+  const amountState = block.itemStackEditorState_.data?.amount
+  const itemAmt = amountState?.data
+  const regRef = amountState?.registryReference
+  const hasRegRef = Boolean(regRef)
+
+  if (!itemName || itemAmt === undefined || itemAmt === null) return 'edit item stack'
+
+  const componentsSuffix = block.itemStackEditorState_.data?.components.length ? '[...]' : ''
+  const amountDisplay = hasRegRef
+    ? (regRef?.readableName ? `× ${regRef.readableName}` : `×`)
+    : (itemAmt === 1 ? '' : `×${itemAmt}`)
+
+  return `${itemName}${componentsSuffix} ${amountDisplay}`
 }
 
 export const constructBlockSpecs: BlockSpec[] = [
@@ -71,7 +81,7 @@ export const constructBlockSpecs: BlockSpec[] = [
               state: this.itemStackEditorState_,
               setState: next => {
                 mutateExtraState(this, () => {
-                  this.itemStackEditorState_ = (typeof next === 'function' ? next(block.itemStackEditorState_) : next) as
+                  this.itemStackEditorState_ = (typeof next === 'function' ? next(this.itemStackEditorState_) : next) as
                     EditorState<ItemStackEditorResult>
                 })
 
